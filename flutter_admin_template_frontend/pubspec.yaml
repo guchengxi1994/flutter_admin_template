@@ -8,11 +8,17 @@ environment:
   sdk: '>=3.0.2 <4.0.0'
 
 dependencies:
+  collapsible_sidebar:
+    git:
+      url: https://github.com/guchengxi1994/flutter_collapsible_sidebar
   cupertino_icons: ^1.0.2
   flutter:
     sdk: flutter
   provider: ^6.0.3
-  
+
+dependency_overrides:  
+  collapsible_sidebar:
+    path: D:/github_repo/flutter_collapsible_sidebar
 
 dev_dependencies:
   flutter_test:

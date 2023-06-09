@@ -33,6 +33,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.1.1"
+  collapsible_sidebar:
+    dependency: "direct main"
+    description:
+      path: "D:/github_repo/flutter_collapsible_sidebar"
+      relative: false
+    source: path
+    version: "2.0.5+1"
   collection:
     dependency: transitive
     description:

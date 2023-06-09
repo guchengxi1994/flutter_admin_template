@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'controllers/widget_auth_controller.dart';
 import 'controllers/router_auth_controller.dart';
+import 'layout/layout.dart';
 
 void main() {
   runApp(const MyApp());
@@ -51,20 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title).wrapper("main/:/1", context),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              'AAA',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ).wrapper("main/:/4", context),
-          ],
-        ),
-      ),
+      body: const Layout(),
     );
   }
 }
