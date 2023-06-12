@@ -2,6 +2,10 @@ import 'package:collapsible_sidebar/collapsible_sidebar.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
+import 'package:provider/provider.dart';
+
+import '../controllers/global_controller.dart';
+
 class Layout extends StatefulWidget {
   const Layout({super.key});
 
@@ -17,6 +21,8 @@ class _LayoutState extends State<Layout> {
     super.initState();
     _items = [
       CollapsibleItem(
+          visible: context.read<MenuAuthController>().inSet("Dashboard"),
+          router: "Dashboard",
           text: 'Dashboard',
           icon: Icons.assessment,
           onPressed: () => setState(() => _headline = 'DashBoard'),
@@ -25,86 +31,60 @@ class _LayoutState extends State<Layout> {
           isSelected: true,
           subItems: [
             CollapsibleItem(
+              visible:
+                  context.read<MenuAuthController>().inSet("Dashboard/Menu"),
               text: 'Menu',
-              icon: Icons.menu_book,
+              router: "Dashboard/Menu",
+              icon: Icons.menu,
               onPressed: () => setState(() => _headline = 'Menu'),
               onHold: () => ScaffoldMessenger.of(context)
                   .showSnackBar(const SnackBar(content: Text("Menu"))),
-              isSelected: true,
-            ),
-            CollapsibleItem(
-                text: 'Shop',
-                // iconImage: AssetImage("assets/shop_icon.png"),
-                icon: Icons.ac_unit,
-                onPressed: () => setState(() => _headline = 'Shop'),
-                onHold: () => ScaffoldMessenger.of(context)
-                    .showSnackBar(const SnackBar(content: Text("Shop"))),
-                isSelected: true,
-                subItems: [
-                  CollapsibleItem(
-                    text: 'Cart',
-                    icon: Icons.shopping_cart,
-                    onPressed: () => setState(() => _headline = 'Cart'),
-                    onHold: () => ScaffoldMessenger.of(context)
-                        .showSnackBar(const SnackBar(content: Text("Cart"))),
-                    isSelected: true,
-                  )
-                ]),
+            )
           ]),
       CollapsibleItem(
-        text: 'Search',
+        visible: context.read<MenuAuthController>().inSet("Users"),
+        text: 'Users',
+        router: "Users",
         icon: Icons.search,
         onPressed: () => setState(() => _headline = 'Search'),
         onHold: () => ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: const Text("Search"))),
+            .showSnackBar(const SnackBar(content: Text("Search"))),
       ),
       CollapsibleItem(
+        visible: context.read<MenuAuthController>().inSet("Department"),
+        text: 'Department',
+        router: 'Department',
+        icon: Icons.local_fire_department,
+        onPressed: () => setState(() => _headline = 'Department'),
+        onHold: () => ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text("Department"))),
+      ),
+      CollapsibleItem(
+        visible: context.read<MenuAuthController>().inSet("Roles"),
+        router: "Roles",
+        text: 'Roles',
+        icon: Icons.people,
+        onPressed: () => setState(() => _headline = 'Roles'),
+        onHold: () => ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text("Roles"))),
+      ),
+      CollapsibleItem(
+        visible: context.read<MenuAuthController>().inSet("Notifications"),
+        router: "Notifications",
         text: 'Notifications',
         icon: Icons.notifications,
         onPressed: () => setState(() => _headline = 'Notifications'),
         onHold: () => ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: const Text("Notifications"))),
+            .showSnackBar(const SnackBar(content: Text("Notifications"))),
       ),
       CollapsibleItem(
+        visible: context.read<MenuAuthController>().inSet("Settings"),
+        router: "Settings",
         text: 'Settings',
         icon: Icons.settings,
         onPressed: () => setState(() => _headline = 'Settings'),
         onHold: () => ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: const Text("Settings"))),
-      ),
-      CollapsibleItem(
-        text: 'Alarm',
-        icon: Icons.access_alarm,
-        onPressed: () => setState(() => _headline = 'Alarm'),
-        onHold: () => ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: const Text("Alarm"))),
-      ),
-      CollapsibleItem(
-        text: 'Eco',
-        icon: Icons.eco,
-        onPressed: () => setState(() => _headline = 'Eco'),
-        onHold: () => ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: const Text("Eco"))),
-      ),
-      CollapsibleItem(
-        text: 'Event',
-        icon: Icons.event,
-        onPressed: () => setState(() => _headline = 'Event'),
-        onHold: () => ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: const Text("Event"))),
-      ),
-      CollapsibleItem(
-        text: 'No Icon',
-        onPressed: () => setState(() => _headline = 'No Icon'),
-        onHold: () => ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: const Text("No Icon"))),
-      ),
-      CollapsibleItem(
-        text: 'Email',
-        icon: Icons.email,
-        onPressed: () => setState(() => _headline = 'Email'),
-        onHold: () => ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: const Text("Email"))),
+            .showSnackBar(const SnackBar(content: Text("Settings"))),
       ),
     ];
   }
@@ -117,7 +97,29 @@ class _LayoutState extends State<Layout> {
         isCollapsed: MediaQuery.of(context).size.width <= 800,
         items: _items,
         collapseOnBodyTap: false,
-        title: 'John Smith',
+        avatar: Builder(builder: (ctx) {
+          return Container(
+            width: 200,
+            height: 100,
+            child: Center(
+              child: Text(
+                "This is title",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          );
+        }),
+        collapsedAvatar: Builder(builder: (ctx) {
+          return Container(
+            height: 100,
+            child: Center(
+              child: Text(
+                "Title",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          );
+        }),
         onTitleTap: () {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               content: Text('Yay! Flutter Collapsible Sidebar!')));
@@ -162,7 +164,7 @@ class _LayoutState extends State<Layout> {
             offset: Offset(-size.height * 0.3, -size.width * 0.23),
             child: Text(
               _headline,
-              style: Theme.of(context).textTheme.headline1,
+              style: Theme.of(context).textTheme.headlineMedium,
               overflow: TextOverflow.visible,
               softWrap: false,
             ),

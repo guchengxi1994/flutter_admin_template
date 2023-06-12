@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_template_frontend/extensions/widget_extension.dart';
 import 'package:provider/provider.dart';
+import 'controllers/global_controller.dart';
 
-import 'controllers/widget_auth_controller.dart';
-import 'controllers/router_auth_controller.dart';
 import 'layout/layout.dart';
 
 void main() {
@@ -18,7 +17,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => WidgetAuthController()..init()),
-        ChangeNotifierProvider(create: (_) => RouterAuthController()..init())
+        ChangeNotifierProvider(create: (_) => RouterAuthController()..init()),
+        ChangeNotifierProvider(create: (_) => MenuAuthController()..init()),
       ],
       builder: (context, child) {
         return MaterialApp(
