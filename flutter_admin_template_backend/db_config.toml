@@ -1,9 +1,13 @@
 title = "toml config file"
 
 [database]
-name = "???"
+name = "flutter_admin_template"
 address = "localhost"
 port = "3306"
 username = "root"
 password = "123456"
-database = "???"
+database = "flutter_admin_template"
+
+[redis]
+hostname = "127.0.0.1"
+port = "6379"

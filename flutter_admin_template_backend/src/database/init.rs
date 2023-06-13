@@ -1,4 +1,4 @@
-use std::sync::{Arc, RwLock};
+use std::sync::Mutex;
 
 use lazy_static::lazy_static;
 use sqlx::{MySql, MySqlPool, Pool};
@@ -28,10 +28,11 @@ impl Default for MyPool {
 
 // 声明创建静态连接池
 lazy_static! {
-    pub static ref POOL: Arc<RwLock<MyPool>> = Arc::new(RwLock::new(Default::default()));
+    pub static ref POOL: Mutex<MyPool> = Mutex::new(Default::default());
+    pub static ref REDIS_CLIENT: Mutex<Option<redis::Client>> = Mutex::new(None);
 }
 
-pub fn init_database_from_config_file(conf_path: &str) {
+pub async fn init_database_from_config_file(conf_path: &str) {
     let option = crate::database::load_config::load_config(conf_path);
     match option {
         Some(o) => {
@@ -43,27 +44,25 @@ pub fn init_database_from_config_file(conf_path: &str) {
                 o.database.port,
                 o.database.database
             );
-            init(url);
+            let redis_url = format!("redis://{}:{}/", o.redis.hostname, o.redis.port);
+            init(url).await;
+            let _ = init_redis(redis_url);
         }
         None => {
-            println!("[rust error] : load config file error")
+            println!("[rust error] : load config file error");
+            panic!("load config file error")
         }
     }
 }
 
-pub fn init(url: String) {
-    let rt = tokio::runtime::Runtime::new().unwrap();
-    rt.block_on(async {
-        let pool = POOL.clone();
-        let pool = pool.write();
-        match pool {
-            Ok(mut p) => {
-                *p = MyPool::new(&url).await;
-                println!("[rust] : db init");
-            }
-            Err(e) => {
-                println!("[rust error] : {:?}", e);
-            }
-        }
-    })
+pub fn init_redis(url: String) -> anyhow::Result<()> {
+    let client = redis::Client::open(url)?;
+    let mut c = REDIS_CLIENT.lock().unwrap();
+    *c = Some(client);
+    anyhow::Ok(())
+}
+
+pub async fn init(url: String) {
+    let mut pool = POOL.lock().unwrap();
+    *pool = MyPool::new(&url).await
 }

@@ -13,9 +13,16 @@ pub struct DatabaseInfo {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct RedisInfo {
+    pub hostname: String,
+    pub port: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
     pub title: String,
     pub database: DatabaseInfo,
+    pub redis:RedisInfo
 }
 
 pub fn load_config(conf_path: &str) -> Option<Config> {

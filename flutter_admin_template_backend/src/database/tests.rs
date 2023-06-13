@@ -6,12 +6,15 @@ mod tests {
             "root", "123456", "localhost", "3306", "knowledge_one"
         );
         {
-            crate::database::init::init(url);
+            let rt = tokio::runtime::Runtime::new().unwrap();
+            rt.block_on(async {
+                crate::database::init::init(url).await;
+            })
         }
         {
             let rt = tokio::runtime::Runtime::new().unwrap();
             rt.block_on(async {
-                let pool = crate::database::init::POOL.read().unwrap();
+                let pool = crate::database::init::POOL.lock().unwrap();
                 let sql = sqlx::query(
                     r#"INSERT INTO file (file_name,file_path,file_hash) VALUES(?,?,?) "#,
                 )
@@ -32,5 +35,17 @@ mod tests {
                 }
             })
         }
+    }
+
+    #[test]
+    pub fn redis_test() {
+        let rt = tokio::runtime::Runtime::new().unwrap();
+        rt.block_on(async {
+            let client = redis::Client::open("redis://127.0.0.1:6379/").unwrap();
+            let mut con = client.get_connection().unwrap();
+            let _: () = redis::Commands::set(&mut con, "my_key", 42).unwrap();
+            let r: i64 = redis::Commands::get(&mut con, "my_key").unwrap();
+            println!("[rust] : {:?}", r);
+        })
     }
 }
