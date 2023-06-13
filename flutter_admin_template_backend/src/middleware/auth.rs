@@ -36,6 +36,11 @@ pub struct AuthMiddleware<S> {
     service: S,
 }
 
+#[derive(Debug, serde::Deserialize)]
+struct Params {
+    token: String,
+}
+
 impl<S, B> Service<ServiceRequest> for AuthMiddleware<S>
 where
     S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
@@ -50,6 +55,29 @@ where
 
     fn call(&self, req: ServiceRequest) -> Self::Future {
         println!("Hi from start. You requested: {}", req.path());
+
+        if req.path().to_string() != "/system/user/login"{
+            let auth = web::Query::<Params>::from_query(req.query_string());
+            match auth {
+                Ok(_auth) => {
+                    let id =
+                        crate::database::validate_token::validate_token(_auth.0.token.clone());
+                    match id {
+                        Ok(id) => {
+                            println!("{:?}", id);
+                        }
+                        Err(_) => {
+                            println!(" {:?} Token not valid", _auth.0.token);
+                            return Err(error::ErrorUnauthorized("Token not valid"));
+                        }
+                    }
+                }
+                Err(_) => {
+                    println!("Authorization Not Found");
+                    return Err(error::ErrorUnauthorized("Authorization Not Found"));
+                }
+            }
+        }
 
         let fut = self.service.call(req);
 

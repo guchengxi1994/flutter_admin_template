@@ -22,7 +22,9 @@ async fn main() -> std::io::Result<()> {
             .wrap_fn(|req, srv| {
                 println!("Hi from server. You requested: {}", req.path());
                 srv.call(req)
-            })
+            }).wrap(
+                crate::middleware::auth::Auth
+            )
             .wrap_fn(|req, srv| {
                 println!("Hi from response");
                 let auth = web::Query::<Params>::from_query(req.query_string());
