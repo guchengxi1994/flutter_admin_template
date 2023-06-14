@@ -7,8 +7,8 @@ pub struct User {
     pub user_name: String,
     pub password: String,
     pub create_by: Option<String>,
-    pub create_time: chrono::DateTime<chrono::Utc>,
-    pub update_time: chrono::DateTime<chrono::Utc>,
+    pub create_time: chrono::DateTime<chrono::Local>,
+    pub update_time: chrono::DateTime<chrono::Local>,
     pub is_deleted: i64,
     pub remark: Option<String>,
 }

@@ -4,3 +4,4 @@ pub mod load_config;
 pub mod init;
 mod tests;
 pub mod validate_token;
+pub mod refresh_token;

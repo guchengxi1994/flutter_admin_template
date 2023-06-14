@@ -1,10 +1,10 @@
 use crate::common::base_response::BaseResponse;
-use crate::controllers::user_controller;
+use crate::controllers::user_login_controller;
 use actix_web::{error, web, HttpResponse};
 
-pub fn user_group(config: &mut web::ServiceConfig) {
+pub fn user_login_group(config: &mut web::ServiceConfig) {
     config.service(
-        web::scope("/system/user")
+        web::scope("/system/login")
             .app_data(web::JsonConfig::default().error_handler(|err, _req| {
                 println!("[rust-error] : {:?} ", err);
 
@@ -18,7 +18,10 @@ pub fn user_group(config: &mut web::ServiceConfig) {
 
                 error::InternalError::from_response(err, HttpResponse::Ok().body(body)).into()
             }))
-            .route("/create", web::post().to(user_controller::new_user))
-            .route("/login", web::post().to(user_controller::login)),
+            .route("/all", web::get().to(user_login_controller::get_all))
+            .route(
+                "/current",
+                web::get().to(user_login_controller::get_current),
+            ),
     );
 }

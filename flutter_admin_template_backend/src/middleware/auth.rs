@@ -1,8 +1,10 @@
+use crate::common::base_response::BaseResponse;
 use std::future::{ready, Ready};
 
 use actix_web::{
+    body::EitherBody,
     dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform},
-    Error,
+    web, Error, HttpResponse, HttpMessage,
 };
 use futures_util::future::LocalBoxFuture;
 
@@ -21,7 +23,7 @@ where
     S::Future: 'static,
     B: 'static,
 {
-    type Response = ServiceResponse<B>;
+    type Response = ServiceResponse<EitherBody<B>>;
     type Error = Error;
     type InitError = ();
     type Transform = AuthMiddleware<S>;
@@ -47,34 +49,52 @@ where
     S::Future: 'static,
     B: 'static,
 {
-    type Response = ServiceResponse<B>;
+    type Response = ServiceResponse<EitherBody<B>>;
     type Error = Error;
     type Future = LocalBoxFuture<'static, Result<Self::Response, Self::Error>>;
 
     forward_ready!(service);
 
     fn call(&self, req: ServiceRequest) -> Self::Future {
-        println!("Hi from start. You requested: {}", req.path());
-
-        if req.path().to_string() != "/system/user/login"{
+        if req.path().to_string() != "/system/user/login" {
             let auth = web::Query::<Params>::from_query(req.query_string());
             match auth {
                 Ok(_auth) => {
-                    let id =
-                        crate::database::validate_token::validate_token(_auth.0.token.clone());
+                    let id = crate::database::validate_token::validate_token(_auth.0.token.clone());
                     match id {
                         Ok(id) => {
+                            req.extensions_mut().insert(super::UserId{user_id:id});
                             println!("{:?}", id);
                         }
                         Err(_) => {
                             println!(" {:?} Token not valid", _auth.0.token);
-                            return Err(error::ErrorUnauthorized("Token not valid"));
+                            let b: BaseResponse<Option<String>> = BaseResponse {
+                                code: 20001,
+                                message: "Token not valid",
+                                data: None,
+                            };
+
+                            let res = req
+                                .into_response(
+                                    HttpResponse::Ok().body(serde_json::to_string(&b).unwrap()),
+                                )
+                                .map_into_right_body();
+                            return Box::pin(async { Ok(res) });
                         }
                     }
                 }
                 Err(_) => {
                     println!("Authorization Not Found");
-                    return Err(error::ErrorUnauthorized("Authorization Not Found"));
+                    let b: BaseResponse<Option<String>> = BaseResponse {
+                        code: 20001,
+                        message: "Authorization Not Found",
+                        data: None,
+                    };
+
+                    let res = req
+                        .into_response(HttpResponse::Ok().body(serde_json::to_string(&b).unwrap()))
+                        .map_into_right_body();
+                    return Box::pin(async { Ok(res) });
                 }
             }
         }
@@ -82,9 +102,8 @@ where
         let fut = self.service.call(req);
 
         Box::pin(async move {
-            let res = fut.await?;
+            let res = fut.await?.map_into_left_body();
 
-            println!("Hi from response");
             Ok(res)
         })
     }

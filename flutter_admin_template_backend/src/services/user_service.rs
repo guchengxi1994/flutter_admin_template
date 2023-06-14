@@ -1,3 +1,4 @@
+use crate::models::user_login::LoginState;
 use crate::{database::init::REDIS_CLIENT, models::user::User};
 use serde::Deserialize;
 use validator::Validate;
@@ -77,14 +78,25 @@ impl User {
                 .fetch_one(&mut tx)
                 .await
                 {
+                    let _ = sqlx::query(
+                        r#"INSERT INTO user_login (user_id,user_name,login_ip,login_state) VALUES (?,?,?,?)"#,
+                    )
+                    .bind(_u.user_id).bind(_u.user_name)
+                    .bind(login_ip)
+                    .bind(LoginState::ErrPwd.to_string())
+                    .execute(&mut tx)
+                    .await?;
                     anyhow::bail!("密码错误")
                 }
 
-                let _ = sqlx::query(r#"INSERT INTO user_login (user_id,login_ip) VALUES (?,?)"#)
-                    .bind(_u.user_id)
-                    .bind(login_ip)
-                    .execute(&mut tx)
-                    .await?;
+                let _ = sqlx::query(
+                    r#"INSERT INTO user_login (user_id,user_name,login_ip,login_state) VALUES (?,?,?,?)"#,
+                )
+                .bind(_u.user_id).bind(_u.user_name)
+                .bind(login_ip)
+                .bind(LoginState::Success.to_string())
+                .execute(&mut tx)
+                .await?;
                 tx.commit().await?;
                 let token = crate::common::hash::get_token(req.user_name);
                 let mut con = REDIS_CLIENT.lock().unwrap().clone().unwrap();
@@ -94,6 +106,14 @@ impl User {
             }
             Err(_) => {
                 println!("[rust error] : 用户不存在");
+                let _ = sqlx::query(
+                    r#"INSERT INTO user_login (user_id,user_name,login_ip,login_state) VALUES (?,?,?,?)"#,
+                )
+                .bind(0).bind("unknow")
+                .bind(login_ip)
+                .bind(LoginState::NoUser.to_string())
+                .execute(&mut tx)
+                .await?;
                 anyhow::bail!("用户不存在")
             }
         }

@@ -7,7 +7,10 @@ edition = "2021"
 
 [dependencies]
 actix-web = "4"
+async-trait = "0.1.68"
 anyhow = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+env_logger = "0.9"
 gm-sm3 = "0.10.0"
 futures-util = "0.3.28"
 hex = "0.4.0"
