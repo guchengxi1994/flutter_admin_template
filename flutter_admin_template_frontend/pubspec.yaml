@@ -12,9 +12,12 @@ dependencies:
     git:
       url: https://github.com/guchengxi1994/flutter_collapsible_sidebar
   cupertino_icons: ^1.0.2
+  dio: ^5.2.1+1
   flutter:
     sdk: flutter
+  loading_indicator: ^3.1.0
   provider: ^6.0.3
+  shared_preferences: ^2.1.2
   sm_crypto: ^1.0.3
 
 dependency_overrides:  
@@ -25,6 +28,11 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+
+deferred-components:
+  - name: fat 
+    libraries:
+      - package:flutter_admin_template_frontend/login/login_screen.dart
 
 
 flutter:
