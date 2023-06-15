@@ -9,7 +9,7 @@ pub fn user_login_group(config: &mut web::ServiceConfig) {
                 println!("[rust-error] : {:?} ", err);
 
                 let a = BaseResponse {
-                    code: 20001,
+                    code: crate::constants::BAD_REQUEST,
                     message: "参数验证失败",
                     data: "",
                 };

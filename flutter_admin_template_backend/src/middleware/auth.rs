@@ -69,7 +69,7 @@ where
                         Err(_) => {
                             println!(" {:?} Token not valid", _auth.0.token);
                             let b: BaseResponse<Option<String>> = BaseResponse {
-                                code: 20001,
+                                code: crate::constants::INVALID_TOKEN,
                                 message: "Token not valid",
                                 data: None,
                             };
@@ -86,7 +86,7 @@ where
                 Err(_) => {
                     println!("Authorization Not Found");
                     let b: BaseResponse<Option<String>> = BaseResponse {
-                        code: 20001,
+                        code: crate::constants::INVALID_USER,
                         message: "Authorization Not Found",
                         data: None,
                     };

@@ -10,7 +10,7 @@ pub async fn new_user(info: web::Json<NewUserRequest>) -> HttpResponse {
     match r {
         Ok(_) => {
             let b: BaseResponse<Option<String>> = BaseResponse {
-                code: 20000,
+                code: crate::constants::OK,
                 message: "成功",
                 data: None,
             };
@@ -19,7 +19,7 @@ pub async fn new_user(info: web::Json<NewUserRequest>) -> HttpResponse {
         Err(e) => {
             let err_str = e.to_string();
             let b: BaseResponse<Option<String>> = BaseResponse {
-                code: 20001,
+                code: crate::constants::BAD_REQUEST,
                 message: err_str.as_str(),
                 data: None,
             };
@@ -37,7 +37,7 @@ pub async fn login(info: web::Json<UserLoginRequest>, req: HttpRequest) -> HttpR
         match r {
             Ok(_r) => {
                 let b: BaseResponse<Option<String>> = BaseResponse {
-                    code: 20000,
+                    code: crate::constants::OK,
                     message: "成功",
                     data: Some(_r),
                 };
@@ -46,7 +46,7 @@ pub async fn login(info: web::Json<UserLoginRequest>, req: HttpRequest) -> HttpR
             Err(e) => {
                 let err_str = e.to_string();
                 let b: BaseResponse<Option<String>> = BaseResponse {
-                    code: 20001,
+                    code: crate::constants::BAD_REQUEST,
                     message: err_str.as_str(),
                     data: None,
                 };
@@ -55,7 +55,7 @@ pub async fn login(info: web::Json<UserLoginRequest>, req: HttpRequest) -> HttpR
         }
     };
     let b: BaseResponse<Option<String>> = BaseResponse {
-        code: 20001,
+        code: crate::constants::BAD_REQUEST,
         message: "获取IP异常",
         data: None,
     };

@@ -1,3 +1,4 @@
+use crate::constants::TOKEN_EXPIRE;
 use crate::models::user_login::LoginState;
 use crate::{database::init::REDIS_CLIENT, models::user::User};
 use serde::Deserialize;
@@ -101,7 +102,8 @@ impl User {
                 let token = crate::common::hash::get_token(req.user_name);
                 let mut con = REDIS_CLIENT.lock().unwrap().clone().unwrap();
                 let _: () = redis::Commands::set(&mut con, token.clone(), _u.user_id)?;
-                let _: () = redis::Commands::expire(&mut con, token.clone(), 300)?;
+                let d = TOKEN_EXPIRE.lock().unwrap();
+                let _: () = redis::Commands::expire(&mut con, token.clone(), *d)?;
                 return anyhow::Ok(token);
             }
             Err(_) => {

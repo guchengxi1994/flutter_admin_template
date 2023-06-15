@@ -7,6 +7,7 @@ mod middleware;
 mod models;
 mod routers;
 mod services;
+mod constants;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
