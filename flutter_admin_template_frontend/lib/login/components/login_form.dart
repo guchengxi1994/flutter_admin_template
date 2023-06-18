@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_template_frontend/common/screen_utils.dart';
+import 'package:flutter_admin_template_frontend/routers.dart';
 import 'package:flutter_admin_template_frontend/styles/app_style.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../login_controller.dart';
 import 'logo.dart';
 
-class LoginForm extends StatefulWidget {
-  const LoginForm({super.key});
+final loginProvider =
+    ChangeNotifierProvider<LoginController>((ref) => LoginController());
 
-  @override
-  State<LoginForm> createState() => _LoginFormState();
-}
+// ignore: must_be_immutable
+class LoginForm extends ConsumerWidget {
+  LoginForm({super.key});
 
-class _LoginFormState extends State<LoginForm> {
   bool isPasswordEmpty = false;
   bool isUsernameEmpty = false;
 
@@ -21,8 +21,8 @@ class _LoginFormState extends State<LoginForm> {
   final TextEditingController passwardController = TextEditingController();
 
   @override
-  Widget build(BuildContext context) {
-    bool passwordVisible = context.watch<LoginController>().passwordVisible;
+  Widget build(BuildContext context, WidgetRef ref) {
+    bool passwordVisible = ref.watch(loginProvider).passwordVisible;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -58,9 +58,9 @@ class _LoginFormState extends State<LoginForm> {
                   child: TextField(
                 onChanged: (value) {
                   if (isUsernameEmpty) {
-                    setState(() {
-                      isUsernameEmpty = false;
-                    });
+                    // setState(() {
+                    //   isUsernameEmpty = false;
+                    // });
                   }
                 },
                 style: const TextStyle(fontSize: 16),
@@ -113,9 +113,9 @@ class _LoginFormState extends State<LoginForm> {
                     onSubmitted: (value) async {},
                     onChanged: (value) {
                       if (isPasswordEmpty) {
-                        setState(() {
-                          isPasswordEmpty = false;
-                        });
+                        // setState(() {
+                        //   isPasswordEmpty = false;
+                        // });
                       }
                     },
                     obscuringCharacter: "*",
@@ -136,9 +136,7 @@ class _LoginFormState extends State<LoginForm> {
                         ),
                         onPressed: () {
                           //更新状态控制密码显示或隐藏
-                          context
-                              .read<LoginController>()
-                              .changePasswordStatus();
+                          ref.read(loginProvider).changePasswordStatus();
                         },
                       ),
                     )),
@@ -162,7 +160,9 @@ class _LoginFormState extends State<LoginForm> {
           height: 28.h(MediaQuery.of(context).size.height),
         ),
         InkWell(
-          onTap: () async {},
+          onTap: () async {
+            Navigator.of(context).pushNamed(FatRouters.mainScreen);
+          },
           child: Container(
               decoration: const BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(122)),
@@ -179,7 +179,7 @@ class _LoginFormState extends State<LoginForm> {
               // width: AppStyle.loginFormWidth,
               height: 40,
               child: Center(
-                child: context.watch<LoginController>().isLoading
+                child: ref.watch(loginProvider).isLoading
                     ? const SizedBox(
                         width: 20,
                         height: 20,

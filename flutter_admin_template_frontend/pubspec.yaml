@@ -15,8 +15,8 @@ dependencies:
   dio: ^5.2.1+1
   flutter:
     sdk: flutter
+  flutter_riverpod: ^2.3.6
   loading_indicator: ^3.1.0
-  provider: ^6.0.3
   shared_preferences: ^2.1.2
   sm_crypto: ^1.0.3
 

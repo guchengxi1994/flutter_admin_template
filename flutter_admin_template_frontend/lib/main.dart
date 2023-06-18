@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_template_frontend/routers.dart';
-import 'package:provider/provider.dart';
-import 'controllers/global_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -12,20 +11,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => WidgetAuthController()..init()),
-        ChangeNotifierProvider(create: (_) => RouterAuthController()..init()),
-        ChangeNotifierProvider(create: (_) => MenuAuthController()..init()),
-      ],
-      builder: (context, child) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Flutter Demo',
-          routes: FatRouters.routers,
-          initialRoute: FatRouters.loginScreen,
-        );
-      },
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
+      routes: FatRouters.routers,
+      initialRoute: FatRouters.loginScreen,
     );
   }
 }

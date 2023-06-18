@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../controllers/widget_auth_controller.dart';
+import '../controllers/global_controller.dart';
 
 extension WidgetExtension on Widget {
-  Widget wrapper(String id, BuildContext context) {
-    bool visible = context.read<WidgetAuthController>().inSet(id);
+  Widget wrapper(String id, WidgetRef ref) {
+    bool visible = ref.read(widgetAuthProvider).inSet(id);
     return Visibility(visible: visible, child: this);
   }
 }

@@ -2,6 +2,14 @@ import 'package:flutter/material.dart';
 
 class MenuAuthController extends ChangeNotifier {
   final Set<String> _auth = {};
+  String headLine = "";
+
+  changeHeadline(String s) {
+    if (headLine != s) {
+      headLine = s;
+      notifyListeners();
+    }
+  }
 
   init() async {
     // for test
