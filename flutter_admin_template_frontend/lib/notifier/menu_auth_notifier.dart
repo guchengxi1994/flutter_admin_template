@@ -23,6 +23,14 @@ class MenuAuthNotifier extends ChangeNotifier {
     _auth.add("/main/logs/signin");
   }
 
+  List<ValueNotifier<bool>> subVisibles = List.filled(1, ValueNotifier(false));
+
+  collapseAll() {
+    for (final i in subVisibles) {
+      i.value = false;
+    }
+  }
+
   bool inSet(String i) {
     return _auth.contains(i);
   }

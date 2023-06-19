@@ -132,14 +132,22 @@ class Sidebar extends ConsumerWidget {
                 SidebarItemWithChildren(
                   model: logModel,
                   visible: ref.watch(menuAuthProvider).inSet(logModel.router),
+                  subVisible: ref.read(menuAuthProvider).subVisibles[0],
                 )
               ],
             ),
           )),
           GestureDetector(
-            onTap: () {
+            onTap: () async {
               final i = ref.read(sidebarProvider).isCollapse;
-              ref.read(sidebarProvider).changeIsCollapse(!i);
+              if (i) {
+                ref.read(menuAuthProvider).collapseAll();
+              }
+
+              await Future.delayed(const Duration(milliseconds: 100))
+                  .then((value) {
+                ref.read(sidebarProvider).changeIsCollapse(!i);
+              });
             },
             child: _buildCollapseButton(ref),
           )

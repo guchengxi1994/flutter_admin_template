@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_template_frontend/layout/models/sidebar_item_model.dart';
+import 'package:flutter_admin_template_frontend/layout/notifier/sidebar_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hovering/hovering.dart';
 import 'dart:math' as math;
@@ -7,19 +8,72 @@ import 'dart:math' as math;
 import '../../notifier/global_notifier.dart';
 import '../../styles/app_style.dart';
 
-ValueNotifier<bool> subVisible = ValueNotifier(false);
+// ValueNotifier<bool> subVisible = ValueNotifier(false);
 
 class SidebarItemWithChildren extends ConsumerWidget {
   const SidebarItemWithChildren(
-      {super.key, required this.model, required this.visible});
+      {super.key,
+      required this.model,
+      required this.visible,
+      required this.subVisible});
   final SidebarModel model;
   final bool visible;
+  final ValueNotifier<bool> subVisible;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ValueListenableBuilder(
         valueListenable: subVisible,
         builder: (ctx, d, w) {
+          if (ref.watch(sidebarProvider).isCollapse) {
+            return MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () {
+                    ref.read(menuAuthProvider).changeRouter(model.router);
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(top: 3),
+                    width: AppStyle.sidebarCollapseWidth - 10,
+                    height: AppStyle.sidebarCollapseWidth - 10,
+                    decoration: ref.watch(menuAuthProvider).currentRouter ==
+                            model.router
+                        ? BoxDecoration(
+                            color: AppStyle.hoveringBackgroundColor,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)))
+                        : null,
+                    child: Tooltip(
+                      message: model.tooltip,
+                      child: HoverWidget(
+                        hoverChild: Container(
+                          decoration: BoxDecoration(
+                              color: AppStyle.hoveringBackgroundColor,
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(8))),
+                          child: model.iconOnHover!,
+                        ),
+                        onHover: (v) {},
+                        child: Container(
+                          decoration:
+                              ref.watch(menuAuthProvider).currentRouter ==
+                                      model.router
+                                  ? BoxDecoration(
+                                      color: AppStyle.hoveringBackgroundColor,
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(8)))
+                                  : null,
+                          child: ref.watch(menuAuthProvider).currentRouter ==
+                                  model.router
+                              ? model.iconOnHover
+                              : model.icon!,
+                        ),
+                      ),
+                    ),
+                  ),
+                ));
+          }
+
           if (!subVisible.value) {
             return MouseRegion(
               cursor: SystemMouseCursors.click,
@@ -89,8 +143,13 @@ class SidebarItemWithChildren extends ConsumerWidget {
                             const Expanded(child: SizedBox()),
                             Transform.rotate(
                               angle: math.pi / 2,
-                              child: const Icon(
+                              child: Icon(
                                 Icons.chevron_right,
+                                color:
+                                    ref.watch(menuAuthProvider).currentRouter ==
+                                            model.router
+                                        ? Colors.white
+                                        : null,
                               ),
                             )
                           ],
@@ -172,9 +231,14 @@ class SidebarItemWithChildren extends ConsumerWidget {
                                 const Expanded(child: SizedBox()),
                                 Transform.rotate(
                                   angle: math.pi / 2,
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.chevron_left,
-                                    color: Colors.white,
+                                    color: ref
+                                                .watch(menuAuthProvider)
+                                                .currentRouter ==
+                                            model.router
+                                        ? Colors.white
+                                        : null,
                                   ),
                                 )
                               ],
@@ -193,6 +257,8 @@ class SidebarItemWithChildren extends ConsumerWidget {
   List<Widget> _buildChildren(WidgetRef ref) {
     List<Widget> result = [];
     for (final i in model.children) {
+      final r = i.router;
+      int count = r.split("/").length - 3;
       result.add(
         MouseRegion(
           cursor: SystemMouseCursors.click,
@@ -201,7 +267,7 @@ class SidebarItemWithChildren extends ConsumerWidget {
               ref.read(menuAuthProvider).changeRouter(i.router);
             },
             child: Container(
-              margin: const EdgeInsets.only(top: 3, left: 20, right: 10),
+              margin: EdgeInsets.only(top: 3, left: count * 20, right: 10),
               height: AppStyle.sidebarCollapseWidth - 10,
               // width: AppStyle.sidebarWidth - 20,
               decoration: ref.watch(menuAuthProvider).currentRouter == i.router

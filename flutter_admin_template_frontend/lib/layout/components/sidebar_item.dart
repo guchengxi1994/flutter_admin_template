@@ -47,7 +47,19 @@ class SidebarItem extends ConsumerWidget {
                     child: model.iconOnHover!,
                   ),
                   onHover: (v) {},
-                  child: Container(child: model.icon!),
+                  child: Container(
+                    decoration: ref.watch(menuAuthProvider).currentRouter ==
+                            model.router
+                        ? BoxDecoration(
+                            color: AppStyle.hoveringBackgroundColor,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)))
+                        : null,
+                    child: ref.watch(menuAuthProvider).currentRouter ==
+                            model.router
+                        ? model.iconOnHover
+                        : model.icon!,
+                  ),
                 ),
               ),
             ),
