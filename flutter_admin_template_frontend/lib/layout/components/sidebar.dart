@@ -2,12 +2,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_template_frontend/layout/components/sidebar_item.dart';
-import 'package:flutter_admin_template_frontend/layout/models/sidemenu_item_model.dart';
+import 'package:flutter_admin_template_frontend/layout/models/sidebar_item_model.dart';
 import 'package:flutter_admin_template_frontend/layout/notifier/sidebar_notifier.dart';
 import 'package:flutter_admin_template_frontend/notifier/global_notifier.dart';
 import 'package:flutter_admin_template_frontend/styles/app_style.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hovering/hovering.dart';
+
+import 'sidebar_item_with_children.dart';
 
 class Sidebar extends ConsumerWidget {
   Sidebar({super.key, this.header});
@@ -18,8 +20,8 @@ class Sidebar extends ConsumerWidget {
     return _buildContent(ref);
   }
 
-  late SidemenuModel dashboardModel = SidemenuModel(
-      router: "dashboard",
+  late SidebarModel dashboardModel = SidebarModel(
+      router: "/main/dashboard",
       title: "Dashboard",
       index: 0,
       icon: const Icon(Icons.dashboard),
@@ -28,8 +30,8 @@ class Sidebar extends ConsumerWidget {
         color: Colors.white,
       ));
 
-  late SidemenuModel userdModel = SidemenuModel(
-      router: "user",
+  late SidebarModel userdModel = SidebarModel(
+      router: "/main/user",
       title: "User",
       index: 1,
       icon: const Icon(Icons.people),
@@ -38,8 +40,8 @@ class Sidebar extends ConsumerWidget {
         color: Colors.white,
       ));
 
-  late SidemenuModel deptModel = SidemenuModel(
-      router: "dept",
+  late SidebarModel deptModel = SidebarModel(
+      router: "/main/dept",
       title: "Department",
       index: 2,
       icon: const Icon(Icons.local_fire_department),
@@ -48,8 +50,8 @@ class Sidebar extends ConsumerWidget {
         color: Colors.white,
       ));
 
-  late SidemenuModel menuModel = SidemenuModel(
-      router: "menu",
+  late SidebarModel menuModel = SidebarModel(
+      router: "/main/menu",
       title: "Menu",
       index: 3,
       icon: const Icon(Icons.menu),
@@ -57,6 +59,36 @@ class Sidebar extends ConsumerWidget {
         Icons.menu_outlined,
         color: Colors.white,
       ));
+
+  late SidebarModel logModel = SidebarModel(
+      router: "/main/logs",
+      title: "Log",
+      index: 3,
+      icon: const Icon(Icons.details),
+      iconOnHover: const Icon(
+        Icons.details_outlined,
+        color: Colors.white,
+      ),
+      children: [
+        SidebarModel(
+            router: "/main/logs/operation",
+            title: "Operation",
+            index: 4,
+            icon: const Icon(Icons.change_circle),
+            iconOnHover: const Icon(
+              Icons.change_circle_outlined,
+              color: Colors.white,
+            )),
+        SidebarModel(
+            router: "/main/logs/signin",
+            title: "Sign in",
+            index: 4,
+            icon: const Icon(Icons.login),
+            iconOnHover: const Icon(
+              Icons.login_outlined,
+              color: Colors.white,
+            )),
+      ]);
 
   Widget _buildContent(WidgetRef ref) {
     return Container(
@@ -93,6 +125,14 @@ class Sidebar extends ConsumerWidget {
                   model: menuModel,
                   visible: ref.watch(menuAuthProvider).inSet(menuModel.router),
                 ),
+                // SidebarItem(
+                //   model: logModel,
+                //   visible: ref.watch(menuAuthProvider).inSet(logModel.router),
+                // ),
+                SidebarItemWithChildren(
+                  model: logModel,
+                  visible: ref.watch(menuAuthProvider).inSet(logModel.router),
+                )
               ],
             ),
           )),

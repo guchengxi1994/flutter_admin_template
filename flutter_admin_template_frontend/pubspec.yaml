@@ -28,6 +28,13 @@ deferred-components:
   - name: fat 
     libraries:
       - package:flutter_admin_template_frontend/login/login_screen.dart
+      - package:flutter_admin_template_frontend/dashboard/dashboard_screen.dart
+      - package:flutter_admin_template_frontend/dept/dept_screen.dart
+      - package:flutter_admin_template_frontend/menu/menu_screen.dart
+      - package:flutter_admin_template_frontend/user/user_screen.dart
+      - package:flutter_admin_template_frontend/log/log_summary_screen.dart
+      - package:flutter_admin_template_frontend/log/sign_in_log_screen.dart
+      - package:flutter_admin_template_frontend/log/operation_log_screen.dart
 
 
 flutter:

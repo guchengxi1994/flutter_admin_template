@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_admin_template_frontend/routers.dart';
 
 class MenuAuthNotifier extends ChangeNotifier {
   final Set<String> _auth = {};
-  final PageController controller = PageController();
 
-  int currentPageIndex = 0;
-  changeIndex(int id) {
-    if (currentPageIndex != id) {
-      currentPageIndex = id;
-      controller.jumpToPage(id);
-      notifyListeners();
+  String currentRouter = "/main/dashboard";
+  changeRouter(String router) {
+    if (currentRouter != router) {
+      currentRouter = router;
+      FatRouters.navigatorKey.currentState!.pushNamed(router);
     }
   }
 
   init() async {
     // for test
-    _auth.add("dashboard");
-    _auth.add("user");
-    _auth.add("dept");
-    _auth.add("menu");
+    _auth.add("/main/dashboard");
+    _auth.add("/main/user");
+    _auth.add("/main/menu");
+    _auth.add("/main/dept");
+    _auth.add("/main/logs");
+    _auth.add("/main/logs/operation");
+    _auth.add("/main/logs/signin");
   }
 
   bool inSet(String i) {

@@ -163,7 +163,7 @@ class LoginForm extends ConsumerWidget {
               return;
             }
 
-            Navigator.of(context).pushNamed(FatRouters.mainScreen);
+            Navigator.of(context).pushNamed(FatRouters.dashboardScreen);
           },
           child: Container(
               decoration: const BoxDecoration(

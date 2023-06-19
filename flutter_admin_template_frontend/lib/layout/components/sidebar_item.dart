@@ -4,12 +4,12 @@ import 'package:flutter_admin_template_frontend/styles/app_style.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hovering/hovering.dart';
 
-import '../models/sidemenu_item_model.dart';
+import '../models/sidebar_item_model.dart';
 import '../notifier/sidebar_notifier.dart';
 
 class SidebarItem extends ConsumerWidget {
   const SidebarItem({super.key, required this.model, required this.visible});
-  final SidemenuModel model;
+  final SidebarModel model;
   final bool visible;
 
   @override
@@ -24,14 +24,14 @@ class SidebarItem extends ConsumerWidget {
           cursor: SystemMouseCursors.click,
           child: GestureDetector(
             onTap: () {
-              ref.read(menuAuthProvider).changeIndex(model.index);
+              ref.read(menuAuthProvider).changeRouter(model.router);
             },
             child: Container(
               margin: const EdgeInsets.only(top: 3),
               width: AppStyle.sidebarCollapseWidth - 10,
               height: AppStyle.sidebarCollapseWidth - 10,
-              decoration: ref.watch(menuAuthProvider).currentPageIndex ==
-                      model.index
+              decoration: ref.watch(menuAuthProvider).currentRouter ==
+                      model.router
                   ? BoxDecoration(
                       color: AppStyle.hoveringBackgroundColor,
                       borderRadius: const BorderRadius.all(Radius.circular(8)))
@@ -57,14 +57,14 @@ class SidebarItem extends ConsumerWidget {
         cursor: SystemMouseCursors.click,
         child: GestureDetector(
           onTap: () {
-            ref.read(menuAuthProvider).changeIndex(model.index);
+            ref.read(menuAuthProvider).changeRouter(model.router);
           },
           child: Container(
             margin: const EdgeInsets.only(top: 3),
             height: AppStyle.sidebarCollapseWidth - 10,
             width: AppStyle.sidebarWidth - 20,
-            decoration: ref.watch(menuAuthProvider).currentPageIndex ==
-                    model.index
+            decoration: ref.watch(menuAuthProvider).currentRouter ==
+                    model.router
                 ? BoxDecoration(
                     color: AppStyle.hoveringBackgroundColor,
                     borderRadius: const BorderRadius.all(Radius.circular(8)))
@@ -93,11 +93,19 @@ class SidebarItem extends ConsumerWidget {
                   padding: const EdgeInsets.only(left: 10),
                   child: Row(
                     children: [
-                      model.icon!,
+                      ref.watch(menuAuthProvider).currentRouter == model.router
+                          ? model.iconOnHover!
+                          : model.icon!,
                       const SizedBox(
                         width: 10,
                       ),
-                      Text(model.title)
+                      Text(
+                        model.title,
+                        style: ref.watch(menuAuthProvider).currentRouter ==
+                                model.router
+                            ? const TextStyle(color: Colors.white)
+                            : null,
+                      )
                     ],
                   ),
                 )),

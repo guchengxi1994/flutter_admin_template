@@ -13,9 +13,30 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      routes: FatRouters.routers,
+      // routes: FatRouters.routers,
       initialRoute: FatRouters.loginScreen,
+      navigatorKey: FatRouters.navigatorKey,
+      onGenerateRoute: (settings) {
+        if (settings.name == null) {
+          return null;
+        }
+        final uri = Uri.parse(settings.name!);
+        final page = FatRouters.routers[uri.path];
+
+        if (page != null) {
+          return PageRouteBuilder(
+              settings: settings,
+              pageBuilder: (_, __, ___) => page.call(context),
+              transitionsBuilder: (_, anim, __, child) {
+                return FadeTransition(
+                  opacity: anim,
+                  child: child,
+                );
+              });
+        }
+
+        return null;
+      },
     );
   }
 }
