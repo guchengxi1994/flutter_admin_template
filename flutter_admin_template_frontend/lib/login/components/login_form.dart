@@ -14,9 +14,6 @@ final loginProvider =
 class LoginForm extends ConsumerWidget {
   LoginForm({super.key});
 
-  bool isPasswordEmpty = false;
-  bool isUsernameEmpty = false;
-
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwardController = TextEditingController();
 
@@ -57,10 +54,8 @@ class LoginForm extends ConsumerWidget {
               Expanded(
                   child: TextField(
                 onChanged: (value) {
-                  if (isUsernameEmpty) {
-                    // setState(() {
-                    //   isUsernameEmpty = false;
-                    // });
+                  if (ref.read(loginProvider).isUsernameEmpty) {
+                    ref.read(loginProvider).changeUsernameEmptyStatus(false);
                   }
                 },
                 style: const TextStyle(fontSize: 16),
@@ -76,15 +71,12 @@ class LoginForm extends ConsumerWidget {
           ),
         ),
         Visibility(
-            visible: isUsernameEmpty,
-            child: Container(
-              // width: AppStyle.loginFormWidth,
-              child: const Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  "用户名为空",
-                  style: TextStyle(color: Colors.red),
-                ),
+            visible: ref.watch(loginProvider).isUsernameEmpty,
+            child: const Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                "用户名为空",
+                style: TextStyle(color: Colors.red),
               ),
             )),
         SizedBox(
@@ -112,10 +104,10 @@ class LoginForm extends ConsumerWidget {
                 child: TextField(
                     onSubmitted: (value) async {},
                     onChanged: (value) {
-                      if (isPasswordEmpty) {
-                        // setState(() {
-                        //   isPasswordEmpty = false;
-                        // });
+                      if (ref.read(loginProvider).isPasswordEmpty) {
+                        ref
+                            .read(loginProvider)
+                            .changePasswordEmptyStatus(false);
                       }
                     },
                     obscuringCharacter: "*",
@@ -145,15 +137,12 @@ class LoginForm extends ConsumerWidget {
           ),
         ),
         Visibility(
-            visible: isPasswordEmpty,
-            child: Container(
-              width: 300,
-              child: const Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  "密码为空",
-                  style: TextStyle(color: Colors.red),
-                ),
+            visible: ref.watch(loginProvider).isPasswordEmpty,
+            child: const Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                "密码为空",
+                style: TextStyle(color: Colors.red),
               ),
             )),
         SizedBox(
@@ -161,6 +150,19 @@ class LoginForm extends ConsumerWidget {
         ),
         InkWell(
           onTap: () async {
+            if (usernameController.text == "") {
+              ref.read(loginProvider).changeUsernameEmptyStatus(true);
+            }
+
+            if (passwardController.text == "") {
+              ref.read(loginProvider).changePasswordEmptyStatus(true);
+            }
+
+            if (usernameController.text == "" ||
+                passwardController.text == "") {
+              return;
+            }
+
             Navigator.of(context).pushNamed(FatRouters.mainScreen);
           },
           child: Container(

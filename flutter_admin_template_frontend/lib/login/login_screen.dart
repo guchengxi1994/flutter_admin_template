@@ -36,7 +36,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 if (width > 900) const Expanded(flex: 1, child: SizedBox()),
                 Expanded(
                   flex: 1,
-                  child: SizedBox(child: LoginForm()),
+                  child: SizedBox(
+                      child: Padding(
+                    padding: const EdgeInsets.only(left: 20, right: 20),
+                    child: LoginForm(),
+                  )),
                 ),
               ],
             ),

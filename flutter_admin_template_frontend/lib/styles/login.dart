@@ -3,7 +3,7 @@ part of 'app_style.dart';
 class _LoginScreenStyle {
   _LoginScreenStyle._();
 
-  static const double logoHeight = 50;
+  static const double logoHeight = 80;
   static const double logoFontSize = 30;
   static const Color logoColor = Color.fromARGB(193, 15, 84, 188);
   static const Color backgroundColor1 = Color.fromARGB(255, 15, 84, 188);

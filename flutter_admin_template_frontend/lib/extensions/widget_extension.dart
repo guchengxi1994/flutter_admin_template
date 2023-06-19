@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../controllers/global_controller.dart';
+import '../notifier/global_notifier.dart';
 
 extension WidgetExtension on Widget {
   Widget wrapper(String id, WidgetRef ref) {

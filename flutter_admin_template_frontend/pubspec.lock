@@ -33,13 +33,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.1.1"
-  collapsible_sidebar:
-    dependency: "direct main"
-    description:
-      path: "D:/github_repo/flutter_collapsible_sidebar"
-      relative: false
-    source: path
-    version: "2.0.5+1"
   collection:
     dependency: transitive
     description:
@@ -127,6 +120,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  hovering:
+    dependency: "direct main"
+    description:
+      name: hovering
+      sha256: "0df77800487be6d29c8687fb775f53e1b308988c6e63a6a9c579cec701fbfe76"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.0.4"
   http_parser:
     dependency: transitive
     description:

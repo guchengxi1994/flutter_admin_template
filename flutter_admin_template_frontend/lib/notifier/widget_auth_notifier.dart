@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class WidgetAuthController extends ChangeNotifier {
+class WidgetAuthNotifier extends ChangeNotifier {
   /// module/component/id
   ///
   /// `:` if empty
