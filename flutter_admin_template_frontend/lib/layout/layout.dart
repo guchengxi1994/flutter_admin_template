@@ -15,7 +15,7 @@ class Layout extends ConsumerWidget {
         final router =
             ModalRoute.of(context)?.settings.name ?? "/main/dashboard";
         debugPrint(router);
-        ref.read(menuAuthProvider).changeRouter(router);
+        ref.read(menuAuthProvider).changeRouterNoNavigation(router);
       },
     );
 

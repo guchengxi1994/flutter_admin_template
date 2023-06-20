@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 part './login.dart';
 part 'sidebar.dart';
+part 'table.dart';
 
 class AppStyle {
   AppStyle._();
@@ -21,4 +22,6 @@ class AppStyle {
   static Color get hoveringBackgroundColor =>
       _SidebarStyle.hoveringBackgroundColor;
   static double get sidebarHeaderHeight => _SidebarStyle.sidebarHeaderHeight;
+
+  static TextStyle get tableColumnStyle => _TableStyle.columnStyle;
 }

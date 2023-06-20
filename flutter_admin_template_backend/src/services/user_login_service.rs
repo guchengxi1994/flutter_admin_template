@@ -26,7 +26,7 @@ impl super::Query<UserLogin> for UserLogin {
         .await?;
         anyhow::Ok(super::DataList {
             count: count.count,
-            data: logs,
+            records: logs,
         })
     }
 
@@ -65,7 +65,7 @@ impl super::Query<UserLogin> for UserLogin {
         .await?;
         anyhow::Ok(super::DataList {
             count: count.count,
-            data: logs,
+            records: logs,
         })
     }
 
@@ -103,7 +103,7 @@ impl super::Query<UserLogin> for UserLogin {
         .await?;
         anyhow::Ok(super::DataList {
             count: count.count,
-            data: logs,
+            records: logs,
         })
     }
 }

@@ -21,7 +21,7 @@ impl Display for ByIdMany {
 #[derive(Clone, Debug, sqlx::FromRow, serde::Serialize, serde::Deserialize)]
 pub struct DataList<T> {
     pub count: i64,
-    pub data: Vec<T>,
+    pub records: Vec<T>,
 }
 
 #[derive(Clone, Debug, sqlx::FromRow)]

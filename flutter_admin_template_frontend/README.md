@@ -1,16 +1,16 @@
 # flutter_admin_template_frontend
 
-A new Flutter project.
+### dependencies
 
-## Getting Started
+```yaml
+dio: ^5.2.1+1
+flutter_riverpod: ^2.3.6
+flutter_smart_dialog: ^4.9.0+6
+hovering: ^1.0.4
+just_the_tooltip: ^0.0.12
+loading_indicator: ^3.1.0
+shared_preferences: ^2.1.2
+sm_crypto: ^1.0.3
+super_context_menu: ^0.1.0
+```
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.

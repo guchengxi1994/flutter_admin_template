@@ -6,9 +6,12 @@ class MenuAuthNotifier extends ChangeNotifier {
 
   String currentRouter = "/main/dashboard";
   changeRouter(String router) {
+    debugPrint(
+        "[flutter] call navigation: before :$currentRouter ,after $router");
     if (currentRouter != router) {
       currentRouter = router;
-      FatRouters.navigatorKey.currentState!.pushNamed(router);
+      FatRouters.navigatorKey.currentState!
+          .pushNamedAndRemoveUntil(router, (v) => false);
     }
   }
 
