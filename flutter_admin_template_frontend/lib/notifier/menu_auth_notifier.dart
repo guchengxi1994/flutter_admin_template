@@ -12,6 +12,13 @@ class MenuAuthNotifier extends ChangeNotifier {
     }
   }
 
+  changeRouterNoNavigation(String router) {
+    if (currentRouter != router) {
+      currentRouter = router;
+      notifyListeners();
+    }
+  }
+
   init() async {
     // for test
     _auth.add("/main/dashboard");

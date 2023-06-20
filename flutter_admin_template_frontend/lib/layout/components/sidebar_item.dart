@@ -15,10 +15,11 @@ class SidebarItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     bool isCollapse = ref.watch(sidebarProvider).isCollapse;
-    return Visibility(visible: visible, child: _buildItem(isCollapse, ref));
+    return Visibility(
+        visible: visible, child: _buildItem(isCollapse, ref, context));
   }
 
-  Widget _buildItem(bool isCollapse, WidgetRef ref) {
+  Widget _buildItem(bool isCollapse, WidgetRef ref, BuildContext context) {
     if (isCollapse) {
       return MouseRegion(
           cursor: SystemMouseCursors.click,

@@ -27,51 +27,53 @@ class SidebarItemWithChildren extends ConsumerWidget {
         builder: (ctx, d, w) {
           if (ref.watch(sidebarProvider).isCollapse) {
             return MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: GestureDetector(
-                  onTap: () {
-                    ref.read(menuAuthProvider).changeRouter(model.router);
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 3),
-                    width: AppStyle.sidebarCollapseWidth - 10,
-                    height: AppStyle.sidebarCollapseWidth - 10,
-                    decoration: ref.watch(menuAuthProvider).currentRouter ==
-                            model.router
-                        ? BoxDecoration(
-                            color: AppStyle.hoveringBackgroundColor,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(8)))
-                        : null,
-                    child: Tooltip(
-                      message: model.tooltip,
-                      child: HoverWidget(
-                        hoverChild: Container(
-                          decoration: BoxDecoration(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () {
+                  ref.read(sidebarProvider).changeIsCollapse(false);
+                  subVisible.value = true;
+                  ref.read(menuAuthProvider).changeRouter(model.router);
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(top: 3),
+                  width: AppStyle.sidebarCollapseWidth - 10,
+                  height: AppStyle.sidebarCollapseWidth - 10,
+                  decoration:
+                      ref.watch(menuAuthProvider).currentRouter == model.router
+                          ? BoxDecoration(
                               color: AppStyle.hoveringBackgroundColor,
                               borderRadius:
-                                  const BorderRadius.all(Radius.circular(8))),
-                          child: model.iconOnHover!,
-                        ),
-                        onHover: (v) {},
-                        child: Container(
-                          decoration:
-                              ref.watch(menuAuthProvider).currentRouter ==
-                                      model.router
-                                  ? BoxDecoration(
-                                      color: AppStyle.hoveringBackgroundColor,
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(8)))
-                                  : null,
-                          child: ref.watch(menuAuthProvider).currentRouter ==
-                                  model.router
-                              ? model.iconOnHover
-                              : model.icon!,
-                        ),
+                                  const BorderRadius.all(Radius.circular(8)))
+                          : null,
+                  child: Tooltip(
+                    message: model.tooltip,
+                    child: HoverWidget(
+                      hoverChild: Container(
+                        decoration: BoxDecoration(
+                            color: AppStyle.hoveringBackgroundColor,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8))),
+                        child: model.iconOnHover!,
+                      ),
+                      onHover: (v) {},
+                      child: Container(
+                        decoration: ref.watch(menuAuthProvider).currentRouter ==
+                                model.router
+                            ? BoxDecoration(
+                                color: AppStyle.hoveringBackgroundColor,
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(8)))
+                            : null,
+                        child: ref.watch(menuAuthProvider).currentRouter ==
+                                model.router
+                            ? model.iconOnHover
+                            : model.icon!,
                       ),
                     ),
                   ),
-                ));
+                ),
+              ),
+            );
           }
 
           if (!subVisible.value) {
@@ -159,96 +161,101 @@ class SidebarItemWithChildren extends ConsumerWidget {
               ),
             );
           } else {
-            return Column(
-              children: [
-                MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: GestureDetector(
-                    onTap: () {
-                      ref.read(menuAuthProvider).changeRouter(model.router);
-                      subVisible.value = false;
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.only(top: 3),
-                      height: AppStyle.sidebarCollapseWidth - 10,
-                      width: AppStyle.sidebarWidth - 20,
-                      decoration: ref.watch(menuAuthProvider).currentRouter ==
-                              model.router
-                          ? BoxDecoration(
-                              color: AppStyle.hoveringBackgroundColor,
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(8)))
-                          : null,
-                      child: HoverWidget(
-                          hoverChild: Container(
-                            decoration: BoxDecoration(
+            return SizedBox(
+              height:
+                  (model.children.length + 1) * AppStyle.sidebarCollapseWidth -
+                      model.children.length * 10,
+              child: Column(
+                children: [
+                  MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                      onTap: () {
+                        ref.read(menuAuthProvider).changeRouter(model.router);
+                        subVisible.value = false;
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(top: 3),
+                        height: AppStyle.sidebarCollapseWidth - 10,
+                        width: AppStyle.sidebarWidth - 20,
+                        decoration: ref.watch(menuAuthProvider).currentRouter ==
+                                model.router
+                            ? BoxDecoration(
                                 color: AppStyle.hoveringBackgroundColor,
                                 borderRadius:
-                                    const BorderRadius.all(Radius.circular(8))),
-                            padding: const EdgeInsets.only(left: 10),
-                            child: Row(
-                              children: [
-                                model.iconOnHover!,
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Text(
-                                  model.title,
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                                const Expanded(child: SizedBox()),
-                                Transform.rotate(
-                                  angle: math.pi / 2,
-                                  child: const Icon(
-                                    Icons.chevron_left,
-                                    color: Colors.white,
+                                    const BorderRadius.all(Radius.circular(8)))
+                            : null,
+                        child: HoverWidget(
+                            hoverChild: Container(
+                              decoration: BoxDecoration(
+                                  color: AppStyle.hoveringBackgroundColor,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(8))),
+                              padding: const EdgeInsets.only(left: 10),
+                              child: Row(
+                                children: [
+                                  model.iconOnHover!,
+                                  const SizedBox(
+                                    width: 10,
                                   ),
-                                )
-                              ],
+                                  Text(
+                                    model.title,
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                  const Expanded(child: SizedBox()),
+                                  Transform.rotate(
+                                    angle: math.pi / 2,
+                                    child: const Icon(
+                                      Icons.chevron_left,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
-                          ),
-                          onHover: (v) {},
-                          child: Container(
-                            padding: const EdgeInsets.only(left: 10),
-                            child: Row(
-                              children: [
-                                ref.watch(menuAuthProvider).currentRouter ==
-                                        model.router
-                                    ? model.iconOnHover!
-                                    : model.icon!,
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Text(
-                                  model.title,
-                                  style: ref
-                                              .watch(menuAuthProvider)
-                                              .currentRouter ==
+                            onHover: (v) {},
+                            child: Container(
+                              padding: const EdgeInsets.only(left: 10),
+                              child: Row(
+                                children: [
+                                  ref.watch(menuAuthProvider).currentRouter ==
                                           model.router
-                                      ? const TextStyle(color: Colors.white)
-                                      : null,
-                                ),
-                                const Expanded(child: SizedBox()),
-                                Transform.rotate(
-                                  angle: math.pi / 2,
-                                  child: Icon(
-                                    Icons.chevron_left,
-                                    color: ref
+                                      ? model.iconOnHover!
+                                      : model.icon!,
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(
+                                    model.title,
+                                    style: ref
                                                 .watch(menuAuthProvider)
                                                 .currentRouter ==
                                             model.router
-                                        ? Colors.white
+                                        ? const TextStyle(color: Colors.white)
                                         : null,
                                   ),
-                                )
-                              ],
-                            ),
-                          )),
+                                  const Expanded(child: SizedBox()),
+                                  Transform.rotate(
+                                    angle: math.pi / 2,
+                                    child: Icon(
+                                      Icons.chevron_left,
+                                      color: ref
+                                                  .watch(menuAuthProvider)
+                                                  .currentRouter ==
+                                              model.router
+                                          ? Colors.white
+                                          : null,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            )),
+                      ),
                     ),
                   ),
-                ),
-                ..._buildChildren(ref)
-              ],
+                  ..._buildChildren(ref)
+                ],
+              ),
             );
           }
         });
