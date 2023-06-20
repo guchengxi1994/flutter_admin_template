@@ -1,13 +1,13 @@
 use actix_web::{dev::Service, middleware::Logger, App, HttpServer};
 
 mod common;
+mod constants;
 mod controllers;
 mod database;
 mod middleware;
 mod models;
 mod routers;
 mod services;
-mod constants;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -18,6 +18,12 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(|| {
         App::new()
+            .wrap(
+                actix_cors::Cors::default()
+                    .allow_any_header()
+                    .allow_any_method()
+                    .allow_any_origin(),
+            )
             .wrap_fn(|req, srv| {
                 println!("Hi from server. You requested: {}", req.path());
                 srv.call(req)
@@ -28,7 +34,7 @@ async fn main() -> std::io::Result<()> {
             .configure(crate::routers::user::user_group)
             .configure(crate::routers::user_login::user_login_group)
     })
-    .bind("127.0.0.1:15234")?
+    .bind("0.0.0.0:15234")?
     .run()
     .await
 }

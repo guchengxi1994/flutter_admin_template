@@ -76,7 +76,7 @@ where
 
                             let res = req
                                 .into_response(
-                                    HttpResponse::Ok().body(serde_json::to_string(&b).unwrap()),
+                                    HttpResponse::Ok().json(&b),
                                 )
                                 .map_into_right_body();
                             return Box::pin(async { Ok(res) });
@@ -92,7 +92,7 @@ where
                     };
 
                     let res = req
-                        .into_response(HttpResponse::Ok().body(serde_json::to_string(&b).unwrap()))
+                        .into_response(HttpResponse::Ok().json(&b))
                         .map_into_right_body();
                     return Box::pin(async { Ok(res) });
                 }

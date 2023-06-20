@@ -4,11 +4,11 @@ import 'package:flutter_admin_template_frontend/routers.dart';
 import 'package:flutter_admin_template_frontend/styles/app_style.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../login_controller.dart';
+import '../login_notifier.dart';
 import 'logo.dart';
 
 final loginProvider =
-    ChangeNotifierProvider<LoginController>((ref) => LoginController());
+    ChangeNotifierProvider<LoginNotifier>((ref) => LoginNotifier());
 
 // ignore: must_be_immutable
 class LoginForm extends ConsumerWidget {
@@ -36,18 +36,9 @@ class LoginForm extends ConsumerWidget {
           decoration: BoxDecoration(
             color: AppStyle.loginLightgrey1,
             borderRadius: const BorderRadius.all(Radius.circular(122)),
-            // border: Border.all(
-            //     color: const Color.fromARGB(255, 212, 203, 203),
-            //     width: 0.5),
           ),
-          // width: AppStyle.loginFormWidth,
-          // height: AppStyle.loginFormHeight,
           child: Row(
             children: [
-              // const Padding(
-              //   padding: EdgeInsets.only(left: 10, right: 10),
-              //   child: Icon(Icons.phone_iphone),
-              // ),
               const SizedBox(
                 width: 20,
               ),
@@ -62,7 +53,7 @@ class LoginForm extends ConsumerWidget {
                 controller: usernameController,
                 maxLength: 11,
                 decoration: const InputDecoration(
-                  hintText: "请输入手机号码",
+                  hintText: "请输入账号名",
                   border: InputBorder.none,
                   counterText: "",
                 ),
@@ -102,7 +93,15 @@ class LoginForm extends ConsumerWidget {
               ),
               Expanded(
                 child: TextField(
-                    onSubmitted: (value) async {},
+                    onSubmitted: (value) async {
+                      final r = await ref.read(loginProvider).login(
+                          usernameController.text, passwardController.text);
+                      if (r) {
+                        // ignore: use_build_context_synchronously
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                            FatRouters.dashboardScreen, (_) => false);
+                      }
+                    },
                     onChanged: (value) {
                       if (ref.read(loginProvider).isPasswordEmpty) {
                         ref
@@ -163,7 +162,14 @@ class LoginForm extends ConsumerWidget {
               return;
             }
 
-            Navigator.of(context).pushNamed(FatRouters.dashboardScreen);
+            final r = await ref
+                .read(loginProvider)
+                .login(usernameController.text, passwardController.text);
+            if (r) {
+              // ignore: use_build_context_synchronously
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                  FatRouters.dashboardScreen, (v) => false);
+            }
           },
           child: Container(
               decoration: const BoxDecoration(

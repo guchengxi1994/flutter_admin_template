@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class RouterAuthNotifier extends ChangeNotifier {
+class ApiAuthNotifier extends ChangeNotifier {
   final Set<String> _auth = {};
 
   init() async {

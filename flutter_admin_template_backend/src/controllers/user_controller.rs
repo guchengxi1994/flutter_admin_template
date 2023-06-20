@@ -14,7 +14,7 @@ pub async fn new_user(info: web::Json<NewUserRequest>) -> HttpResponse {
                 message: "成功",
                 data: None,
             };
-            return HttpResponse::Ok().body(serde_json::to_string(&b).unwrap());
+            return HttpResponse::Ok().json(&b);
         }
         Err(e) => {
             let err_str = e.to_string();
@@ -23,7 +23,7 @@ pub async fn new_user(info: web::Json<NewUserRequest>) -> HttpResponse {
                 message: err_str.as_str(),
                 data: None,
             };
-            return HttpResponse::Ok().body(serde_json::to_string(&b).unwrap());
+            return HttpResponse::Ok().json(&b);
         }
     }
 }
@@ -41,7 +41,7 @@ pub async fn login(info: web::Json<UserLoginRequest>, req: HttpRequest) -> HttpR
                     message: "成功",
                     data: Some(_r),
                 };
-                return HttpResponse::Ok().body(serde_json::to_string(&b).unwrap());
+                return HttpResponse::Ok().json(&b);
             }
             Err(e) => {
                 let err_str = e.to_string();
@@ -50,7 +50,7 @@ pub async fn login(info: web::Json<UserLoginRequest>, req: HttpRequest) -> HttpR
                     message: err_str.as_str(),
                     data: None,
                 };
-                return HttpResponse::Ok().body(serde_json::to_string(&b).unwrap());
+                return HttpResponse::Ok().json(&b);
             }
         }
     };
@@ -59,5 +59,5 @@ pub async fn login(info: web::Json<UserLoginRequest>, req: HttpRequest) -> HttpR
         message: "获取IP异常",
         data: None,
     };
-    return HttpResponse::Ok().body(serde_json::to_string(&b).unwrap());
+    return HttpResponse::Ok().json(&b);
 }

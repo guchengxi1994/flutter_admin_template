@@ -32,7 +32,7 @@ pub async fn get_all(req: HttpRequest, c: Option<web::ReqData<UserId>>) -> HttpR
                 message: "当前用户无法查询全部",
                 data: None,
             };
-            return HttpResponse::Ok().body(serde_json::to_string(&b).unwrap());
+            return HttpResponse::Ok().json(&b);
         } else {
             let pool = POOL.lock().unwrap();
             let logs =
@@ -44,7 +44,7 @@ pub async fn get_all(req: HttpRequest, c: Option<web::ReqData<UserId>>) -> HttpR
                         message: "查询成功",
                         data: _logs,
                     };
-                    return HttpResponse::Ok().body(serde_json::to_string(&b).unwrap());
+                    return HttpResponse::Ok().json(&b);
                 }
                 Err(e) => {
                     println!("[rust error] : {:?}", e);
@@ -53,7 +53,7 @@ pub async fn get_all(req: HttpRequest, c: Option<web::ReqData<UserId>>) -> HttpR
                         message: "查询失败",
                         data: None,
                     };
-                    return HttpResponse::Ok().body(serde_json::to_string(&b).unwrap());
+                    return HttpResponse::Ok().json(&b);
                 }
             }
         }
@@ -63,7 +63,7 @@ pub async fn get_all(req: HttpRequest, c: Option<web::ReqData<UserId>>) -> HttpR
             message: "获取用户信息失败",
             data: None,
         };
-        return HttpResponse::Ok().body(serde_json::to_string(&b).unwrap());
+        return HttpResponse::Ok().json(&b);
     }
 }
 
@@ -99,7 +99,7 @@ pub async fn get_current(req: HttpRequest, c: Option<web::ReqData<UserId>>) -> H
                     message: "查询成功",
                     data: _logs,
                 };
-                return HttpResponse::Ok().body(serde_json::to_string(&b).unwrap());
+                return HttpResponse::Ok().json(&b);
             }
             Err(e) => {
                 println!("[rust error] : {:?}", e);
@@ -108,7 +108,7 @@ pub async fn get_current(req: HttpRequest, c: Option<web::ReqData<UserId>>) -> H
                     message: "查询失败",
                     data: None,
                 };
-                return HttpResponse::Ok().body(serde_json::to_string(&b).unwrap());
+                return HttpResponse::Ok().json(&b);
             }
         }
     } else {
@@ -117,6 +117,6 @@ pub async fn get_current(req: HttpRequest, c: Option<web::ReqData<UserId>>) -> H
             message: "获取用户信息失败",
             data: None,
         };
-        return HttpResponse::Ok().body(serde_json::to_string(&b).unwrap());
+        return HttpResponse::Ok().json(&b);
     }
 }
