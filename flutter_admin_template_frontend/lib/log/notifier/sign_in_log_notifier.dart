@@ -18,9 +18,18 @@ class SignInLogNotifier<_ extends BaseRequest,
   @override
   List<Records> get records => _convertListToRecord();
 
-  Records? _convertStringToRecord(String s) {
+  Records? _convertStringToRecord(dynamic s) {
     try {
-      final m = jsonDecode(s);
+      final Map<String, dynamic> m;
+      if (s is String) {
+        m = jsonDecode(s);
+      } else if (s is Map) {
+        m = s as Map<String, dynamic>;
+      } else {
+        m = {};
+        throw Exception("[flutter] cannot read content");
+      }
+
       return Records.fromJson(m);
     } catch (e) {
       return null;
@@ -44,5 +53,16 @@ class SignInLogNotifier<_ extends BaseRequest,
       }
     }
     return result;
+  }
+
+  @override
+  onPageIndexChange(int index, String url,
+      {Map<String, dynamic> parameters = const {}}) async {
+    url = "${apiDetails["signinlog"]!}?pageNumber=$index&pageSize=10";
+    for (final i in parameters.entries) {
+      url = "$url&${i.key}=${i.value}";
+    }
+
+    return super.onPageIndexChange(index, url, parameters: parameters);
   }
 }

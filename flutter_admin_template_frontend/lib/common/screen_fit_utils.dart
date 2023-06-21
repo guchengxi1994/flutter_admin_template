@@ -28,4 +28,18 @@ extension Fitness on num {
   double size(double height, double width) {
     return min(w(width), h(height));
   }
+
+  double fixMinSize(double min) {
+    if (this < min) {
+      return min;
+    }
+    return toDouble();
+  }
+
+  /// FIXME
+  ///
+  /// unnecessary
+  double loose() {
+    return this - 5.5;
+  }
 }

@@ -2,28 +2,65 @@ use sqlx::{MySql, Pool, QueryBuilder};
 
 use crate::models::user_login::UserLogin;
 
-use super::{Pagination, QueryParam, query_params::ByIdMany};
-
-
+use super::{
+    query_params::SigninRecordsQueryParam,
+    query_params::{ByIdMany, Count},
+    Pagination, QueryParam,
+};
 
 #[async_trait::async_trait]
 impl super::Query<UserLogin> for UserLogin {
     async fn all(
         pool: &Pool<MySql>,
-        query_params: QueryParam<Pagination>,
+        query_params: QueryParam<SigninRecordsQueryParam>,
     ) -> anyhow::Result<super::DataList<Self>> {
         let _q = query_params.data;
-        let logs =
-            sqlx::query_as::<sqlx::MySql, UserLogin>(r#"SELECT * FROM user_login limit ?,?"#)
-                .bind((_q.page_number - 1) * _q.page_size)
-                .bind(_q.page_size)
-                .fetch_all(pool)
-                .await?;
-        let count = sqlx::query_as::<sqlx::MySql, super::Count>(
-            r#"SELECT COUNT(login_id) as count FROM user_login"#,
-        )
-        .fetch_one(pool)
-        .await?;
+
+        let mut query = QueryBuilder::<MySql>::new("SELECT * FROM user_login WHERE user_id>0");
+        let mut count_query = QueryBuilder::<MySql>::new(
+            "SELECT COUNT(login_id) as count FROM ( SELECT * FROM user_login WHERE user_id>0",
+        );
+        if let Some(username) = _q.username {
+            println!("[username] {:?} ", username);
+            query.push(" and user_name LIKE ");
+            let l = format!("'%{}%'", username);
+            query.push(l.clone());
+            count_query.push(" and user_name LIKE ");
+            count_query.push(l);
+        }
+
+        if let Some(user_id) = _q.user_id {
+            query.push(" and user_id = ");
+            query.push_bind(user_id);
+
+            count_query.push(" and user_id = ");
+            count_query.push_bind(user_id);
+        }
+
+        if let Some(start_time) = _q.start_time {
+            if let Some(end_time) = _q.end_time {
+                query.push(" and UNIX_TIMESTAMP(login_time) > ");
+                query.push_bind(start_time);
+                query.push(" and UNIX_TIMESTAMP(login_time) < ");
+                query.push_bind(end_time);
+
+                count_query.push(" and UNIX_TIMESTAMP(login_time) > ");
+                count_query.push_bind(start_time);
+                count_query.push(" and UNIX_TIMESTAMP(login_time) < ");
+                count_query.push_bind(end_time);
+            }
+        }
+
+        count_query.push(" ) as t");
+
+        let count: Count = count_query.build_query_as().fetch_one(pool).await?;
+
+        query.push(" limit");
+        query.push_bind((_q.page_number - 1) * _q.page_size);
+        query.push(",");
+        query.push_bind(_q.page_size);
+
+        let logs: Vec<UserLogin> = query.build_query_as().fetch_all(pool).await?;
         anyhow::Ok(super::DataList {
             count: count.count,
             records: logs,

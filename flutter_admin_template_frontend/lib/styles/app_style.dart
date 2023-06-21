@@ -24,4 +24,5 @@ class AppStyle {
   static double get sidebarHeaderHeight => _SidebarStyle.sidebarHeaderHeight;
 
   static TextStyle get tableColumnStyle => _TableStyle.columnStyle;
+  static TextStyle get itemStyle => _TableStyle.itemStyle;
 }

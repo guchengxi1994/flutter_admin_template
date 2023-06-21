@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_admin_template_frontend/common/screen_fit_utils.dart';
+import 'package:flutter_admin_template_frontend/layout/notifier/sidebar_notifier.dart';
+import 'package:flutter_admin_template_frontend/log/models/sign_in_response.dart';
 import 'package:flutter_admin_template_frontend/log/notifier/sign_in_log_notifier.dart';
 import 'package:flutter_admin_template_frontend/styles/app_style.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+
+import '../table/components/datatable_indicator.dart';
 
 final signinLogNotifier =
     ChangeNotifierProvider<SignInLogNotifier>((ref) => SignInLogNotifier());
-
-// class SignInLogScreen extends ConsumerWidget {
-//   const SignInLogScreen({super.key});
-
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     final records = ref.watch(signinLogNotifier).records;
-//     print(records.length);
-//     return const Text("sign in");
-//   }
-// }
 
 class SignInLogScreen extends ConsumerStatefulWidget {
   const SignInLogScreen({super.key});
@@ -29,6 +24,15 @@ class SignInLogScreen extends ConsumerStatefulWidget {
 class SignInLogScreenState extends ConsumerState<SignInLogScreen> {
   final ScrollController controller = ScrollController();
   final ScrollController controller2 = ScrollController();
+
+  late double w1 = 50;
+  late double w2 = 50;
+  late double w3 = 100;
+  late double w4 = 100;
+  late double w5 = 75;
+  late double w6 = 175;
+
+  final GlobalKey<DatatableIndicatorState> globalKey = GlobalKey();
 
   @override
   void dispose() {
@@ -46,10 +50,59 @@ class SignInLogScreenState extends ConsumerState<SignInLogScreen> {
     });
   }
 
+  final total = 550;
+
   @override
   Widget build(BuildContext context) {
-    final records = ref.watch(signinLogNotifier).records;
-    return Text('${records.length}');
+    final isCollapse = ref.watch(sidebarProvider).isCollapse;
+
+    double realExtra;
+    if (!isCollapse) {
+      realExtra = MediaQuery.of(context).size.width - AppStyle.sidebarWidth;
+    } else {
+      realExtra =
+          MediaQuery.of(context).size.width - AppStyle.sidebarCollapseWidth;
+    }
+
+    w1 = (50 / total * realExtra).loose().fixMinSize(50);
+    w2 = (50 / total * realExtra).loose().fixMinSize(50);
+    w3 = (100 / total * realExtra).loose().fixMinSize(100);
+    w4 = (100 / total * realExtra).loose().fixMinSize(100);
+    w5 = (75 / total * realExtra).loose().fixMinSize(75);
+    w6 = (175 / total * realExtra).loose().fixMinSize(175);
+
+    return Column(
+      children: [
+        _buildContent(),
+        const SizedBox(
+          height: 15,
+        ),
+        ref.watch(signinLogNotifier).pageLength == 0
+            ? const SizedBox()
+            : Center(
+                child: DatatableIndicator(
+                  key: globalKey,
+                  pageLength: ref.watch(signinLogNotifier).pageLength,
+                  whenIndexChanged: (int index) async {
+                    debugPrint("[flutter] current index : $index");
+
+                    await ref
+                        .read(signinLogNotifier)
+                        .onPageIndexChange(index, "");
+                    // // print(index);
+                    // await recordController.onPageIndexChange(index,
+                    //     first: _first,
+                    //     last: _last,
+                    //     status: _status,
+                    //     keyword: _keyword);
+                  },
+                ),
+              ),
+        const SizedBox(
+          height: 15,
+        ),
+      ],
+    );
   }
 
   Widget _buildContent() {
@@ -75,7 +128,7 @@ class SignInLogScreenState extends ConsumerState<SignInLogScreen> {
           )))
         : Expanded(
             child: Container(
-            padding: const EdgeInsets.only(left: 16),
+            padding: const EdgeInsets.only(left: 16, right: 16),
             child: Scrollbar(
               controller: controller2,
               thumbVisibility: true,
@@ -85,12 +138,15 @@ class SignInLogScreenState extends ConsumerState<SignInLogScreen> {
                 child: SingleChildScrollView(
                   controller: controller,
                   child: DataTable(
+                    columnSpacing: 0,
+                    showBottomBorder: true,
+                    horizontalMargin: 0,
                     dividerThickness: 1,
-                    rows: [],
+                    rows: records.map((e) => _buildRow(e)).toList(),
                     columns: [
                       DataColumn(
                           label: SizedBox(
-                        width: 50,
+                        width: w1,
                         child: Text(
                           "Login Id",
                           style: AppStyle.tableColumnStyle,
@@ -98,7 +154,7 @@ class SignInLogScreenState extends ConsumerState<SignInLogScreen> {
                       )),
                       DataColumn(
                         label: SizedBox(
-                          width: 50,
+                          width: w2,
                           child: Text(
                             "User Id",
                             style: AppStyle.tableColumnStyle,
@@ -107,7 +163,15 @@ class SignInLogScreenState extends ConsumerState<SignInLogScreen> {
                       ),
                       DataColumn(
                           label: SizedBox(
-                        width: 50,
+                        width: w3,
+                        child: Text(
+                          "Username",
+                          style: AppStyle.tableColumnStyle,
+                        ),
+                      )),
+                      DataColumn(
+                          label: SizedBox(
+                        width: w4,
                         child: Text(
                           "Login IP",
                           style: AppStyle.tableColumnStyle,
@@ -115,15 +179,7 @@ class SignInLogScreenState extends ConsumerState<SignInLogScreen> {
                       )),
                       DataColumn(
                           label: SizedBox(
-                        width: 50,
-                        child: Text(
-                          "Login Time",
-                          style: AppStyle.tableColumnStyle,
-                        ),
-                      )),
-                      DataColumn(
-                          label: SizedBox(
-                        width: 50,
+                        width: w5,
                         child: Text(
                           "Login Status",
                           style: AppStyle.tableColumnStyle,
@@ -131,9 +187,9 @@ class SignInLogScreenState extends ConsumerState<SignInLogScreen> {
                       )),
                       DataColumn(
                           label: SizedBox(
-                        width: 50,
+                        width: w6,
                         child: Text(
-                          "Username",
+                          "Login Time",
                           style: AppStyle.tableColumnStyle,
                         ),
                       )),
@@ -143,5 +199,53 @@ class SignInLogScreenState extends ConsumerState<SignInLogScreen> {
               ),
             ),
           ));
+  }
+
+  DataRow _buildRow(Records records) {
+    return DataRow(cells: [
+      DataCell(SizedBox(
+        width: w1,
+        child: Text(
+          records.loginId.toString(),
+          style: AppStyle.itemStyle,
+        ),
+      )),
+      DataCell(SizedBox(
+        width: w2,
+        child: Text(
+          records.userId.toString(),
+          style: AppStyle.itemStyle,
+        ),
+      )),
+      DataCell(SizedBox(
+        width: w3,
+        child: Text(
+          records.userName.toString(),
+          style: AppStyle.itemStyle,
+        ),
+      )),
+      DataCell(SizedBox(
+        width: w4,
+        child: Text(
+          records.loginIp.toString(),
+          style: AppStyle.itemStyle,
+        ),
+      )),
+      DataCell(SizedBox(
+        width: w5,
+        child: Text(
+          records.loginState.toString(),
+          style: AppStyle.itemStyle,
+        ),
+      )),
+      DataCell(SizedBox(
+        width: w6,
+        child: Text(
+          DateFormat("yyyy-MM-dd HH:mm:ss")
+              .format(DateTime.parse(records.loginTime.toString()).toLocal()),
+          style: AppStyle.itemStyle,
+        ),
+      )),
+    ]);
   }
 }

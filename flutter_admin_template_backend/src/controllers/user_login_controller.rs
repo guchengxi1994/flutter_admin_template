@@ -5,34 +5,41 @@ use crate::{
     database::init::POOL,
     middleware::UserId,
     models::user_login,
-    services::query_params::{DataList, Pagination, QueryParam},
+    services::query_params::{DataList, Pagination, QueryParam, SigninRecordsQueryParam},
     services::Query,
 };
 
 pub async fn get_all(req: HttpRequest, c: Option<web::ReqData<UserId>>) -> HttpResponse {
-    let page = web::Query::<Pagination>::from_query(req.query_string());
-    let pagination: Pagination;
+    let page = web::Query::<SigninRecordsQueryParam>::from_query(req.query_string());
+    let pagination: SigninRecordsQueryParam;
     match page {
         Ok(p) => {
             pagination = p.0;
         }
         Err(_) => {
-            pagination = Pagination {
+            pagination = SigninRecordsQueryParam {
                 page_number: 1,
                 page_size: 10,
+                username: None,
+                user_id: None,
+                start_time: None,
+                end_time: None,
             }
         }
     }
 
+    let c1 = c.clone();
+
     if let Some(c) = c {
         let user_id = c.into_inner().user_id;
         if user_id != 1 {
-            let b: BaseResponse<Option<String>> = BaseResponse {
-                code: crate::constants::BAD_REQUEST,
-                message: "当前用户无法查询全部",
-                data: None,
-            };
-            return HttpResponse::Ok().json(&b);
+            // let b: BaseResponse<Option<String>> = BaseResponse {
+            //     code: crate::constants::BAD_REQUEST,
+            //     message: "当前用户无法查询全部",
+            //     data: None,
+            // };
+            // return HttpResponse::Ok().json(&b);
+            return get_current(req, c1).await;
         } else {
             let pool = POOL.lock().unwrap();
             let logs =

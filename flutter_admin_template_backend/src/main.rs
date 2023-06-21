@@ -17,13 +17,15 @@ async fn main() -> std::io::Result<()> {
     env_logger::init();
 
     HttpServer::new(|| {
+        // let cors = actix_cors::Cors::default()
+        //     .allow_any_header()
+        //     .allow_any_method()
+        //     .allow_any_origin()
+        //     .send_wildcard();
+        let cors = actix_cors::Cors::permissive();
+
         App::new()
-            .wrap(
-                actix_cors::Cors::default()
-                    .allow_any_header()
-                    .allow_any_method()
-                    .allow_any_origin(),
-            )
+            .wrap(cors)
             .wrap_fn(|req, srv| {
                 println!("Hi from server. You requested: {}", req.path());
                 srv.call(req)

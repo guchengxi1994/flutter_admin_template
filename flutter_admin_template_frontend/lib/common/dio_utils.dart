@@ -1,5 +1,21 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_admin_template_frontend/common/local_storage.dart';
+import 'package:flutter_admin_template_frontend/routers.dart';
+
+class AuthInterCeptor extends Interceptor {
+  final FatLocalStorage storage = FatLocalStorage();
+
+  @override
+  void onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
+    if (options.path != "/system/user/login") {
+      options.queryParameters["token"] = await storage.getToken();
+    }
+
+    super.onRequest(options, handler);
+  }
+}
 
 class DioUtils {
   // ignore: prefer_final_fields
@@ -9,6 +25,7 @@ class DioUtils {
 
   DioUtils._internal() {
     _dio ??= Dio();
+    _dio!.interceptors.add(AuthInterCeptor());
   }
 
   ///get请求方法
@@ -17,8 +34,16 @@ class DioUtils {
       Response response = await _dio!.get(url,
           queryParameters: params, options: options, cancelToken: cancelToken);
       return response;
-    } on DioException catch (e) {
+    } on Exception catch (e) {
       debugPrint('getHttp exception: $e');
+
+      /// FIXME
+      ///
+      /// actix-web cors error
+      ///
+      /// not sure why
+      FatRouters.navigatorKey.currentState
+          ?.pushNamedAndRemoveUntil(FatRouters.loginScreen, (route) => false);
       return null;
     }
   }
@@ -32,8 +57,8 @@ class DioUtils {
           options: options,
           cancelToken: cancelToken);
       return response;
-    } on DioException catch (e) {
-      debugPrint('getHttp exception: $e');
+    } on Exception catch (e) {
+      debugPrint('putHttp exception: $e');
       return null;
     }
   }
@@ -47,8 +72,8 @@ class DioUtils {
           options: options,
           cancelToken: cancelToken);
       return response;
-    } on DioException catch (e) {
-      debugPrint('getHttp exception: $e');
+    } on Exception catch (e) {
+      debugPrint('postHttp exception: $e');
       return null;
     }
   }

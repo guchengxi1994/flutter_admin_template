@@ -4,7 +4,7 @@ use std::future::{ready, Ready};
 use actix_web::{
     body::EitherBody,
     dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform},
-    web, Error, HttpResponse, HttpMessage,
+    web, Error, HttpMessage, HttpResponse,
 };
 use futures_util::future::LocalBoxFuture;
 
@@ -63,7 +63,7 @@ where
                     let id = crate::database::validate_token::validate_token(_auth.0.token.clone());
                     match id {
                         Ok(id) => {
-                            req.extensions_mut().insert(super::UserId{user_id:id});
+                            req.extensions_mut().insert(super::UserId { user_id: id });
                             println!("{:?}", id);
                         }
                         Err(_) => {
@@ -75,9 +75,7 @@ where
                             };
 
                             let res = req
-                                .into_response(
-                                    HttpResponse::Ok().json(&b),
-                                )
+                                .into_response(HttpResponse::Ok().json(&b))
                                 .map_into_right_body();
                             return Box::pin(async { Ok(res) });
                         }

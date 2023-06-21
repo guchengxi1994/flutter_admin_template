@@ -9,7 +9,7 @@ class BaseResponse {
     if (json['records'] != null) {
       records = [];
       json['records'].forEach((v) {
-        records!.add(v.toString());
+        records!.add(v);
       });
     }
   }

@@ -4,4 +4,7 @@ class _TableStyle {
   _TableStyle._();
   static TextStyle columnStyle =
       const TextStyle(fontSize: 12, color: Color.fromARGB(255, 206, 206, 206));
+
+  static TextStyle itemStyle =
+      const TextStyle(fontSize: 12, color: Color.fromARGB(255, 32, 32, 32));
 }
