@@ -25,14 +25,14 @@ async fn main() -> std::io::Result<()> {
         let cors = actix_cors::Cors::permissive();
 
         App::new()
+            .wrap(Logger::default())
+            .wrap(crate::middleware::auth::Auth)
+            .wrap(crate::middleware::refresh_token::RefreshToken)
             .wrap(cors)
             .wrap_fn(|req, srv| {
                 println!("Hi from server. You requested: {}", req.path());
                 srv.call(req)
             })
-            .wrap(Logger::default())
-            .wrap(crate::middleware::auth::Auth)
-            .wrap(crate::middleware::refresh_token::RefreshToken)
             .configure(crate::routers::user::user_group)
             .configure(crate::routers::log::log_group)
     })

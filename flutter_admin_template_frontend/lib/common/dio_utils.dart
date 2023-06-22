@@ -51,13 +51,6 @@ class DioUtils {
       return response;
     } on Exception catch (e) {
       debugPrint('getHttp exception: $e');
-
-      /// FIXME
-      ///
-      /// actix-web cors error
-      ///
-      /// not sure why
-
       return null;
     }
   }
