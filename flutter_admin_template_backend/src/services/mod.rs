@@ -2,7 +2,7 @@ use sqlx::{MySql, Pool};
 use self::query_params::{QueryParam, DataList, Pagination, ByIdMany,Count,SigninRecordsQueryParam};
 
 mod tests;
-pub mod user_login_service;
+pub mod log_service;
 pub mod user_service;
 pub mod query_params;
 

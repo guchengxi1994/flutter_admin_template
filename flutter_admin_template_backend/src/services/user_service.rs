@@ -1,5 +1,5 @@
 use crate::constants::TOKEN_EXPIRE;
-use crate::models::user_login::LoginState;
+use crate::models::sign_in_record::LoginState;
 use crate::{database::init::REDIS_CLIENT, models::user::User};
 use serde::Deserialize;
 use validator::Validate;

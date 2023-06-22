@@ -26,7 +26,7 @@ impl Display for LoginState {
 
 #[derive(Clone, Debug, sqlx::FromRow, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct UserLogin {
+pub struct SignInRecord {
     pub login_id: i64,
     pub user_id: i64,
     pub login_ip: String,

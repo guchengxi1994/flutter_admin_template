@@ -1,6 +1,6 @@
 use sqlx::{MySql, Pool, QueryBuilder};
 
-use crate::models::user_login::UserLogin;
+use crate::models::sign_in_record::SignInRecord;
 
 use super::{
     query_params::SigninRecordsQueryParam,
@@ -9,7 +9,7 @@ use super::{
 };
 
 #[async_trait::async_trait]
-impl super::Query<UserLogin> for UserLogin {
+impl super::Query<SignInRecord> for SignInRecord {
     async fn all(
         pool: &Pool<MySql>,
         query_params: QueryParam<SigninRecordsQueryParam>,
@@ -60,7 +60,7 @@ impl super::Query<UserLogin> for UserLogin {
         query.push(",");
         query.push_bind(_q.page_size);
 
-        let logs: Vec<UserLogin> = query.build_query_as().fetch_all(pool).await?;
+        let logs: Vec<SignInRecord> = query.build_query_as().fetch_all(pool).await?;
         anyhow::Ok(super::DataList {
             count: count.count,
             records: logs,
@@ -68,7 +68,7 @@ impl super::Query<UserLogin> for UserLogin {
     }
 
     async fn current_single(id: i64, pool: &Pool<MySql>) -> anyhow::Result<Self> {
-        let log = sqlx::query_as::<sqlx::MySql, UserLogin>(
+        let log = sqlx::query_as::<sqlx::MySql, SignInRecord>(
             r#"SELECT * FROM user_login WHERE user_id = ? order by login_id desc limit 1"#,
         )
         .bind(id)
@@ -92,7 +92,7 @@ impl super::Query<UserLogin> for UserLogin {
         query.push(",");
         query.push_bind(_q.page_size);
 
-        let logs: Vec<UserLogin> = query.build_query_as().fetch_all(pool).await?;
+        let logs: Vec<SignInRecord> = query.build_query_as().fetch_all(pool).await?;
 
         let count = sqlx::query_as::<sqlx::MySql, super::Count>(
             r#"SELECT COUNT(login_id) as count FROM user_login WHERE user_id = ?"#,
@@ -107,7 +107,7 @@ impl super::Query<UserLogin> for UserLogin {
     }
 
     async fn by_id_single(id: i64, pool: &Pool<MySql>) -> anyhow::Result<Self> {
-        let log = sqlx::query_as::<sqlx::MySql, UserLogin>(
+        let log = sqlx::query_as::<sqlx::MySql, SignInRecord>(
             r#"SELECT * FROM user_login WHERE user_id = ? order by login_id desc limit 1"#,
         )
         .bind(id)
@@ -130,7 +130,7 @@ impl super::Query<UserLogin> for UserLogin {
         query.push(",");
         query.push_bind(_q.page_size);
 
-        let logs: Vec<UserLogin> = query.build_query_as().fetch_all(pool).await?;
+        let logs: Vec<SignInRecord> = query.build_query_as().fetch_all(pool).await?;
 
         let count = sqlx::query_as::<sqlx::MySql, super::query_params::Count>(
             r#"SELECT COUNT(login_id) as count FROM user_login WHERE user_id = ?"#,

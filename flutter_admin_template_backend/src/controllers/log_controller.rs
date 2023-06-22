@@ -4,12 +4,12 @@ use crate::{
     common::base_response::BaseResponse,
     database::init::POOL,
     middleware::UserId,
-    models::user_login,
+    models::sign_in_record,
     services::query_params::{DataList, Pagination, QueryParam, SigninRecordsQueryParam},
     services::Query,
 };
 
-pub async fn get_all(req: HttpRequest, c: Option<web::ReqData<UserId>>) -> HttpResponse {
+pub async fn sign_in_get_all(req: HttpRequest, c: Option<web::ReqData<UserId>>) -> HttpResponse {
     let page = web::Query::<SigninRecordsQueryParam>::from_query(req.query_string());
     let pagination: SigninRecordsQueryParam;
     match page {
@@ -39,14 +39,15 @@ pub async fn get_all(req: HttpRequest, c: Option<web::ReqData<UserId>>) -> HttpR
             //     data: None,
             // };
             // return HttpResponse::Ok().json(&b);
-            return get_current(req, c1).await;
+            return sign_in_get_current(req, c1).await;
         } else {
             let pool = POOL.lock().unwrap();
             let logs =
-                user_login::UserLogin::all(pool.get_pool(), QueryParam { data: pagination }).await;
+                sign_in_record::SignInRecord::all(pool.get_pool(), QueryParam { data: pagination })
+                    .await;
             match logs {
                 Ok(_logs) => {
-                    let b: BaseResponse<DataList<user_login::UserLogin>> = BaseResponse {
+                    let b: BaseResponse<DataList<sign_in_record::SignInRecord>> = BaseResponse {
                         code: crate::constants::OK,
                         message: "查询成功",
                         data: _logs,
@@ -74,7 +75,10 @@ pub async fn get_all(req: HttpRequest, c: Option<web::ReqData<UserId>>) -> HttpR
     }
 }
 
-pub async fn get_current(req: HttpRequest, c: Option<web::ReqData<UserId>>) -> HttpResponse {
+pub async fn sign_in_get_current(
+    req: HttpRequest,
+    c: Option<web::ReqData<UserId>>,
+) -> HttpResponse {
     let page = web::Query::<Pagination>::from_query(req.query_string());
     let pagination: Pagination;
     match page {
@@ -93,7 +97,7 @@ pub async fn get_current(req: HttpRequest, c: Option<web::ReqData<UserId>>) -> H
         let user_id = c.into_inner().user_id;
 
         let pool = POOL.lock().unwrap();
-        let logs = user_login::UserLogin::current_many(
+        let logs = sign_in_record::SignInRecord::current_many(
             user_id,
             pool.get_pool(),
             QueryParam { data: pagination },
@@ -101,7 +105,7 @@ pub async fn get_current(req: HttpRequest, c: Option<web::ReqData<UserId>>) -> H
         .await;
         match logs {
             Ok(_logs) => {
-                let b: BaseResponse<DataList<user_login::UserLogin>> = BaseResponse {
+                let b: BaseResponse<DataList<sign_in_record::SignInRecord>> = BaseResponse {
                     code: crate::constants::OK,
                     message: "查询成功",
                     data: _logs,

@@ -34,7 +34,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(crate::middleware::auth::Auth)
             .wrap(crate::middleware::refresh_token::RefreshToken)
             .configure(crate::routers::user::user_group)
-            .configure(crate::routers::user_login::user_login_group)
+            .configure(crate::routers::log::log_group)
     })
     .bind("0.0.0.0:15234")?
     .run()

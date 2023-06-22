@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_admin_template_frontend/common/local_storage.dart';
 import 'package:flutter_admin_template_frontend/routers.dart';
 
+import 'smart_dialog_utils.dart';
+
 class AuthInterCeptor extends Interceptor {
   final FatLocalStorage storage = FatLocalStorage();
 
@@ -14,6 +16,19 @@ class AuthInterCeptor extends Interceptor {
     }
 
     super.onRequest(options, handler);
+  }
+
+  @override
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
+    if (response.data != null) {
+      if (response.data['code'] == 40001 || response.data['code'] == 40002) {
+        SmartDialogUtils.error("登录已过期");
+        FatRouters.navigatorKey.currentState
+            ?.pushNamedAndRemoveUntil(FatRouters.loginScreen, (route) => false);
+        return;
+      }
+    }
+    super.onResponse(response, handler);
   }
 }
 
@@ -42,8 +57,7 @@ class DioUtils {
       /// actix-web cors error
       ///
       /// not sure why
-      FatRouters.navigatorKey.currentState
-          ?.pushNamedAndRemoveUntil(FatRouters.loginScreen, (route) => false);
+
       return null;
     }
   }
