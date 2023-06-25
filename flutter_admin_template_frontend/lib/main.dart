@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
       builder: FlutterSmartDialog.init(),
       initialRoute: FatRouters.loginScreen,
       navigatorKey: FatRouters.navigatorKey,
+      theme: ThemeData(useMaterial3: true),
       onGenerateRoute: (settings) {
         if (settings.name == null) {
           return null;
