@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter_admin_template_frontend/styles/app_style.dart';
 
 typedef QueryInitialData<T> = dynamic Function();
 typedef QueryByIndex<T> = dynamic Function(int index);
@@ -94,15 +95,18 @@ class DatatableIndicatorState extends State<DatatableIndicator> {
                 });
               }
             },
-            child: Container(
-              width: size,
-              height: size,
-              decoration: BoxDecoration(
-                  border: Border.all(
-                      color: const Color.fromARGB(255, 230, 223, 223)),
-                  borderRadius: const BorderRadius.all(Radius.circular(4)),
-                  color: ele == _pageIndex ? Colors.blue : Colors.white),
-              child: const Icon(Icons.chevron_left),
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Container(
+                width: size,
+                height: size,
+                decoration: BoxDecoration(
+                    border: Border.all(
+                        color: const Color.fromARGB(255, 230, 223, 223)),
+                    borderRadius: const BorderRadius.all(Radius.circular(4)),
+                    color: ele == _pageIndex ? AppStyle.appBlue : Colors.white),
+                child: const Icon(Icons.chevron_left),
+              ),
             ),
           );
         }
@@ -118,15 +122,18 @@ class DatatableIndicatorState extends State<DatatableIndicator> {
               }
             },
             // child: buildPagerItem(child: Text(ele.toString())),
-            child: Container(
-              width: size,
-              height: size,
-              decoration: BoxDecoration(
-                  border: Border.all(
-                      color: const Color.fromARGB(255, 230, 223, 223)),
-                  borderRadius: const BorderRadius.all(Radius.circular(4)),
-                  color: ele == _pageIndex ? Colors.blue : Colors.white),
-              child: const Icon(Icons.chevron_right),
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Container(
+                width: size,
+                height: size,
+                decoration: BoxDecoration(
+                    border: Border.all(
+                        color: const Color.fromARGB(255, 230, 223, 223)),
+                    borderRadius: const BorderRadius.all(Radius.circular(4)),
+                    color: ele == _pageIndex ? AppStyle.appBlue : Colors.white),
+                child: const Icon(Icons.chevron_right),
+              ),
             ),
           );
         }
@@ -142,20 +149,23 @@ class DatatableIndicatorState extends State<DatatableIndicator> {
               });
             }
           },
-          child: Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-                border:
-                    Border.all(color: const Color.fromARGB(255, 230, 223, 223)),
-                borderRadius: const BorderRadius.all(Radius.circular(4)),
-                color: ele == _pageIndex ? Colors.blue : Colors.white),
-            child: Center(
-              child: Text("$ele",
-                  // 当前页码对应的组件的样式
-                  style: ele == _pageIndex
-                      ? const TextStyle(color: Colors.white)
-                      : const TextStyle(color: Colors.black)),
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: Container(
+              width: size,
+              height: size,
+              decoration: BoxDecoration(
+                  border: Border.all(
+                      color: const Color.fromARGB(255, 230, 223, 223)),
+                  borderRadius: const BorderRadius.all(Radius.circular(4)),
+                  color: ele == _pageIndex ? AppStyle.appBlue : Colors.white),
+              child: Center(
+                child: Text("$ele",
+                    // 当前页码对应的组件的样式
+                    style: ele == _pageIndex
+                        ? const TextStyle(color: Colors.white)
+                        : const TextStyle(color: Colors.black)),
+              ),
             ),
           ),
         );

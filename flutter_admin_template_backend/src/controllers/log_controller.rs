@@ -5,8 +5,11 @@ use crate::{
     database::init::POOL,
     middleware::UserId,
     models::sign_in_record,
-    services::query_params::{DataList, Pagination, QueryParam, SigninRecordsQueryParam},
     services::Query,
+    services::{
+        log_service::SignInSummary,
+        query_params::{DataList, Pagination, QueryParam, SigninRecordsQueryParam},
+    },
 };
 
 pub async fn sign_in_get_all(req: HttpRequest, c: Option<web::ReqData<UserId>>) -> HttpResponse {
@@ -24,6 +27,7 @@ pub async fn sign_in_get_all(req: HttpRequest, c: Option<web::ReqData<UserId>>) 
                 user_id: None,
                 start_time: None,
                 end_time: None,
+                state: None,
             }
         }
     }
@@ -129,5 +133,48 @@ pub async fn sign_in_get_current(
             data: None,
         };
         return HttpResponse::Ok().json(&b);
+    }
+}
+
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LogSummary {
+    pub sign_in: Vec<SignInSummary>,
+}
+
+pub async fn get_log_summary(_req: HttpRequest, c: Option<web::ReqData<UserId>>) -> HttpResponse {
+    let user_id: i64;
+    if let Some(c) = c {
+        user_id = c.into_inner().user_id;
+    } else {
+        let b: BaseResponse<Option<String>> = BaseResponse {
+            code: crate::constants::BAD_REQUEST,
+            message: "查询失败",
+            data: None,
+        };
+        return HttpResponse::Ok().json(&b);
+    }
+
+    let pool = POOL.lock().unwrap();
+    let summary =
+        crate::services::log_service::get_sign_in_log_summary(pool.get_pool(), user_id).await;
+    match summary {
+        Ok(s) => {
+            let b: BaseResponse<LogSummary> = BaseResponse {
+                code: crate::constants::OK,
+                message: "查询成功",
+                data: LogSummary { sign_in: s },
+            };
+            return HttpResponse::Ok().json(&b);
+        }
+        Err(e) => {
+            println!("[rust error] : {:?}", e);
+            let b: BaseResponse<Option<String>> = BaseResponse {
+                code: crate::constants::BAD_REQUEST,
+                message: "查询失败",
+                data: None,
+            };
+            return HttpResponse::Ok().json(&b);
+        }
     }
 }

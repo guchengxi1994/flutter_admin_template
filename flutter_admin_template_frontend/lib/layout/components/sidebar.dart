@@ -91,11 +91,16 @@ class Sidebar extends ConsumerWidget {
       ]);
 
   Widget _buildContent(WidgetRef ref) {
+    bool isCollapse = ref.watch(sidebarProvider).isCollapse;
     return Container(
-      width: !ref.watch(sidebarProvider).isCollapse
-          ? AppStyle.sidebarWidth
-          : AppStyle.sidebarCollapseWidth,
-      color: AppStyle.appBlue,
+      width:
+          !isCollapse ? AppStyle.sidebarWidth : AppStyle.sidebarCollapseWidth,
+      // color: AppStyle.appBlue,
+      margin: !isCollapse ? null : const EdgeInsets.all(5),
+      padding: isCollapse ? null : const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+          color: AppStyle.appBlue,
+          borderRadius: !isCollapse ? null : BorderRadius.circular(12)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,

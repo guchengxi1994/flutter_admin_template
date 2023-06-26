@@ -62,19 +62,21 @@ pub struct SigninRecordsQueryParam {
     pub user_id: Option<i64>,
     pub start_time: Option<i64>,
     pub end_time: Option<i64>,
+    pub state : Option<String>
 }
 
 impl Display for SigninRecordsQueryParam {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "page_number : {:?}, page_size: {:?}, username:{:?}, user_id:{:?}, start:{:?},end:{:?}",
+            "page_number : {:?}, page_size: {:?}, username:{:?}, user_id:{:?}, start:{:?},end:{:?},state:{:?}",
             self.page_number,
             self.page_size,
             self.username,
             self.user_id,
             self.start_time,
-            self.end_time
+            self.end_time,
+            self.state
         )
     }
 }

@@ -18,6 +18,7 @@ pub fn log_group(config: &mut web::ServiceConfig) {
 
                 error::InternalError::from_response(err, HttpResponse::Ok().body(body)).into()
             }))
+            .route("/summary", web::get().to(log_controller::get_log_summary))
             .route(
                 "/signin/all",
                 web::get().to(log_controller::sign_in_get_all),

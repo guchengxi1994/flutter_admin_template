@@ -1,5 +1,5 @@
 use crate::constants::TOKEN_EXPIRE;
-use crate::models::sign_in_record::LoginState;
+use crate::models::sign_in_record::SignInState;
 use crate::{database::init::REDIS_CLIENT, models::user::User};
 use serde::Deserialize;
 use validator::Validate;
@@ -84,7 +84,7 @@ impl User {
                     )
                     .bind(_u.user_id).bind(_u.user_name)
                     .bind(login_ip)
-                    .bind(LoginState::ErrPwd.to_string())
+                    .bind(SignInState::ErrPwd.to_string())
                     .execute(&mut tx)
                     .await?;
                     anyhow::bail!("密码错误")
@@ -95,7 +95,7 @@ impl User {
                 )
                 .bind(_u.user_id).bind(_u.user_name)
                 .bind(login_ip)
-                .bind(LoginState::Success.to_string())
+                .bind(SignInState::Success.to_string())
                 .execute(&mut tx)
                 .await?;
                 tx.commit().await?;
@@ -113,7 +113,7 @@ impl User {
                 )
                 .bind(0).bind("unknow")
                 .bind(login_ip)
-                .bind(LoginState::NoUser.to_string())
+                .bind(SignInState::NoUser.to_string())
                 .execute(&mut tx)
                 .await?;
                 anyhow::bail!("用户不存在")

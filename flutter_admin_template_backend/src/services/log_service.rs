@@ -1,6 +1,6 @@
 use sqlx::{MySql, Pool, QueryBuilder};
 
-use crate::models::sign_in_record::SignInRecord;
+use crate::models::sign_in_record::{SignInRecord};
 
 use super::{
     query_params::SigninRecordsQueryParam,
@@ -21,12 +21,21 @@ impl super::Query<SignInRecord> for SignInRecord {
             "SELECT COUNT(login_id) as count FROM ( SELECT * FROM user_login WHERE user_id>0",
         );
         if let Some(username) = _q.username {
-            println!("[username] {:?} ", username);
             query.push(" and user_name LIKE ");
             let l = format!("'%{}%'", username);
             query.push(l.clone());
             count_query.push(" and user_name LIKE ");
             count_query.push(l);
+        }
+
+        if let Some(state) = _q.state {
+            if state == "success" {
+                query.push(" and login_state = 'success'");
+                count_query.push(" and login_state = 'success'");
+            } else {
+                query.push(" and login_state != 'success'");
+                count_query.push(" and login_state != 'success'");
+            }
         }
 
         if let Some(user_id) = _q.user_id {
@@ -143,4 +152,29 @@ impl super::Query<SignInRecord> for SignInRecord {
             records: logs,
         })
     }
+}
+
+#[derive(Clone, Debug, sqlx::FromRow, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SignInSummary {
+    pub count: i64,
+    pub login_state: String,
+}
+
+pub async fn get_sign_in_log_summary(
+    pool: &Pool<MySql>,
+    user_id: i64,
+) -> anyhow::Result<Vec<SignInSummary>> {
+    let mut query: QueryBuilder<'_, _>;
+    if user_id != 1 {
+        query = QueryBuilder::new("SELECT count(login_id) as count,login_state FROM user_login LEFT JOIN `user` ON user_login.user_id = `user`.user_id WHERE `user`.is_deleted = 0  and `user`.user_id = ");
+        query.push_bind(user_id);
+    } else {
+        query = QueryBuilder::new("SELECT count(login_id) as count,login_state FROM user_login LEFT JOIN `user` ON user_login.user_id = `user`.user_id WHERE `user`.is_deleted = 0  and `user`.user_id > 0 ")
+    }
+
+    query.push(" GROUP BY user_login.login_state");
+    let result: Vec<SignInSummary> = query.build_query_as().fetch_all(pool).await?;
+
+    anyhow::Ok(result)
 }

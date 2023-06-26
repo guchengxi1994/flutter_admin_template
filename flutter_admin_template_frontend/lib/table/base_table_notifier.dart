@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_admin_template_frontend/common/local_storage.dart';
 
 import '../common/dio_utils.dart';
 import '../common/smart_dialog_utils.dart';
@@ -10,7 +9,6 @@ import 'base_request.dart';
 class BaseTableNotifier<Q extends BaseRequest, R extends BaseResponse>
     extends ChangeNotifier {
   final DioUtils dioUtils = DioUtils();
-  final FatLocalStorage storage = FatLocalStorage();
 
   List records = [];
 
@@ -55,6 +53,46 @@ class BaseTableNotifier<Q extends BaseRequest, R extends BaseResponse>
 
   onPageIndexChange(int index, String url,
       {Map<String, dynamic> parameters = const {}}) async {
+    Response? r = await dioUtils.get(url);
+    if (r != null) {
+      if (r.data['code'] != 20000) {
+        SmartDialogUtils.error(r.data['message'].toString());
+      } else {
+        BaseResponse response = BaseResponse.fromJson(r.data['data']);
+        records = response.records ?? [];
+        totalCount = response.count ?? 0;
+        pageLength = getPageCount();
+        notifyListeners();
+      }
+    }
+  }
+
+  onReset(String url, String method, {Q? request}) async {
+    assert((method == "post" && request != null) || method == "get");
+    currentIndex = 1;
+
+    Response? r;
+    if (method == "post") {
+      r = await dioUtils.post(url, data: request!.toJson());
+    } else {
+      r = await dioUtils.get(url);
+    }
+
+    if (r != null) {
+      if (r.data['code'] != 20000) {
+        SmartDialogUtils.error(r.data['message'].toString());
+      } else {
+        BaseResponse response = BaseResponse.fromJson(r.data['data']);
+        records = response.records ?? [];
+        totalCount = response.count ?? 0;
+        pageLength = getPageCount();
+        notifyListeners();
+      }
+    }
+  }
+
+  onSubmit(String url, DateTime? first, DateTime? last, String? status,
+      String? keyword, bool b) async {
     Response? r = await dioUtils.get(url);
     if (r != null) {
       if (r.data['code'] != 20000) {
