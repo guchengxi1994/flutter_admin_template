@@ -170,7 +170,7 @@ pub async fn get_sign_in_log_summary(
         query = QueryBuilder::new("SELECT count(login_id) as count,login_state FROM user_login LEFT JOIN `user` ON user_login.user_id = `user`.user_id WHERE `user`.is_deleted = 0  and `user`.user_id = ");
         query.push_bind(user_id);
     } else {
-        query = QueryBuilder::new("SELECT count(login_id) as count,login_state FROM user_login LEFT JOIN `user` ON user_login.user_id = `user`.user_id WHERE `user`.is_deleted = 0  and `user`.user_id > 0 ")
+        query = QueryBuilder::new("SELECT count(login_id) as count,login_state FROM user_login LEFT JOIN `user` ON user_login.user_id = `user`.user_id WHERE `user`.is_deleted = 0 ")
     }
 
     query.push(" GROUP BY user_login.login_state");
