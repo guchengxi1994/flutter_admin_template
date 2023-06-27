@@ -29,6 +29,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(crate::middleware::auth::Auth)
             .wrap(crate::middleware::refresh_token::RefreshToken)
             .wrap(cors)
+            .wrap(crate::middleware::reject_request::RejectRequest)
             .wrap_fn(|req, srv| {
                 println!("Hi from server. You requested: {}", req.path());
                 srv.call(req)

@@ -1,8 +1,12 @@
+use std::time::SystemTime;
+
 use crate::constants::TOKEN_EXPIRE;
 use crate::models::sign_in_record::SignInState;
 use crate::{database::init::REDIS_CLIENT, models::user::User};
 use serde::Deserialize;
 use validator::Validate;
+
+use super::Query;
 
 #[derive(Debug, Validate, Deserialize)]
 pub struct NewUserRequest {
@@ -89,18 +93,37 @@ impl User {
                     .await?;
                     anyhow::bail!("密码错误")
                 }
+                let cli = REDIS_CLIENT.lock().unwrap().clone().unwrap();
+                let mut con = cli.get_connection().unwrap();
+                // 获取最后一次登录的时间和token
+                let log = crate::models::sign_in_record::SignInRecord::current_single(
+                    _u.user_id,
+                    pool.get_pool(),
+                )
+                .await?;
+
+                // 如果没有超时
+                let duration = SystemTime::now().duration_since(log.login_time.into())?;
+                if let Some(t) = log.token {
+                    if duration.as_secs() < (*TOKEN_EXPIRE.lock().unwrap()).try_into()? {
+                        // 刷新token
+                        let _ = crate::database::refresh_token::refresh_token(t.clone(), &mut con);
+                        return anyhow::Ok(t);
+                    }
+                }
+
+                let token = crate::common::hash::get_token(req.user_name);
 
                 let _ = sqlx::query(
-                    r#"INSERT INTO user_login (user_id,user_name,login_ip,login_state) VALUES (?,?,?,?)"#,
+                    r#"INSERT INTO user_login (user_id,user_name,login_ip,login_state,token) VALUES (?,?,?,?,?)"#,
                 )
                 .bind(_u.user_id).bind(_u.user_name)
                 .bind(login_ip)
-                .bind(SignInState::Success.to_string())
+                .bind(SignInState::Success.to_string()).bind(token.clone())
                 .execute(&mut tx)
                 .await?;
                 tx.commit().await?;
-                let token = crate::common::hash::get_token(req.user_name);
-                let mut con = REDIS_CLIENT.lock().unwrap().clone().unwrap();
+
                 let _: () = redis::Commands::set(&mut con, token.clone(), _u.user_id)?;
                 let d = TOKEN_EXPIRE.lock().unwrap();
                 let _: () = redis::Commands::expire(&mut con, token.clone(), *d)?;
