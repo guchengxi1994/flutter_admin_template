@@ -96,7 +96,7 @@ impl User {
                 let cli = REDIS_CLIENT.lock().unwrap().clone().unwrap();
                 let mut con = cli.get_connection().unwrap();
                 // 获取最后一次登录的时间和token
-                let log = crate::models::sign_in_record::SignInRecord::current_single(
+                let log = crate::services::log_service::SignInRecordWithName::current_single(
                     _u.user_id,
                     pool.get_pool(),
                 )

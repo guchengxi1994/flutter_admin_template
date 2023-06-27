@@ -4,10 +4,9 @@ use crate::{
     common::base_response::BaseResponse,
     database::init::POOL,
     middleware::UserId,
-    models::sign_in_record,
     services::Query,
     services::{
-        log_service::SignInSummary,
+        log_service::{SignInSummary, UserSignInSummary,SignInRecordWithName},
         query_params::{DataList, Pagination, QueryParam, SigninRecordsQueryParam},
     },
 };
@@ -37,21 +36,15 @@ pub async fn sign_in_get_all(req: HttpRequest, c: Option<web::ReqData<UserId>>) 
     if let Some(c) = c {
         let user_id = c.into_inner().user_id;
         if user_id != 1 {
-            // let b: BaseResponse<Option<String>> = BaseResponse {
-            //     code: crate::constants::BAD_REQUEST,
-            //     message: "当前用户无法查询全部",
-            //     data: None,
-            // };
-            // return HttpResponse::Ok().json(&b);
             return sign_in_get_current(req, c1).await;
         } else {
             let pool = POOL.lock().unwrap();
             let logs =
-                sign_in_record::SignInRecord::all(pool.get_pool(), QueryParam { data: pagination })
+            SignInRecordWithName::all(pool.get_pool(), QueryParam { data: pagination })
                     .await;
             match logs {
                 Ok(_logs) => {
-                    let b: BaseResponse<DataList<sign_in_record::SignInRecord>> = BaseResponse {
+                    let b: BaseResponse<DataList<SignInRecordWithName>> = BaseResponse {
                         code: crate::constants::OK,
                         message: "查询成功",
                         data: _logs,
@@ -101,7 +94,7 @@ pub async fn sign_in_get_current(
         let user_id = c.into_inner().user_id;
 
         let pool = POOL.lock().unwrap();
-        let logs = sign_in_record::SignInRecord::current_many(
+        let logs = SignInRecordWithName::current_many(
             user_id,
             pool.get_pool(),
             QueryParam { data: pagination },
@@ -109,7 +102,7 @@ pub async fn sign_in_get_current(
         .await;
         match logs {
             Ok(_logs) => {
-                let b: BaseResponse<DataList<sign_in_record::SignInRecord>> = BaseResponse {
+                let b: BaseResponse<DataList<SignInRecordWithName>> = BaseResponse {
                     code: crate::constants::OK,
                     message: "查询成功",
                     data: _logs,
@@ -140,6 +133,7 @@ pub async fn sign_in_get_current(
 #[serde(rename_all = "camelCase")]
 pub struct LogSummary {
     pub sign_in: Vec<SignInSummary>,
+    pub user_sign_in: Vec<UserSignInSummary>,
 }
 
 pub async fn get_log_summary(_req: HttpRequest, c: Option<web::ReqData<UserId>>) -> HttpResponse {
@@ -158,17 +152,41 @@ pub async fn get_log_summary(_req: HttpRequest, c: Option<web::ReqData<UserId>>)
     let pool = POOL.lock().unwrap();
     let summary =
         crate::services::log_service::get_sign_in_log_summary(pool.get_pool(), user_id).await;
-    match summary {
-        Ok(s) => {
+
+    let user_sign_in_summary =
+        crate::services::log_service::get_user_sign_in_summary(pool.get_pool(), user_id).await;
+
+    match (summary, user_sign_in_summary) {
+        (Ok(s), Ok(u)) => {
             let b: BaseResponse<LogSummary> = BaseResponse {
                 code: crate::constants::OK,
                 message: "查询成功",
-                data: LogSummary { sign_in: s },
+                data: LogSummary {
+                    sign_in: s,
+                    user_sign_in: u,
+                },
             };
             return HttpResponse::Ok().json(&b);
         }
-        Err(e) => {
+        (Ok(_), Err(e)) => {
             println!("[rust error] : {:?}", e);
+            let b: BaseResponse<Option<String>> = BaseResponse {
+                code: crate::constants::BAD_REQUEST,
+                message: "查询失败",
+                data: None,
+            };
+            return HttpResponse::Ok().json(&b);
+        }
+        (Err(e), Ok(_)) => {
+            println!("[rust error] : {:?}", e);
+            let b: BaseResponse<Option<String>> = BaseResponse {
+                code: crate::constants::BAD_REQUEST,
+                message: "查询失败",
+                data: None,
+            };
+            return HttpResponse::Ok().json(&b);
+        }
+        (Err(_), Err(_)) => {
             let b: BaseResponse<Option<String>> = BaseResponse {
                 code: crate::constants::BAD_REQUEST,
                 message: "查询失败",

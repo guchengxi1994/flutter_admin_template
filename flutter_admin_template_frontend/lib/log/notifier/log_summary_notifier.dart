@@ -8,6 +8,7 @@ import 'package:flutter_admin_template_frontend/log/models/log_summary_response.
 class LogSummaryNotifier extends ChangeNotifier {
   final DioUtils dioUtils = DioUtils();
   List<SignIn> signIns = [];
+  List<UserSignIn> userSignIns = [];
 
   init() async {
     String url = apiDetails["logSummary"]!;
@@ -19,6 +20,7 @@ class LogSummaryNotifier extends ChangeNotifier {
         SignInLogSummary summary = SignInLogSummary.fromJson(r.data['data']);
         // print(summary.toJson());
         signIns = summary.signIn ?? [];
+        userSignIns = summary.userSignIn ?? [];
         notifyListeners();
       }
     }

@@ -2,7 +2,7 @@ name: flutter_admin_template_frontend
 description: A new Flutter project.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 0.1.0
+version: 0.1.1
 
 environment:
   sdk: '>=3.0.2 <4.0.0'

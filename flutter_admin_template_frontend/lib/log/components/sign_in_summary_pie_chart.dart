@@ -3,20 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_admin_template_frontend/log/models/log_summary_response.dart';
 import 'package:flutter_admin_template_frontend/styles/pie_chart_style.dart';
 
-class SignInSummaryPieChart extends StatefulWidget {
+class SignInSummaryPieChart extends StatelessWidget {
   const SignInSummaryPieChart({super.key, required this.signIn});
   final List<SignIn> signIn;
 
   @override
-  State<SignInSummaryPieChart> createState() => _SignInSummaryPieChartState();
-}
-
-class _SignInSummaryPieChartState extends State<SignInSummaryPieChart> {
-  int touchedIndex = -1;
-
-  @override
   Widget build(BuildContext context) {
-    if (widget.signIn.isEmpty) {
+    if (signIn.isEmpty) {
       return Center(
         child: SizedBox(
             child: Column(
@@ -37,14 +30,23 @@ class _SignInSummaryPieChartState extends State<SignInSummaryPieChart> {
         )),
       );
     }
-    return DChartPie(
-      data: widget.signIn
-          .map((e) => {'domain': e.loginState, 'measure': e.count})
-          .toList(),
-      fillColor: (p, i) => PieChartStyle.getIndex(i! + 1),
-      pieLabel: (pieData, index) {
-        return "${pieData['domain']}: ${pieData['measure']} times";
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        SizedBox(
+          height: 300,
+          child: DChartPie(
+            data: signIn
+                .map((e) => {'domain': e.loginState, 'measure': e.count})
+                .toList(),
+            fillColor: (p, i) => PieChartStyle.getIndex(i! + 1),
+            pieLabel: (pieData, index) {
+              return "${pieData['domain']}: ${pieData['measure']} times";
+            },
+          ),
+        ),
+        const Text("Fig.登录状态")
+      ],
     );
   }
 }

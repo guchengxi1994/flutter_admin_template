@@ -32,7 +32,6 @@ pub struct SignInRecord {
     pub login_ip: String,
     pub login_time: chrono::DateTime<chrono::Local>,
     pub login_state: String,
-    pub user_name: String,
     #[serde(skip)]
     pub token: Option<String>,
 }
