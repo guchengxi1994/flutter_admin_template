@@ -1,7 +1,12 @@
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{
+    web::{self, ReqData},
+    HttpRequest, HttpResponse,
+};
 
 use crate::{
     common::base_response::BaseResponse,
+    middleware::UserId,
+    models::user::User,
     services::user_service::{NewUserRequest, UserLoginRequest},
 };
 
@@ -57,6 +62,27 @@ pub async fn login(info: web::Json<UserLoginRequest>, req: HttpRequest) -> HttpR
     let b: BaseResponse<Option<String>> = BaseResponse {
         code: crate::constants::BAD_REQUEST,
         message: "获取IP异常",
+        data: None,
+    };
+    return HttpResponse::Ok().json(&b);
+}
+
+pub async fn get_current_user_info(user_id: Option<ReqData<UserId>>) -> HttpResponse {
+    if let Some(_id) = user_id {
+        let u = crate::models::user::User::get_user_info(_id.user_id).await;
+        if let Ok(_u) = u {
+            let b: BaseResponse<Option<User>> = BaseResponse {
+                code: crate::constants::OK,
+                message: "",
+                data: Some(_u),
+            };
+            return HttpResponse::Ok().json(&b);
+        }
+    }
+
+    let b: BaseResponse<Option<String>> = BaseResponse {
+        code: crate::constants::INVALID_USER,
+        message: "获取人员信息失败",
         data: None,
     };
     return HttpResponse::Ok().json(&b);

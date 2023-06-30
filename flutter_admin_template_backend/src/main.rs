@@ -27,6 +27,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(crate::middleware::reject_request::RejectRequest)
             .configure(crate::routers::user::user_group)
             .configure(crate::routers::log::log_group)
+            .configure(crate::routers::router::router_group)
     })
     .bind("0.0.0.0:15234")?
     .run()

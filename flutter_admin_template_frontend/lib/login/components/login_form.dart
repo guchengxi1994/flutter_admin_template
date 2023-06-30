@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_template_frontend/common/screen_fit_utils.dart';
+import 'package:flutter_admin_template_frontend/notifier/global_notifier.dart';
 import 'package:flutter_admin_template_frontend/routers.dart';
 import 'package:flutter_admin_template_frontend/styles/app_style.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -166,6 +167,7 @@ class LoginForm extends ConsumerWidget {
                 .read(loginProvider)
                 .login(usernameController.text, passwardController.text);
             if (r) {
+              await ref.read(menuAuthProvider).refresh();
               // ignore: use_build_context_synchronously
               Navigator.of(context).pushNamedAndRemoveUntil(
                   FatRouters.dashboardScreen, (v) => false);

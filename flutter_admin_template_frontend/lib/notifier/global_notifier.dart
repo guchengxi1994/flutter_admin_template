@@ -5,7 +5,7 @@ import 'api_auth_notifier.dart';
 import 'widget_auth_notifier.dart';
 
 final menuAuthProvider = ChangeNotifierProvider<MenuAuthNotifier>((ref) {
-  return MenuAuthNotifier()..init();
+  return MenuAuthNotifier();
 });
 
 final routerAuthProvider = ChangeNotifierProvider<ApiAuthNotifier>((ref) {

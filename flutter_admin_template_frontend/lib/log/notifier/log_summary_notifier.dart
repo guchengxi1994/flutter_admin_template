@@ -14,7 +14,7 @@ class LogSummaryNotifier extends ChangeNotifier {
     String url = apiDetails["logSummary"]!;
     Response? r = await dioUtils.get(url);
     if (r != null) {
-      if (r.data['code'] != 20000) {
+      if (r.data['code'] != httpCodeOK) {
         SmartDialogUtils.error(r.data['message'].toString());
       } else {
         SignInLogSummary summary = SignInLogSummary.fromJson(r.data['data']);

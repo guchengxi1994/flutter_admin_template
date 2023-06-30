@@ -64,7 +64,7 @@ where
                     match id {
                         Ok(id) => {
                             req.extensions_mut().insert(super::UserId { user_id: id });
-                            println!("{:?}", id);
+                            println!("current_user_id ==> {:?}", id);
                         }
                         Err(_) => {
                             println!(" {:?} Token not valid", _auth.0.token);

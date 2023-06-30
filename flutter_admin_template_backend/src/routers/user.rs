@@ -19,6 +19,7 @@ pub fn user_group(config: &mut web::ServiceConfig) {
                 error::InternalError::from_response(err, HttpResponse::Ok().body(body)).into()
             }))
             .route("/create", web::post().to(user_controller::new_user))
-            .route("/login", web::post().to(user_controller::login)),
+            .route("/login", web::post().to(user_controller::login))
+            .route("/info", web::get().to(user_controller::get_current_user_info)),
     );
 }

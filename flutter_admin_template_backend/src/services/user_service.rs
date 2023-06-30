@@ -84,9 +84,9 @@ impl User {
                 .await
                 {
                     let _ = sqlx::query(
-                        r#"INSERT INTO user_login (user_id,user_name,login_ip,login_state) VALUES (?,?,?,?)"#,
+                        r#"INSERT INTO user_login (user_id,login_ip,login_state) VALUES (?,?,?)"#,
                     )
-                    .bind(_u.user_id).bind(_u.user_name)
+                    .bind(_u.user_id)
                     .bind(login_ip)
                     .bind(SignInState::ErrPwd.to_string())
                     .execute(&mut tx)
@@ -115,9 +115,9 @@ impl User {
                 let token = crate::common::hash::get_token(req.user_name);
 
                 let _ = sqlx::query(
-                    r#"INSERT INTO user_login (user_id,user_name,login_ip,login_state,token) VALUES (?,?,?,?,?)"#,
+                    r#"INSERT INTO user_login (user_id,login_ip,login_state,token) VALUES (?,?,?,?)"#,
                 )
-                .bind(_u.user_id).bind(_u.user_name)
+                .bind(_u.user_id)
                 .bind(login_ip)
                 .bind(SignInState::Success.to_string()).bind(token.clone())
                 .execute(&mut tx)
@@ -132,9 +132,9 @@ impl User {
             Err(_) => {
                 println!("[rust error] : 用户不存在");
                 let _ = sqlx::query(
-                    r#"INSERT INTO user_login (user_id,user_name,login_ip,login_state) VALUES (?,?,?,?)"#,
+                    r#"INSERT INTO user_login (user_id,login_ip,login_state) VALUES (?,?,?)"#,
                 )
-                .bind(0).bind("unknow")
+                .bind(0)
                 .bind(login_ip)
                 .bind(SignInState::NoUser.to_string())
                 .execute(&mut tx)
@@ -142,5 +142,17 @@ impl User {
                 anyhow::bail!("用户不存在")
             }
         }
+    }
+
+    pub async fn get_user_info(user_id: i64) -> anyhow::Result<Self> {
+        let pool = crate::database::init::POOL.lock().unwrap();
+        let u = sqlx::query_as::<sqlx::MySql, User>(
+            r#"select * from user where is_deleted = 0 and user_id = ?"#,
+        )
+        .bind(user_id)
+        .fetch_one(pool.get_pool())
+        .await?;
+
+        anyhow::Ok(u)
     }
 }
