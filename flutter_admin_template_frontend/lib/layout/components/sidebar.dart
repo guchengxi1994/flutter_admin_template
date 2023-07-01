@@ -26,80 +26,56 @@ class SidebarState extends ConsumerState<Sidebar> {
       router: "/main/dashboard",
       title: "Dashboard",
       index: 0,
-      icon: const Icon(Icons.dashboard),
-      iconOnHover: const Icon(
-        Icons.dashboard_outlined,
-        color: Colors.white,
-      ));
+      icon: SidebarIcons.dashBoard,
+      iconOnHover: SidebarIcons.dashBoardOnHover);
 
   late SidebarModel userdModel = SidebarModel(
       router: "/main/user",
       title: "User",
       index: 1,
-      icon: const Icon(Icons.people),
-      iconOnHover: const Icon(
-        Icons.people_outline,
-        color: Colors.white,
-      ));
+      icon: SidebarIcons.user,
+      iconOnHover: SidebarIcons.userOnHover);
 
   late SidebarModel deptModel = SidebarModel(
       router: "/main/dept",
       title: "Department",
       index: 2,
-      icon: const Icon(Icons.local_fire_department),
-      iconOnHover: const Icon(
-        Icons.local_fire_department_outlined,
-        color: Colors.white,
-      ));
+      icon: SidebarIcons.dept,
+      iconOnHover: SidebarIcons.deptOnHover);
 
   late SidebarModel menuModel = SidebarModel(
       router: "/main/menu",
       title: "Menu",
       index: 3,
-      icon: const Icon(Icons.menu),
-      iconOnHover: const Icon(
-        Icons.menu_outlined,
-        color: Colors.white,
-      ));
+      icon: SidebarIcons.menu,
+      iconOnHover: SidebarIcons.menuOnHover);
 
   late SidebarModel roleModel = SidebarModel(
       router: "/main/role",
       title: "Role",
       index: 4,
-      icon: const Icon(Icons.ac_unit),
-      iconOnHover: const Icon(
-        Icons.ac_unit_outlined,
-        color: Colors.white,
-      ));
+      icon: SidebarIcons.role,
+      iconOnHover: SidebarIcons.roleOnHover);
 
   late SidebarModel logModel = SidebarModel(
       router: "/main/logs",
       title: "Log",
       index: 5,
-      icon: const Icon(Icons.details),
-      iconOnHover: const Icon(
-        Icons.details_outlined,
-        color: Colors.white,
-      ),
+      icon: SidebarIcons.log,
+      iconOnHover: SidebarIcons.logOnHover,
       children: [
         SidebarModel(
             router: "/main/logs/operation",
             title: "Operation",
             index: 5,
-            icon: const Icon(Icons.change_circle),
-            iconOnHover: const Icon(
-              Icons.change_circle_outlined,
-              color: Colors.white,
-            )),
+            icon: SidebarIcons.operation,
+            iconOnHover: SidebarIcons.operationOnHover),
         SidebarModel(
             router: "/main/logs/signin",
             title: "Sign in",
             index: 5,
-            icon: const Icon(Icons.login),
-            iconOnHover: const Icon(
-              Icons.login_outlined,
-              color: Colors.white,
-            )),
+            icon: SidebarIcons.signin,
+            iconOnHover: SidebarIcons.signinOnHover),
       ]);
 
   // ignore: prefer_typing_uninitialized_variables

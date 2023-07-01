@@ -8,4 +8,5 @@ const Map<String, String> apiDetails = {
 
   // router
   "currentRouters": "$baseUrl/system/router/current", // Get
+  "allRouters": "$baseUrl/system/router/all", // Get
 };

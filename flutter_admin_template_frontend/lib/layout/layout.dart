@@ -23,7 +23,7 @@ class Layout extends ConsumerWidget {
       child: SafeArea(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
-          children: [Sidebar(), Expanded(child: body)],
+          children: [const Sidebar(), Expanded(child: body)],
         ),
       ),
     );

@@ -28,6 +28,7 @@ async fn main() -> std::io::Result<()> {
             .configure(crate::routers::user::user_group)
             .configure(crate::routers::log::log_group)
             .configure(crate::routers::router::router_group)
+            .configure(crate::routers::role::role_group)
     })
     .bind("0.0.0.0:15234")?
     .run()

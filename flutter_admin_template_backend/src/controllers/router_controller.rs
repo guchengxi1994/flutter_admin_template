@@ -10,7 +10,7 @@ use crate::{
     models::router::Router,
     services::{
         query_params::DataList,
-        router_service::{RouterQueryTrait, RouterSummary},
+        router_service::{RouterTrait, RouterSummary},
     },
 };
 

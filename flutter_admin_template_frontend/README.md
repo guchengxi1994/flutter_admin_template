@@ -2,6 +2,7 @@
 
 ### changelogs
 
+* v0.1.2 `(2023/7/1)`  menu screen
 * v0.1.1 `(2023/6/27)`  add a Barchart
 
 ### dependencies

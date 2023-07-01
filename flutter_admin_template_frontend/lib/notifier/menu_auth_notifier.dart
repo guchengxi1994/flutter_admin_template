@@ -6,7 +6,8 @@ import 'package:flutter_admin_template_frontend/common/local_storage.dart';
 import 'package:flutter_admin_template_frontend/common/smart_dialog_utils.dart';
 import 'package:flutter_admin_template_frontend/routers.dart';
 
-import 'models/menu_auth_response.dart';
+import 'models/menu_auth_response.dart' as menu;
+import 'models/all_router_response.dart' as router;
 
 class MenuAuthNotifier extends ChangeNotifier {
   final Set<String> _auth = {};
@@ -31,6 +32,22 @@ class MenuAuthNotifier extends ChangeNotifier {
     }
   }
 
+  Future<List<router.Records>> getAll() async {
+    Response? r = await dioUtils.get(apiDetails["allRouters"]);
+
+    if (r != null) {
+      if (r.data['code'] != httpCodeOK) {
+        SmartDialogUtils.error(r.data['message'].toString());
+      }
+
+      router.AllRouterResponse allRouterResponse =
+          router.AllRouterResponse.fromJson(r.data['data']);
+      return allRouterResponse.records ?? [];
+    }
+
+    return [];
+  }
+
   refresh() async {
     Response? r = await dioUtils.get(apiDetails["currentRouters"]);
 
@@ -40,22 +57,12 @@ class MenuAuthNotifier extends ChangeNotifier {
         return;
       }
 
-      MenuAuthResponse menuAuthResponse =
-          MenuAuthResponse.fromJson(r.data['data']);
+      menu.MenuAuthResponse menuAuthResponse =
+          menu.MenuAuthResponse.fromJson(r.data['data']);
 
       for (final i in menuAuthResponse.records!) {
-        /// for test
-        ///
-        /// dont remove
-
-        // if (i.router == "/main/logs") {
-        //   continue;
-        // }
         _auth.add(i.router ?? "");
       }
-      // ignore: avoid_print
-      // print(_auth);
-
       await storage.setMenuAuth(_auth.toList());
     } else {
       SmartDialogUtils.error("未知错误");
