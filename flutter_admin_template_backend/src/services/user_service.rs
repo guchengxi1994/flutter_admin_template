@@ -4,6 +4,7 @@ use crate::constants::TOKEN_EXPIRE;
 use crate::models::sign_in_record::SignInState;
 use crate::{database::init::REDIS_CLIENT, models::user::User};
 use serde::Deserialize;
+use sqlx::{MySql, Pool};
 use validator::Validate;
 
 use super::Query;
@@ -26,15 +27,28 @@ pub struct UserLoginRequest {
     pub password: String,
 }
 
-impl User {
-    pub async fn new_user(req: NewUserRequest) -> anyhow::Result<()> {
+#[async_trait::async_trait]
+pub trait UserTrait {
+    async fn new_user(pool: &Pool<MySql>, req: NewUserRequest) -> anyhow::Result<()>;
+
+    async fn get_user_info(pool: &Pool<MySql>, user_id: i64) -> anyhow::Result<User>;
+
+    async fn login(
+        pool: &Pool<MySql>,
+        req: UserLoginRequest,
+        login_ip: String,
+    ) -> anyhow::Result<String>;
+}
+
+pub struct UserService;
+
+#[async_trait::async_trait]
+impl UserTrait for UserService {
+    async fn new_user(pool: &Pool<MySql>, req: NewUserRequest) -> anyhow::Result<()> {
         if let Err(_e) = req.validate() {
             anyhow::bail!("参数错误")
         }
-        // TODO
-        // 需要增加 dept_id 校验的问题
-        let pool = crate::database::init::POOL.lock().unwrap();
-        let mut tx = pool.get_pool().begin().await?;
+        let mut tx = pool.begin().await?;
         if let Err(_) = sqlx::query_as::<sqlx::MySql, User>(
             r#"SELECT * from user where is_deleted = 0 and user_name = ?"#,
         )
@@ -60,13 +74,26 @@ impl User {
         }
     }
 
-    pub async fn login(req: UserLoginRequest, login_ip: String) -> anyhow::Result<String> {
+    async fn get_user_info(pool: &Pool<MySql>, user_id: i64) -> anyhow::Result<User> {
+        let u = sqlx::query_as::<sqlx::MySql, User>(
+            r#"select * from user where is_deleted = 0 and user_id = ?"#,
+        )
+        .bind(user_id)
+        .fetch_one(pool)
+        .await?;
+
+        anyhow::Ok(u)
+    }
+
+    async fn login(
+        pool: &Pool<MySql>,
+        req: UserLoginRequest,
+        login_ip: String,
+    ) -> anyhow::Result<String> {
         if let Err(_e) = req.validate() {
             anyhow::bail!("参数错误")
         }
-
-        let pool = crate::database::init::POOL.lock().unwrap();
-        let mut tx = pool.get_pool().begin().await?;
+        let mut tx = pool.begin().await?;
         let u = sqlx::query_as::<sqlx::MySql, User>(
             r#"SELECT * from user where is_deleted = 0 and user_name = ?"#,
         )
@@ -97,8 +124,7 @@ impl User {
                 let mut con = cli.get_connection().unwrap();
                 // 获取最后一次登录的时间和token
                 let log = crate::services::log_service::SignInRecordWithName::current_single(
-                    _u.user_id,
-                    pool.get_pool(),
+                    _u.user_id, pool,
                 )
                 .await?;
 
@@ -142,17 +168,5 @@ impl User {
                 anyhow::bail!("用户不存在")
             }
         }
-    }
-
-    pub async fn get_user_info(user_id: i64) -> anyhow::Result<Self> {
-        let pool = crate::database::init::POOL.lock().unwrap();
-        let u = sqlx::query_as::<sqlx::MySql, User>(
-            r#"select * from user where is_deleted = 0 and user_id = ?"#,
-        )
-        .bind(user_id)
-        .fetch_one(pool.get_pool())
-        .await?;
-
-        anyhow::Ok(u)
     }
 }

@@ -7,11 +7,12 @@ use crate::{
     common::base_response::BaseResponse,
     middleware::UserId,
     models::user::User,
-    services::user_service::{NewUserRequest, UserLoginRequest},
+    services::user_service::{NewUserRequest, UserLoginRequest, UserTrait},
 };
 
 pub async fn new_user(info: web::Json<NewUserRequest>) -> HttpResponse {
-    let r = crate::models::user::User::new_user(info.0).await;
+    let pool = crate::database::init::POOL.lock().unwrap();
+    let r = crate::services::user_service::UserService::new_user(pool.get_pool(), info.0).await;
     match r {
         Ok(_) => {
             let b: BaseResponse<Option<String>> = BaseResponse {
@@ -38,7 +39,9 @@ pub async fn login(info: web::Json<UserLoginRequest>, req: HttpRequest) -> HttpR
     if let Some(val) = req.peer_addr() {
         // println!("Address {:?}", val.ip());
         ip = val.ip().to_string();
-        let r = crate::models::user::User::login(info.0, ip).await;
+        let pool = crate::database::init::POOL.lock().unwrap();
+        let r =
+            crate::services::user_service::UserService::login(pool.get_pool(), info.0, ip).await;
         match r {
             Ok(_r) => {
                 let b: BaseResponse<Option<String>> = BaseResponse {
@@ -69,7 +72,10 @@ pub async fn login(info: web::Json<UserLoginRequest>, req: HttpRequest) -> HttpR
 
 pub async fn get_current_user_info(user_id: Option<ReqData<UserId>>) -> HttpResponse {
     if let Some(_id) = user_id {
-        let u = crate::models::user::User::get_user_info(_id.user_id).await;
+        let pool = crate::database::init::POOL.lock().unwrap();
+        let u =
+            crate::services::user_service::UserService::get_user_info(pool.get_pool(), _id.user_id)
+                .await;
         if let Ok(_u) = u {
             let b: BaseResponse<Option<User>> = BaseResponse {
                 code: crate::constants::OK,

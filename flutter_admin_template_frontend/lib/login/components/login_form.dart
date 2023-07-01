@@ -98,6 +98,7 @@ class LoginForm extends ConsumerWidget {
                       final r = await ref.read(loginProvider).login(
                           usernameController.text, passwardController.text);
                       if (r) {
+                        await ref.read(menuAuthProvider).refresh();
                         // ignore: use_build_context_synchronously
                         Navigator.of(context).pushNamedAndRemoveUntil(
                             FatRouters.dashboardScreen, (_) => false);

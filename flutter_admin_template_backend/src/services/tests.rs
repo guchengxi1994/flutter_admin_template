@@ -1,4 +1,5 @@
 mod tests {
+
     #[test]
     pub fn new_user_test() {
         {
@@ -21,7 +22,8 @@ mod tests {
             };
             let rt = tokio::runtime::Runtime::new().unwrap();
             rt.block_on(async {
-                let r = crate::models::user::User::new_user(req).await;
+                let pool = crate::database::init::POOL.lock().unwrap();
+                let r = <crate::services::user_service::UserService as crate::services::user_service::UserTrait>::new_user(pool.get_pool(),req).await;
                 match r {
                     Ok(_) => {
                         println!("OK")

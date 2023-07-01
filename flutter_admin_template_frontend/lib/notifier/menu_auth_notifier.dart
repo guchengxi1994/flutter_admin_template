@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_template_frontend/apis.dart';
 import 'package:flutter_admin_template_frontend/common/dio_utils.dart';
+import 'package:flutter_admin_template_frontend/common/local_storage.dart';
 import 'package:flutter_admin_template_frontend/common/smart_dialog_utils.dart';
 import 'package:flutter_admin_template_frontend/routers.dart';
 
@@ -10,6 +11,7 @@ import 'models/menu_auth_response.dart';
 class MenuAuthNotifier extends ChangeNotifier {
   final Set<String> _auth = {};
   final DioUtils dioUtils = DioUtils();
+  final FatLocalStorage storage = FatLocalStorage();
 
   String currentRouter = "/main/dashboard";
   changeRouter(String router) {
@@ -42,12 +44,31 @@ class MenuAuthNotifier extends ChangeNotifier {
           MenuAuthResponse.fromJson(r.data['data']);
 
       for (final i in menuAuthResponse.records!) {
+        /// for test
+        ///
+        /// dont remove
+
+        // if (i.router == "/main/logs") {
+        //   continue;
+        // }
         _auth.add(i.router ?? "");
       }
-      notifyListeners();
+      // ignore: avoid_print
+      // print(_auth);
+
+      await storage.setMenuAuth(_auth.toList());
     } else {
       SmartDialogUtils.error("未知错误");
     }
+  }
+
+  Future<List<String>> loadCache() async {
+    var s = await storage.getMenuAuth();
+    if (s.isEmpty) {
+      await refresh();
+      return _auth.toList();
+    }
+    return s;
   }
 
   List<ValueNotifier<bool>> subVisibles = List.filled(1, ValueNotifier(false));

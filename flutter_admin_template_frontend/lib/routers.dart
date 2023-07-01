@@ -5,6 +5,8 @@ import 'package:flutter_admin_template_frontend/dept/dept_screen.dart'
     deferred as dept;
 import 'package:flutter_admin_template_frontend/menu/menu_screen.dart'
     deferred as menu;
+import 'package:flutter_admin_template_frontend/role/role_screen.dart'
+    deferred as role;
 import 'package:flutter_admin_template_frontend/user/user_screen.dart'
     deferred as user;
 import 'package:flutter_admin_template_frontend/log/log_summary_screen.dart'
@@ -26,6 +28,7 @@ class FatRouters {
   static String menuScreen = "/main/menu";
   static String deptScreen = "/main/dept";
   static String loginScreen = "/loginScreen";
+  static String roleScreen = "/main/role";
   static String logScreen = "/main/logs";
   static String operationLogScreen = "/main/logs/operation";
   static String signInLogScreen = "/main/logs/signin";
@@ -47,6 +50,10 @@ class FatRouters {
         body: FutureLoaderWidget(
             builder: (context) => menu.MenuScreen(),
             loadWidgetFuture: menu.loadLibrary())),
+    roleScreen: (context) => Layout(
+        body: FutureLoaderWidget(
+            builder: (context) => role.RoleScreen(),
+            loadWidgetFuture: role.loadLibrary())),
     logScreen: (context) => Layout(
         body: FutureLoaderWidget(
             builder: (context) => log.LogSummaryScreen(),

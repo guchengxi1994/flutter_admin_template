@@ -8,6 +8,7 @@ environment:
   sdk: '>=3.0.2 <4.0.0'
 
 dependencies:
+  animated_tree_view: ^2.1.0
   calendar_date_picker2: ^0.3.5
   cupertino_icons: ^1.0.2
   d_chart: ^2.2.11
@@ -46,6 +47,7 @@ deferred-components:
       - package:flutter_admin_template_frontend/log/log_summary_screen.dart
       - package:flutter_admin_template_frontend/log/sign_in_log_screen.dart
       - package:flutter_admin_template_frontend/log/operation_log_screen.dart
+      - package:flutter_admin_template_frontend/role/role_screen.dart
 
 
 flutter:

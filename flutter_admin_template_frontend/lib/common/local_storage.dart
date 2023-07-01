@@ -25,4 +25,14 @@ class FatLocalStorage {
     await _initStorage();
     _storage!.setString("token", token);
   }
+
+  Future<void> setMenuAuth(List<String> s) async {
+    await _initStorage();
+    _storage!.setStringList("menuAuth", s);
+  }
+
+  Future<List<String>> getMenuAuth() async {
+    await _initStorage();
+    return _storage!.getStringList("menuAuth") ?? [];
+  }
 }

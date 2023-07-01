@@ -11,15 +11,17 @@ import 'package:hovering/hovering.dart';
 
 import 'sidebar_item_with_children.dart';
 
-class Sidebar extends ConsumerWidget {
-  Sidebar({super.key, this.header});
+class Sidebar extends ConsumerStatefulWidget {
+  const Sidebar({super.key, this.header});
   final Widget? header;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return _buildContent(ref);
+  ConsumerState<ConsumerStatefulWidget> createState() {
+    return SidebarState();
   }
+}
 
+class SidebarState extends ConsumerState<Sidebar> {
   late SidebarModel dashboardModel = SidebarModel(
       router: "/main/dashboard",
       title: "Dashboard",
@@ -60,10 +62,20 @@ class Sidebar extends ConsumerWidget {
         color: Colors.white,
       ));
 
+  late SidebarModel roleModel = SidebarModel(
+      router: "/main/role",
+      title: "Role",
+      index: 4,
+      icon: const Icon(Icons.ac_unit),
+      iconOnHover: const Icon(
+        Icons.ac_unit_outlined,
+        color: Colors.white,
+      ));
+
   late SidebarModel logModel = SidebarModel(
       router: "/main/logs",
       title: "Log",
-      index: 3,
+      index: 5,
       icon: const Icon(Icons.details),
       iconOnHover: const Icon(
         Icons.details_outlined,
@@ -73,7 +85,7 @@ class Sidebar extends ConsumerWidget {
         SidebarModel(
             router: "/main/logs/operation",
             title: "Operation",
-            index: 4,
+            index: 5,
             icon: const Icon(Icons.change_circle),
             iconOnHover: const Icon(
               Icons.change_circle_outlined,
@@ -82,7 +94,7 @@ class Sidebar extends ConsumerWidget {
         SidebarModel(
             router: "/main/logs/signin",
             title: "Sign in",
-            index: 4,
+            index: 5,
             icon: const Icon(Icons.login),
             iconOnHover: const Icon(
               Icons.login_outlined,
@@ -90,7 +102,37 @@ class Sidebar extends ConsumerWidget {
             )),
       ]);
 
-  Widget _buildContent(WidgetRef ref) {
+  // ignore: prefer_typing_uninitialized_variables
+  var future;
+
+  List<String> auths = [];
+
+  loadAuth() async {
+    auths = await ref.read(menuAuthProvider).loadCache();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    future = loadAuth();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: future,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return _buildContent();
+        }
+        return SizedBox(
+          width: AppStyle.sidebarWidth,
+        );
+      },
+    );
+  }
+
+  Widget _buildContent() {
     bool isCollapse = ref.watch(sidebarProvider).isCollapse;
     return Container(
       width:
@@ -105,7 +147,7 @@ class Sidebar extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          header ??
+          widget.header ??
               SizedBox(
                 height: AppStyle.sidebarHeaderHeight,
               ),
@@ -115,29 +157,28 @@ class Sidebar extends ConsumerWidget {
               children: [
                 SidebarItem(
                   model: dashboardModel,
-                  visible:
-                      ref.watch(menuAuthProvider).inSet(dashboardModel.router),
+                  visible: auths.contains(dashboardModel.router),
                 ),
                 SidebarItem(
                   model: userdModel,
-                  visible: ref.watch(menuAuthProvider).inSet(userdModel.router),
+                  visible: auths.contains(userdModel.router),
                 ),
                 SidebarItem(
                   model: deptModel,
-                  visible: ref.watch(menuAuthProvider).inSet(deptModel.router),
+                  visible: auths.contains(deptModel.router),
                 ),
                 SidebarItem(
                   model: menuModel,
-                  visible: ref.watch(menuAuthProvider).inSet(menuModel.router),
+                  visible: auths.contains(menuModel.router),
                 ),
-                // SidebarItem(
-                //   model: logModel,
-                //   visible: ref.watch(menuAuthProvider).inSet(logModel.router),
-                // ),
+                SidebarItem(
+                  model: roleModel,
+                  visible: auths.contains(roleModel.router),
+                ),
                 SidebarItemWithChildren(
                   model: logModel,
-                  visible: ref.watch(menuAuthProvider).inSet(logModel.router),
-                  subVisible: ref.read(menuAuthProvider).subVisibles[0],
+                  visible: auths.contains(logModel.router),
+                  subVisible: ref.watch(menuAuthProvider).subVisibles[0],
                 )
               ],
             ),
@@ -154,14 +195,14 @@ class Sidebar extends ConsumerWidget {
                 ref.read(sidebarProvider).changeIsCollapse(!i);
               });
             },
-            child: _buildCollapseButton(ref),
+            child: _buildCollapseButton(),
           )
         ],
       ),
     );
   }
 
-  Widget _buildCollapseButton(WidgetRef ref) {
+  Widget _buildCollapseButton() {
     if (ref.watch(sidebarProvider).isCollapse) {
       return MouseRegion(
           cursor: SystemMouseCursors.click,
