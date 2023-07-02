@@ -34,9 +34,9 @@ class SidebarIcons {
   static const Widget logOnHover =
       Icon(Icons.details_outlined, color: Colors.white);
 
-  static const Widget operation = Icon(Icons.change_circle);
+  static const Widget operation = Icon(Icons.change_history);
   static const Widget operationOnHover =
-      Icon(Icons.change_circle_outlined, color: Colors.white);
+      Icon(Icons.change_history_outlined, color: Colors.white);
 
   static const Widget signin = Icon(Icons.login);
   static const Widget signinOnHover =

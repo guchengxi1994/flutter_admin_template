@@ -17,7 +17,7 @@ import 'package:flutter_admin_template_frontend/log/operation_log_screen.dart'
     deferred as operation;
 
 import 'common/future_builder.dart';
-import 'login/login_screen.dart' deferred as login;
+import 'signin/login_screen.dart' deferred as login;
 import 'layout/layout.dart';
 
 class FatRouters {

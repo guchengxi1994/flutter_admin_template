@@ -22,5 +22,13 @@ pub fn role_group(config: &mut web::ServiceConfig) {
                 "/all",
                 web::get().to(crate::controllers::role_controller::get_all_roles),
             )
+            .route(
+                "/details/current",
+                web::get().to(crate::controllers::role_controller::get_current_user_role_detail),
+            )
+            .route(
+                "/details",
+                web::get().to(crate::controllers::role_controller::get_detail_by_id),
+            ),
     );
 }

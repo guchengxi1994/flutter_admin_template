@@ -38,6 +38,7 @@ class MenuAuthNotifier extends ChangeNotifier {
     if (r != null) {
       if (r.data['code'] != httpCodeOK) {
         SmartDialogUtils.error(r.data['message'].toString());
+        return [];
       }
 
       router.AllRouterResponse allRouterResponse =
@@ -86,6 +87,7 @@ class MenuAuthNotifier extends ChangeNotifier {
     }
   }
 
+  @Deprecated("unused")
   bool inSet(String i) {
     return _auth.contains(i);
   }

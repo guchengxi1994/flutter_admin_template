@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_admin_template_frontend/login/components/components.dart';
+import 'package:flutter_admin_template_frontend/signin/components/components.dart';
 import 'package:flutter_admin_template_frontend/styles/app_style.dart';
 
 class LoginScreen extends StatefulWidget {

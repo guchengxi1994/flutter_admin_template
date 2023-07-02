@@ -5,6 +5,7 @@ import 'package:flutter_admin_template_frontend/layout/components/sidebar_item.d
 import 'package:flutter_admin_template_frontend/layout/models/sidebar_item_model.dart';
 import 'package:flutter_admin_template_frontend/layout/notifier/sidebar_notifier.dart';
 import 'package:flutter_admin_template_frontend/notifier/global_notifier.dart';
+import 'package:flutter_admin_template_frontend/routers.dart';
 import 'package:flutter_admin_template_frontend/styles/app_style.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hovering/hovering.dart';
@@ -124,8 +125,20 @@ class SidebarState extends ConsumerState<Sidebar> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           widget.header ??
-              SizedBox(
-                height: AppStyle.sidebarHeaderHeight,
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                      FatRouters.loginScreen, (v) => false);
+                },
+                child: /* TODO */ MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: SizedBox(
+                    width: isCollapse
+                        ? AppStyle.sidebarCollapseWidth
+                        : AppStyle.sidebarWidth,
+                    height: AppStyle.sidebarHeaderHeight,
+                  ),
+                ),
               ),
           Expanded(
               child: SingleChildScrollView(

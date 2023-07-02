@@ -2,7 +2,7 @@ name: flutter_admin_template_frontend
 description: A new Flutter project.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 0.1.2
+version: 0.1.3
 
 environment:
   sdk: '>=3.0.2 <4.0.0'
@@ -39,7 +39,7 @@ dev_dependencies:
 deferred-components:
   - name: fat 
     libraries:
-      - package:flutter_admin_template_frontend/login/login_screen.dart
+      - package:flutter_admin_template_frontend/signin/login_screen.dart
       - package:flutter_admin_template_frontend/dashboard/dashboard_screen.dart
       - package:flutter_admin_template_frontend/dept/dept_screen.dart
       - package:flutter_admin_template_frontend/menu/menu_screen.dart
