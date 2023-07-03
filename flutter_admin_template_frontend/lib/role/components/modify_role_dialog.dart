@@ -5,7 +5,8 @@ import 'package:flutter_admin_template_frontend/role/role_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/role_detail_response.dart';
-import '../models/api_by_router_response.dart';
+import '../models/api_by_router_response.dart' as api_router;
+import '../models/api_by_role_response.dart' as api_role;
 
 class ModifyRoleDialog extends ConsumerStatefulWidget {
   const ModifyRoleDialog({super.key, required this.roleId});
@@ -22,6 +23,7 @@ class ModifyRoleDialogState extends ConsumerState<ModifyRoleDialog> {
   late final TreeNode<AllRouters> tree;
 
   late Set<int> menus = {};
+  late List<api_role.Records> apis = [];
 
   // ignore: prefer_typing_uninitialized_variables
   var future;
@@ -35,6 +37,12 @@ class ModifyRoleDialogState extends ConsumerState<ModifyRoleDialog> {
   loadData() async {
     _roleDeailsResponse =
         await ref.read(roleProvider).getDetailById(widget.roleId);
+
+    final response = await ref.read(roleProvider).getApiByRoleId(widget.roleId);
+    if (response != null) {
+      apis = response.records ?? [];
+    }
+
     tree = TreeNode.root();
     if (_roleDeailsResponse != null) {
       menus = (_roleDeailsResponse!.routerIds ?? []).toSet();
@@ -74,7 +82,7 @@ class ModifyRoleDialogState extends ConsumerState<ModifyRoleDialog> {
   // ignore: unused_field
   late TreeViewController? _controller;
 
-  List<Records> records = [];
+  List<api_router.Records> records = [];
 
   @override
   Widget build(BuildContext context) {
@@ -200,11 +208,18 @@ class ModifyRoleDialogState extends ConsumerState<ModifyRoleDialog> {
   }
 
   Widget _buildApis() {
+    final List<String> apiRouters = apis.map((e) => e.apiRouter ?? "").toList();
+
     return ListView.builder(
       itemCount: records.length,
       itemBuilder: (BuildContext context, int index) {
         return Card(
-          child: Text(records[index].apiName ?? ""),
+          child: ListTile(
+            leading: apiRouters.contains(records[index].apiRouter)
+                ? const Icon(Icons.check_box)
+                : const Icon(Icons.square),
+            title: Text(records[index].apiName ?? ""),
+          ),
         );
       },
     );

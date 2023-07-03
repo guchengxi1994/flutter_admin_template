@@ -8,8 +8,8 @@ final menuAuthProvider = ChangeNotifierProvider<MenuAuthNotifier>((ref) {
   return MenuAuthNotifier();
 });
 
-final routerAuthProvider = ChangeNotifierProvider<ApiAuthNotifier>((ref) {
-  return ApiAuthNotifier()..init();
+final apiAuthProvider = ChangeNotifierProvider<ApiAuthNotifier>((ref) {
+  return ApiAuthNotifier();
 });
 
 final widgetAuthProvider = ChangeNotifierProvider<WidgetAuthNotifier>((ref) {

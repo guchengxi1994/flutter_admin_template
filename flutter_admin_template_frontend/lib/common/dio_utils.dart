@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_admin_template_frontend/apis.dart';
 import 'package:flutter_admin_template_frontend/common/local_storage.dart';
 import 'package:flutter_admin_template_frontend/routers.dart';
 
@@ -11,8 +12,16 @@ class AuthInterCeptor extends Interceptor {
   @override
   void onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
-    if (options.path != "/system/user/login") {
+    if ("/system/user/login" != options.path) {
       options.queryParameters["token"] = await storage.getToken();
+
+      List<String> apis = await storage.getApiAuth();
+      var path = options.path.split("?").firstOrNull;
+      if (!apis.contains(path) && !reservedApis.contains(path)) {
+        SmartDialogUtils.error("无权访问");
+        debugPrint("[no-auth] :${options.path}");
+        return;
+      }
     }
 
     super.onRequest(options, handler);
@@ -40,6 +49,7 @@ class DioUtils {
 
   DioUtils._internal() {
     _dio ??= Dio();
+    _dio!.options.baseUrl = baseUrl;
     _dio!.interceptors.add(AuthInterCeptor());
   }
 

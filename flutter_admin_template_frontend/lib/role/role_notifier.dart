@@ -4,6 +4,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter_admin_template_frontend/common/smart_dialog_utils.dart';
 import 'package:flutter_admin_template_frontend/role/models/api_by_router_response.dart'
     as api_by_router;
+import 'package:flutter_admin_template_frontend/role/models/api_by_role_response.dart'
+    as api_by_role;
 import 'package:flutter_admin_template_frontend/role/models/role_list_response.dart'
     as role_list;
 import 'package:flutter_admin_template_frontend/table/base_request.dart';
@@ -89,6 +91,23 @@ class RoleNotifier<_ extends BaseRequest, RoleListResponse extends BaseResponse>
         api_by_router.ApiByRouterResponse apiByRouterResponse =
             api_by_router.ApiByRouterResponse.fromJson(response.data['data']);
         return apiByRouterResponse;
+      }
+    }
+
+    return null;
+  }
+
+  Future<api_by_role.ApiByRoleResponse?> getApiByRoleId(int roleId) async {
+    String url = "${apiDetails["getApiByRole"]!}?id=$roleId";
+    Response? response = await dioUtils.get(url);
+    if (response != null) {
+      if (response.data['code'] != httpCodeOK) {
+        SmartDialogUtils.error(response.data['message'].toString());
+        return null;
+      } else {
+        api_by_role.ApiByRoleResponse apiByRoleResponse =
+            api_by_role.ApiByRoleResponse.fromJson(response.data['data']);
+        return apiByRoleResponse;
       }
     }
 

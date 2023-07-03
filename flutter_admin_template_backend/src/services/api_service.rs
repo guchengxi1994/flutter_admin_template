@@ -1,5 +1,7 @@
 use sqlx::{MySql, Pool};
 
+use crate::models::api::Api;
+
 #[derive(Clone, Debug, sqlx::FromRow, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ApiSummary {
@@ -18,9 +20,9 @@ pub trait ApiTrait {
         pool: &Pool<MySql>,
     ) -> anyhow::Result<Vec<ApiSummary>>;
 
-    async fn query_current(user_id: i64, pool: &Pool<MySql>);
+    async fn query_current(user_id: i64, pool: &Pool<MySql>) -> anyhow::Result<Vec<ApiSummary>>;
 
-    async fn query_all(pool: &Pool<MySql>);
+    async fn query_all(pool: &Pool<MySql>) -> anyhow::Result<Vec<Api>>;
 }
 
 pub struct ApiService;
@@ -28,7 +30,24 @@ pub struct ApiService;
 #[async_trait::async_trait]
 impl ApiTrait for ApiService {
     async fn query_by_role_id(role_id: i64, pool: &Pool<MySql>) -> anyhow::Result<Vec<ApiSummary>> {
-        todo!()
+        let sql = sqlx::query_as::<sqlx::MySql, ApiSummary>(
+            r#"SELECT
+        api.api_id,
+        api.api_name,
+        api.api_router,
+        api.api_method 
+    FROM
+        role_api
+        LEFT JOIN api ON role_api.api_id = api.api_id
+        LEFT JOIN role ON role.role_id = role_api.role_id 
+    WHERE
+        role.is_deleted = 0 and role_api.role_id = ?"#,
+        )
+        .bind(role_id)
+        .fetch_all(pool)
+        .await?;
+
+        anyhow::Ok(sql)
     }
 
     async fn query_by_router_id(
@@ -74,11 +93,32 @@ impl ApiTrait for ApiService {
         anyhow::Ok(sql)
     }
 
-    async fn query_current(user_id: i64, pool: &Pool<MySql>) {
-        todo!()
+    async fn query_current(user_id: i64, pool: &Pool<MySql>) -> anyhow::Result<Vec<ApiSummary>> {
+        let sql = sqlx::query_as::<sqlx::MySql, ApiSummary>(
+            r#"SELECT
+            api.api_id,
+            api.api_name,
+            api.api_router,
+            api.api_method 
+        FROM
+            user_role
+            LEFT JOIN role_api ON user_role.role_id = role_api.role_id
+            LEFT JOIN api ON role_api.api_id = api.api_id 
+        WHERE
+            `user_role`.user_id = ? and api.is_deleted = 0 order by api_id"#,
+        )
+        .bind(user_id)
+        .fetch_all(pool)
+        .await?;
+
+        anyhow::Ok(sql)
     }
 
-    async fn query_all(pool: &Pool<MySql>) {
-        todo!()
+    async fn query_all(pool: &Pool<MySql>) -> anyhow::Result<Vec<Api>> {
+        let sql = sqlx::query_as::<sqlx::MySql, Api>(r#"select * from api where is_deleted = 0"#)
+            .fetch_all(pool)
+            .await?;
+
+        anyhow::Ok(sql)
     }
 }

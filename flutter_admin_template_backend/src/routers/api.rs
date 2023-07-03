@@ -21,6 +21,14 @@ pub fn api_group(config: &mut web::ServiceConfig) {
             .route(
                 "/byRouter",
                 web::get().to(api_controller::get_apis_by_router_id),
+            )
+            .route(
+                "/byRole",
+                web::get().to(api_controller::get_apis_by_role_id),
+            )
+            .route(
+                "/current",
+                web::get().to(api_controller::get_apis_by_current_user),
             ),
     );
 }
