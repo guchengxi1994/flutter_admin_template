@@ -16,12 +16,12 @@ fn get_reject_times(s: String, con: &mut redis::Connection) -> anyhow::Result<i3
 fn times_add_one(s: String, con: &mut redis::Connection) -> anyhow::Result<()> {
     let i = get_reject_times(s.clone(), con)?;
     let _: () = redis::Commands::set(con, s.clone(), i + 1)?;
-    let _: () = redis::Commands::expire(con, s, REJECT_DURATION)?;
+    let _: () = redis::Commands::expire(con, s, *REJECT_DURATION.lock().unwrap())?;
     anyhow::Ok(())
 }
 
-fn set_first_time(s: String, con: &mut redis::Connection) -> anyhow::Result<()>{
+fn set_first_time(s: String, con: &mut redis::Connection) -> anyhow::Result<()> {
     let _: () = redis::Commands::set(con, s.clone(), 1)?;
-    let _: () = redis::Commands::expire(con, s, REJECT_DURATION)?;
+    let _: () = redis::Commands::expire(con, s, *REJECT_DURATION.lock().unwrap())?;
     anyhow::Ok(())
 }

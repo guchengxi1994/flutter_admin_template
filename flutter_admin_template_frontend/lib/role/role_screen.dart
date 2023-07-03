@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_admin_template_frontend/common/screen_fit_utils.dart';
 import 'package:flutter_admin_template_frontend/common/scroller_widget.dart';
 import 'package:flutter_admin_template_frontend/layout/notifier/sidebar_notifier.dart';
-import 'package:flutter_admin_template_frontend/role/models/role_list_response.dart';
+import 'package:flutter_admin_template_frontend/role/models/role_list_response.dart'
+    as role_list;
 import 'package:flutter_admin_template_frontend/role/role_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -10,8 +11,8 @@ import 'package:intl/intl.dart';
 import '../styles/app_style.dart';
 import 'components/modify_role_dialog.dart';
 
-final roleProvider = ChangeNotifierProvider<RoleNotifier>(
-    (ref) => RoleNotifier()..init("", "get"));
+final roleProvider =
+    ChangeNotifierProvider<RoleNotifier>((ref) => RoleNotifier());
 
 class RoleScreen extends ConsumerStatefulWidget {
   const RoleScreen({super.key});
@@ -23,6 +24,12 @@ class RoleScreen extends ConsumerStatefulWidget {
 }
 
 class RoleScreenState extends ConsumerState<RoleScreen> {
+  @override
+  void initState() {
+    super.initState();
+    ref.read(roleProvider).init("", "get");
+  }
+
   @override
   Widget build(BuildContext context) {
     final isCollapse = ref.watch(sidebarProvider).isCollapse;
@@ -150,7 +157,7 @@ class RoleScreenState extends ConsumerState<RoleScreen> {
           );
   }
 
-  DataRow _buildRow(Records e) {
+  DataRow _buildRow(role_list.Records e) {
     return DataRow(cells: [
       DataCell(SizedBox(
         child: Text(

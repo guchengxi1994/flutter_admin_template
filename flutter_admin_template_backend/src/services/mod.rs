@@ -9,6 +9,7 @@ pub mod router_service;
 mod tests;
 pub mod user_service;
 pub mod role_service;
+pub mod api_service;
 
 #[async_trait::async_trait]
 pub trait Query<T> {

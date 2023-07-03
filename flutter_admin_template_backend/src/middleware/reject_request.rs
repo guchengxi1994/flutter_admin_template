@@ -59,7 +59,7 @@ where
 
             let times = super::get_reject_times(s.clone(), &mut con);
             if let Ok(t) = times {
-                if t >= REJECT_TIMES {
+                if t >= *REJECT_TIMES.lock().unwrap() {
                     // 拦截
                     let b: BaseResponse<Option<String>> = BaseResponse {
                         code: crate::constants::BAD_REQUEST,

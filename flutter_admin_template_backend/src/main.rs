@@ -11,7 +11,7 @@ mod services;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
-    crate::database::init::init_database_from_config_file("./db_config.toml").await;
+    crate::database::init::init_from_config_file("./config.toml").await;
 
     std::env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();
@@ -29,6 +29,7 @@ async fn main() -> std::io::Result<()> {
             .configure(crate::routers::log::log_group)
             .configure(crate::routers::router::router_group)
             .configure(crate::routers::role::role_group)
+            .configure(crate::routers::api::api_group)
     })
     .bind("0.0.0.0:15234")?
     .run()

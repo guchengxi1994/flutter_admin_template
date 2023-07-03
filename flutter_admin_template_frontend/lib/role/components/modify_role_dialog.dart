@@ -1,9 +1,11 @@
 import 'package:animated_tree_view/animated_tree_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_admin_template_frontend/common/smart_dialog_utils.dart';
 import 'package:flutter_admin_template_frontend/role/role_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/role_detail_response.dart';
+import '../models/api_by_router_response.dart';
 
 class ModifyRoleDialog extends ConsumerStatefulWidget {
   const ModifyRoleDialog({super.key, required this.roleId});
@@ -37,7 +39,16 @@ class ModifyRoleDialogState extends ConsumerState<ModifyRoleDialog> {
     if (_roleDeailsResponse != null) {
       menus = (_roleDeailsResponse!.routerIds ?? []).toSet();
 
-      final routers = _roleDeailsResponse!.allRouters ?? [];
+      tree.add(TreeNode(
+          key: "通用API",
+          data: AllRouters(
+              parentId: 0,
+              router: "commom",
+              routerName: "通用API",
+              routerId: -1)));
+      menus.add(-1);
+      final routers =
+          List<AllRouters>.from(_roleDeailsResponse!.allRouters ?? []);
       while (routers.isNotEmpty) {
         final i = routers.removeAt(0);
         if (i.parentId == 0) {
@@ -63,6 +74,8 @@ class ModifyRoleDialogState extends ConsumerState<ModifyRoleDialog> {
   // ignore: unused_field
   late TreeViewController? _controller;
 
+  List<Records> records = [];
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -84,7 +97,20 @@ class ModifyRoleDialogState extends ConsumerState<ModifyRoleDialog> {
               child: const Icon(Icons.close),
             ),
           ),
-          Expanded(child: _buildContent())
+          Expanded(
+              child: Row(
+            children: [
+              Expanded(flex: 1, child: _buildContent()),
+              Expanded(flex: 1, child: _buildApis())
+            ],
+          )),
+          Align(
+            alignment: Alignment.topRight,
+            child: ElevatedButton(
+              onPressed: () {},
+              child: const Text("Submit"),
+            ),
+          ),
         ],
       ),
     );
@@ -109,7 +135,15 @@ class ModifyRoleDialogState extends ConsumerState<ModifyRoleDialog> {
                     padding: const EdgeInsets.only(top: 22, right: 22),
                   ),
               indentation: const Indentation(style: IndentStyle.squareJoint),
-              onItemTap: (item) {},
+              onItemTap: (item) async {
+                var response = await ref
+                    .read(roleProvider)
+                    .getApiByRouterId(item.data!.routerId!);
+                if (response != null) {
+                  records = response.records ?? [];
+                  setState(() {});
+                }
+              },
               showRootNode: false,
               builder: (ctx, node) {
                 String sub = "";
@@ -119,16 +153,33 @@ class ModifyRoleDialogState extends ConsumerState<ModifyRoleDialog> {
                 return Card(
                   child: ListTile(
                     leading: GestureDetector(
-                      onTap: () {
-                        debugPrint("check-box clicked");
-                        if (menus
-                            .contains((node.data as AllRouters).routerId)) {
-                          menus.remove((node.data as AllRouters).routerId);
-                        } else {
-                          menus.add((node.data as AllRouters).routerId!);
-                        }
-                        setState(() {});
-                      },
+                      onTap: (node.data as AllRouters).routerId == -1 ||
+                              (node.data as AllRouters).routerId == 1
+                          ? () => SmartDialogUtils.warning("该路由无法取消")
+                          : () {
+                              debugPrint("check-box clicked");
+                              if (menus.contains(
+                                  (node.data as AllRouters).routerId)) {
+                                menus
+                                    .remove((node.data as AllRouters).routerId);
+
+                                for (final i
+                                    in _roleDeailsResponse!.allRouters!) {
+                                  if (i.parentId == node.data!.routerId) {
+                                    menus.remove(i.routerId);
+                                  }
+                                }
+                              } else {
+                                menus.add((node.data as AllRouters).routerId!);
+                                for (final i
+                                    in _roleDeailsResponse!.allRouters!) {
+                                  if (i.parentId == node.data!.routerId) {
+                                    menus.add(i.routerId!);
+                                  }
+                                }
+                              }
+                              setState(() {});
+                            },
                       child: menus.contains((node.data as AllRouters).routerId)
                           ? const Icon(Icons.check_box)
                           : const Icon(Icons.square),
@@ -145,6 +196,17 @@ class ModifyRoleDialogState extends ConsumerState<ModifyRoleDialog> {
         return Container();
       },
       future: future,
+    );
+  }
+
+  Widget _buildApis() {
+    return ListView.builder(
+      itemCount: records.length,
+      itemBuilder: (BuildContext context, int index) {
+        return Card(
+          child: Text(records[index].apiName ?? ""),
+        );
+      },
     );
   }
 }

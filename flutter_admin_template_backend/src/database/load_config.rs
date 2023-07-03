@@ -22,7 +22,14 @@ pub struct RedisInfo {
 pub struct Config {
     pub title: String,
     pub database: DatabaseInfo,
-    pub redis:RedisInfo
+    pub redis: RedisInfo,
+    pub middleware: Middleware,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Middleware {
+    pub reject_times: i32,
+    pub reject_duration: usize,
 }
 
 pub fn load_config(conf_path: &str) -> Option<Config> {

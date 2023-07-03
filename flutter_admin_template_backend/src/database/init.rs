@@ -3,6 +3,8 @@ use std::sync::Mutex;
 use lazy_static::lazy_static;
 use sqlx::{MySql, MySqlPool, Pool};
 
+use crate::constants::{REJECT_DURATION, REJECT_TIMES};
+
 /// 自定义连接池结构体
 pub struct MyPool(Option<Pool<MySql>>);
 
@@ -32,7 +34,7 @@ lazy_static! {
     pub static ref REDIS_CLIENT: Mutex<Option<redis::Client>> = Mutex::new(None);
 }
 
-pub async fn init_database_from_config_file(conf_path: &str) {
+pub async fn init_from_config_file(conf_path: &str) {
     let option = crate::database::load_config::load_config(conf_path);
     match option {
         Some(o) => {
@@ -47,6 +49,14 @@ pub async fn init_database_from_config_file(conf_path: &str) {
             let redis_url = format!("redis://{}:{}/", o.redis.hostname, o.redis.port);
             init(url).await;
             let _ = init_redis(redis_url);
+
+            {
+                *REJECT_TIMES.lock().unwrap() = o.middleware.reject_times;
+            }
+
+            {
+                *REJECT_DURATION.lock().unwrap() = o.middleware.reject_duration;
+            }
         }
         None => {
             println!("[rust error] : load config file error");

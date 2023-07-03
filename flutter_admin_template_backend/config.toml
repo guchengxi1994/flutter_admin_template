@@ -11,3 +11,7 @@ database = "flutter_admin_template"
 [redis]
 hostname = "127.0.0.1"
 port = "6379"
+
+[middleware]
+reject_times = 10
+reject_duration = 10

@@ -2,7 +2,10 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_admin_template_frontend/common/smart_dialog_utils.dart';
-import 'package:flutter_admin_template_frontend/role/models/role_list_response.dart';
+import 'package:flutter_admin_template_frontend/role/models/api_by_router_response.dart'
+    as api_by_router;
+import 'package:flutter_admin_template_frontend/role/models/role_list_response.dart'
+    as role_list;
 import 'package:flutter_admin_template_frontend/table/base_request.dart';
 import 'package:flutter_admin_template_frontend/table/base_table_notifier.dart';
 
@@ -19,16 +22,16 @@ class RoleNotifier<_ extends BaseRequest, RoleListResponse extends BaseResponse>
   }
 
   @override
-  List<Records> get records => _convertListToRecord();
+  List<role_list.Records> get records => _convertListToRecord();
 
-  List<Records> _convertListToRecord() {
-    List<Records> result = [];
+  List<role_list.Records> _convertListToRecord() {
+    List<role_list.Records> result = [];
     for (final i in super.records) {
       final r = _convertStringToRecord(i);
       if (r != null) {
         result.add(r);
       } else {
-        result.add(Records(
+        result.add(role_list.Records(
           roleId: 0,
           roleName: "ERROR",
           createTime: "ERROR",
@@ -40,7 +43,7 @@ class RoleNotifier<_ extends BaseRequest, RoleListResponse extends BaseResponse>
     return result;
   }
 
-  Records? _convertStringToRecord(dynamic s) {
+  role_list.Records? _convertStringToRecord(dynamic s) {
     try {
       final Map<String, dynamic> m;
       if (s is String) {
@@ -52,7 +55,7 @@ class RoleNotifier<_ extends BaseRequest, RoleListResponse extends BaseResponse>
         throw Exception("[flutter] cannot read content");
       }
 
-      return Records.fromJson(m);
+      return role_list.Records.fromJson(m);
     } catch (e) {
       return null;
     }
@@ -69,6 +72,23 @@ class RoleNotifier<_ extends BaseRequest, RoleListResponse extends BaseResponse>
         RoleDeailsResponse roleDeailsResponse =
             RoleDeailsResponse.fromJson(response.data['data']);
         return roleDeailsResponse;
+      }
+    }
+
+    return null;
+  }
+
+  Future<api_by_router.ApiByRouterResponse?> getApiByRouterId(int id) async {
+    String url = "${apiDetails["getApiByRouter"]!}?id=$id";
+    Response? response = await dioUtils.get(url);
+    if (response != null) {
+      if (response.data['code'] != httpCodeOK) {
+        SmartDialogUtils.error(response.data['message'].toString());
+        return null;
+      } else {
+        api_by_router.ApiByRouterResponse apiByRouterResponse =
+            api_by_router.ApiByRouterResponse.fromJson(response.data['data']);
+        return apiByRouterResponse;
       }
     }
 

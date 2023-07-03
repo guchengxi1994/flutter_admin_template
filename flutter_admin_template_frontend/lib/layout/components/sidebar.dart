@@ -130,7 +130,7 @@ class SidebarState extends ConsumerState<Sidebar> {
                   Navigator.of(context).pushNamedAndRemoveUntil(
                       FatRouters.loginScreen, (v) => false);
                 },
-                child: /* TODO */ MouseRegion(
+                child: /* TODO replace with `Header` */ MouseRegion(
                   cursor: SystemMouseCursors.click,
                   child: SizedBox(
                     width: isCollapse
