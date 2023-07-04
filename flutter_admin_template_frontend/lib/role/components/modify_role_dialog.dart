@@ -1,5 +1,6 @@
 import 'package:animated_tree_view/animated_tree_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_admin_template_frontend/apis.dart';
 import 'package:flutter_admin_template_frontend/common/smart_dialog_utils.dart';
 import 'package:flutter_admin_template_frontend/role/role_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -41,6 +42,7 @@ class ModifyRoleDialogState extends ConsumerState<ModifyRoleDialog> {
     final response = await ref.read(roleProvider).getApiByRoleId(widget.roleId);
     if (response != null) {
       apis = response.records ?? [];
+      apiRouters = apis.map((e) => e.apiRouter ?? "").toList();
     }
 
     tree = TreeNode.root();
@@ -124,6 +126,8 @@ class ModifyRoleDialogState extends ConsumerState<ModifyRoleDialog> {
     );
   }
 
+  int currentRouterId = -100;
+
   Widget _buildContent() {
     return FutureBuilder(
       builder: (c, s) {
@@ -149,7 +153,9 @@ class ModifyRoleDialogState extends ConsumerState<ModifyRoleDialog> {
                     .getApiByRouterId(item.data!.routerId!);
                 if (response != null) {
                   records = response.records ?? [];
-                  setState(() {});
+                  setState(() {
+                    currentRouterId = item.data!.routerId!;
+                  });
                 }
               },
               showRootNode: false,
@@ -160,6 +166,8 @@ class ModifyRoleDialogState extends ConsumerState<ModifyRoleDialog> {
                 }
                 return Card(
                   child: ListTile(
+                    selected:
+                        currentRouterId == (node.data as AllRouters).routerId,
                     leading: GestureDetector(
                       onTap: (node.data as AllRouters).routerId == -1 ||
                               (node.data as AllRouters).routerId == 1
@@ -207,17 +215,34 @@ class ModifyRoleDialogState extends ConsumerState<ModifyRoleDialog> {
     );
   }
 
-  Widget _buildApis() {
-    final List<String> apiRouters = apis.map((e) => e.apiRouter ?? "").toList();
+  late List<String> apiRouters = [];
 
+  Widget _buildApis() {
     return ListView.builder(
       itemCount: records.length,
       itemBuilder: (BuildContext context, int index) {
         return Card(
           child: ListTile(
-            leading: apiRouters.contains(records[index].apiRouter)
-                ? const Icon(Icons.check_box)
-                : const Icon(Icons.square),
+            leading: GestureDetector(
+              onTap: () {
+                // print(records[index].apiRouter);
+                // print(apiRouters.contains(records[index].apiRouter));
+                if (reservedApis.contains(records[index].apiRouter)) {
+                  SmartDialogUtils.warning("该路由无法取消");
+                  return;
+                }
+
+                if (apiRouters.contains(records[index].apiRouter)) {
+                  apiRouters.remove(records[index].apiRouter);
+                } else {
+                  apiRouters.add(records[index].apiRouter!);
+                }
+                setState(() {});
+              },
+              child: apiRouters.contains(records[index].apiRouter)
+                  ? const Icon(Icons.check_box)
+                  : const Icon(Icons.square),
+            ),
             title: Text(records[index].apiName ?? ""),
           ),
         );

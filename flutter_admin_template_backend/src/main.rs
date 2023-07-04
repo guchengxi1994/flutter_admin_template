@@ -12,6 +12,7 @@ mod services;
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     crate::database::init::init_from_config_file("./config.toml").await;
+    let _ = crate::database::get_api_auth::init_api().await;
 
     std::env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();

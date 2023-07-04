@@ -5,3 +5,4 @@ pub mod init;
 mod tests;
 pub mod validate_token;
 pub mod refresh_token;
+pub mod get_api_auth;

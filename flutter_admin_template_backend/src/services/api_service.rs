@@ -23,9 +23,14 @@ pub trait ApiTrait {
     async fn query_current(user_id: i64, pool: &Pool<MySql>) -> anyhow::Result<Vec<ApiSummary>>;
 
     async fn query_all(pool: &Pool<MySql>) -> anyhow::Result<Vec<Api>>;
+
+    async fn get_api_id_by_path(s: String, pool: &Pool<MySql>) -> anyhow::Result<Option<i64>>;
 }
 
 pub struct ApiService;
+
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct ApiId(Option<i64>);
 
 #[async_trait::async_trait]
 impl ApiTrait for ApiService {
@@ -120,5 +125,16 @@ impl ApiTrait for ApiService {
             .await?;
 
         anyhow::Ok(sql)
+    }
+
+    async fn get_api_id_by_path(s: String, pool: &Pool<MySql>) -> anyhow::Result<Option<i64>> {
+        let sql = sqlx::query_as::<sqlx::MySql, ApiId>(
+            r#"select api_id from api where is_deleted = 0 and api_router = ?"#,
+        )
+        .bind(s)
+        .fetch_one(pool)
+        .await?;
+
+        anyhow::Ok(sql.0)
     }
 }

@@ -14,6 +14,11 @@ pub trait RoleTrait {
         user_id: i64,
         pool: &Pool<MySql>,
     ) -> anyhow::Result<RoleDetails>;
+
+    async fn get_role_id_by_user_id(
+        user_id: i64,
+        pool: &Pool<MySql>,
+    ) -> anyhow::Result<Option<i64>>;
 }
 
 pub struct RoleService;
@@ -27,6 +32,9 @@ pub struct RoleDetails {
 
 #[derive(Clone, Debug, sqlx::FromRow)]
 pub struct CurrentRouterIds(i64);
+
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct RoleId(Option<i64>);
 
 #[async_trait::async_trait]
 impl RoleTrait for RoleService {
@@ -79,5 +87,19 @@ impl RoleTrait for RoleService {
             router_ids: v,
             all_routers: r,
         })
+    }
+
+    async fn get_role_id_by_user_id(
+        user_id: i64,
+        pool: &Pool<MySql>,
+    ) -> anyhow::Result<Option<i64>> {
+        let r = sqlx::query_as::<sqlx::MySql, RoleId>(
+            r#"select role_id from user_role WHERE user_id = ?"#,
+        )
+        .bind(user_id)
+        .fetch_one(pool)
+        .await?;
+
+        anyhow::Ok(r.0)
     }
 }

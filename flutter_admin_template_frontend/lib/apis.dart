@@ -23,5 +23,7 @@ const Map<String, String> apiDetails = {
 const List<String> reservedApis = [
   "/system/user/login",
   "/system/api/current",
-  "/system/router/current"
+  "/system/router/current",
+  "/system/role/details/current",
+  "/system/user/info"
 ];

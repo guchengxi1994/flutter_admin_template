@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::time::SystemTime;
 
 use crate::constants::TOKEN_EXPIRE;
@@ -7,6 +8,8 @@ use serde::Deserialize;
 use sqlx::{MySql, Pool};
 use validator::Validate;
 
+use super::api_service::ApiTrait;
+use super::role_service::RoleTrait;
 use super::Query;
 
 #[derive(Debug, Validate, Deserialize)]
@@ -148,11 +151,34 @@ impl UserTrait for UserService {
                 .bind(SignInState::Success.to_string()).bind(token.clone())
                 .execute(&mut tx)
                 .await?;
+                // 这里去获取api权限
+
+                // 先去获取role id
+                let role_id =
+                    super::role_service::RoleService::get_role_id_by_user_id(_u.user_id, pool)
+                        .await?;
+
+                let mut api_ids: HashSet<i64> = HashSet::new();
+                api_ids.extend([12, 13, 9, 5, 16]);
+
+                if let Some(rid) = role_id {
+                    let apis = super::api_service::ApiService::query_by_role_id(rid, pool).await?;
+                    for i in apis {
+                        api_ids.insert(i.api_id);
+                    }
+                }
+
                 tx.commit().await?;
 
                 let _: () = redis::Commands::set(&mut con, token.clone(), _u.user_id)?;
                 let d = TOKEN_EXPIRE.lock().unwrap();
                 let _: () = redis::Commands::expire(&mut con, token.clone(), *d)?;
+
+                let api_key = format!("{}_apis", token.clone());
+                for i in api_ids {
+                    let _: () = redis::Commands::lpush(&mut con, api_key.clone(), i)?;
+                }
+                let _: () = redis::Commands::expire(&mut con, api_key.clone(), *d)?;
                 return anyhow::Ok(token);
             }
             Err(_) => {

@@ -56,6 +56,8 @@ where
     forward_ready!(service);
 
     fn call(&self, req: ServiceRequest) -> Self::Future {
+        println!("[rust] current query :{:?}", req.path().to_string());
+
         if req.path().to_string() != "/system/user/login" {
             let auth = web::Query::<Params>::from_query(req.query_string());
             match auth {
@@ -65,6 +67,24 @@ where
                         Ok(id) => {
                             req.extensions_mut().insert(super::UserId { user_id: id });
                             println!("current_user_id ==> {:?}", id);
+                            // 判断 api 可不可以访问
+
+                            let can_visit = crate::database::get_api_auth::can_api_be_visited(
+                                req.path().to_string(),
+                                _auth.0.token.clone(),
+                            );
+                            if !can_visit {
+                                println!(" {:?} 无权访问这个接口", req.path().to_string());
+                                let b: BaseResponse<Option<String>> = BaseResponse {
+                                    code: crate::constants::NO_AUTH,
+                                    message: "无权访问这个接口",
+                                    data: None,
+                                };
+                                let res = req
+                                    .into_response(HttpResponse::Ok().json(&b))
+                                    .map_into_right_body();
+                                return Box::pin(async { Ok(res) });
+                            }
                         }
                         Err(_) => {
                             println!(" {:?} Token not valid", _auth.0.token);
