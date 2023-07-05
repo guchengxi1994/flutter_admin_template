@@ -11,11 +11,13 @@ class Layout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) {
+      (timeStamp) async {
         final router =
             ModalRoute.of(context)?.settings.name ?? "/main/dashboard";
         debugPrint(router);
         ref.read(menuAuthProvider).changeRouterNoNavigation(router);
+
+        await ref.read(wsProvider).init();
       },
     );
 

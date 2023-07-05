@@ -1,5 +1,6 @@
 const httpCodeOK = 20000;
 const String baseUrl = "http://127.0.0.1:15234";
+const String websocketUrl = 'ws://localhost:15234/ws';
 
 const Map<String, String> apiDetails = {
   "login": "/system/user/login",
