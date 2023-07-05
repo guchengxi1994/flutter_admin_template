@@ -1,4 +1,9 @@
-use actix_web::{web, web::ReqData, HttpRequest, HttpResponse};
+use actix::Addr;
+use actix_web::{
+    web::ReqData,
+    web::{self, Data},
+    HttpRequest, HttpResponse,
+};
 
 use crate::{
     common::base_response::BaseResponse,
@@ -9,6 +14,7 @@ use crate::{
         query_params::DataList,
         role_service::{RoleDetails, RoleTrait},
     },
+    websocket::server::Server,
 };
 
 pub async fn get_all_roles() -> HttpResponse {
@@ -96,6 +102,63 @@ pub async fn get_current_user_role_detail(user_id: Option<ReqData<UserId>>) -> H
     let b: BaseResponse<Option<String>> = BaseResponse {
         code: crate::constants::BAD_REQUEST,
         message: "查询失败",
+        data: None,
+    };
+    return HttpResponse::Ok().json(&b);
+}
+
+#[derive(Debug, serde::Deserialize)]
+pub struct UpdateRoleRequest {
+    pub role_id: i64,
+    pub routers: Vec<i64>,
+    pub apis: Vec<i64>,
+}
+
+#[derive(Debug, serde::Deserialize)]
+struct Params {
+    token: String,
+}
+
+pub async fn update_role(
+    req: HttpRequest,
+    info: web::Json<UpdateRoleRequest>,
+    srv: Data<Addr<Server>>,
+) -> HttpResponse {
+    let q = web::Query::<Params>::from_query(req.query_string());
+
+    if let Ok(t) = q {
+        let pool = POOL.lock().unwrap();
+        let r = crate::services::role_service::RoleService::update_role(
+            info.role_id,
+            info.routers.clone(),
+            info.apis.clone(),
+            pool.get_pool(),
+        )
+        .await;
+
+        match r {
+            Ok(_) => {
+                let _ = srv.send(crate::websocket::message::ClientActorMessage {
+                    token: t.token.clone(),
+                    msg: "log out".into(),
+                });
+
+                let b: BaseResponse<Option<String>> = BaseResponse {
+                    code: crate::constants::OK,
+                    message: "更新成功",
+                    data: None,
+                };
+                return HttpResponse::Ok().json(&b);
+            }
+            Err(e) => {
+                println!("[rust] error :{:?}", e);
+            }
+        }
+    }
+
+    let b: BaseResponse<Option<String>> = BaseResponse {
+        code: crate::constants::BAD_REQUEST,
+        message: "更新失败",
         data: None,
     };
     return HttpResponse::Ok().json(&b);

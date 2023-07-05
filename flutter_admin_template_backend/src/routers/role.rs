@@ -29,6 +29,10 @@ pub fn role_group(config: &mut web::ServiceConfig) {
             .route(
                 "/details",
                 web::get().to(crate::controllers::role_controller::get_detail_by_id),
+            )
+            .route(
+                "/update",
+                web::post().to(crate::controllers::role_controller::update_role),
             ),
     );
 }

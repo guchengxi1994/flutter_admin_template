@@ -19,6 +19,13 @@ pub trait RoleTrait {
         user_id: i64,
         pool: &Pool<MySql>,
     ) -> anyhow::Result<Option<i64>>;
+
+    async fn update_role(
+        role_id: i64,
+        routers: Vec<i64>,
+        apis: Vec<i64>,
+        pool: &Pool<MySql>,
+    ) -> anyhow::Result<()>;
 }
 
 pub struct RoleService;
@@ -101,5 +108,61 @@ impl RoleTrait for RoleService {
         .await?;
 
         anyhow::Ok(r.0)
+    }
+
+    async fn update_role(
+        role_id: i64,
+        routers: Vec<i64>,
+        apis: Vec<i64>,
+        pool: &Pool<MySql>,
+    ) -> anyhow::Result<()> {
+        let mut tx = pool.begin().await?;
+        let _ = sqlx::query(r#"delete from role_api where role_id = ?"#)
+            .bind(role_id)
+            .execute(&mut tx)
+            .await?;
+        if apis.len() > 0 {
+            let mut quary =
+                sqlx::QueryBuilder::<MySql>::new("insert into role_api (role_id,api_id) values");
+
+            for i in 0..apis.len() {
+                quary.push("(");
+                quary.push_bind(role_id);
+                quary.push(",");
+                quary.push_bind(apis[i]);
+                quary.push(")");
+                if i != apis.len() - 1 {
+                    quary.push(",");
+                }
+            }
+
+            let _ = quary.build().execute(&mut tx).await?;
+        }
+
+        let _ = sqlx::query(r#"delete from role_router where role_id = ?"#)
+            .bind(role_id)
+            .execute(&mut tx)
+            .await?;
+
+        if routers.len() > 0 {
+            let mut quary = sqlx::QueryBuilder::<MySql>::new(
+                "insert into role_router (role_id,router_id) values",
+            );
+
+            for i in 0..routers.len() {
+                quary.push("(");
+                quary.push_bind(role_id);
+                quary.push(",");
+                quary.push_bind(routers[i]);
+                quary.push(")");
+                if i != routers.len() - 1 {
+                    quary.push(",");
+                }
+            }
+
+            let _ = quary.build().execute(&mut tx).await?;
+        }
+
+        anyhow::Ok(())
     }
 }

@@ -4,10 +4,15 @@ import 'package:flutter_admin_template_frontend/common/local_storage.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class WebsocketNotifier extends ChangeNotifier {
-  late final WebSocketChannel channel;
+  // ignore: avoid_init_to_null
+  late WebSocketChannel? channel = null;
   final FatLocalStorage storage = FatLocalStorage();
 
   init() async {
+    if (channel != null) {
+      return;
+    }
+
     final token = await storage.getToken();
     if (token == "") {
       return;
@@ -15,7 +20,7 @@ class WebsocketNotifier extends ChangeNotifier {
     final wsUrl = Uri.parse("$websocketUrl/$token");
     channel = WebSocketChannel.connect(wsUrl);
 
-    channel.stream.listen((event) {
+    channel!.stream.listen((event) {
       debugPrint("[flutter] ws recieved: ${event.toString()}");
     });
   }
