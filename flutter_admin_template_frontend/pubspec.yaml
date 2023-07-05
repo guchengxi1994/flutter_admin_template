@@ -29,6 +29,7 @@ dependencies:
   shared_preferences: ^2.1.2
   sm_crypto: ^1.0.3
   super_context_menu: ^0.1.0
+  web_socket_channel: ^2.4.0
 
 
 dev_dependencies:

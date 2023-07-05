@@ -1,4 +1,5 @@
-use actix_web::{middleware::Logger, App, HttpServer};
+use actix::Actor;
+use actix_web::{middleware::Logger, App, HttpServer, web::Data};
 
 mod common;
 mod constants;
@@ -8,6 +9,7 @@ mod middleware;
 mod models;
 mod routers;
 mod services;
+mod websocket;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -20,6 +22,8 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         let cors = actix_cors::Cors::permissive();
 
+        let ws_server = crate::websocket::server::Server::default().start();
+
         App::new()
             .wrap(Logger::default())
             .wrap(crate::middleware::auth::Auth)
@@ -31,6 +35,8 @@ async fn main() -> std::io::Result<()> {
             .configure(crate::routers::router::router_group)
             .configure(crate::routers::role::role_group)
             .configure(crate::routers::api::api_group)
+            .service(crate::websocket::controller::websocket)
+            .app_data(Data::new(ws_server))
     })
     .bind("0.0.0.0:15234")?
     .run()

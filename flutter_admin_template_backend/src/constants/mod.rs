@@ -18,3 +18,4 @@ pub const INVALID_USER: i32 = 40001;
 pub const INVALID_TOKEN: i32 = 40002;
 pub const OK: i32 = 20000;
 pub const NO_AUTH: i32 = 20002;
+pub const WS_CONNECTION_ERR: i32 = 20003;

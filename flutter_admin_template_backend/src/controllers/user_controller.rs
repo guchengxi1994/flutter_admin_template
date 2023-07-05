@@ -36,6 +36,7 @@ pub async fn new_user(info: web::Json<NewUserRequest>) -> HttpResponse {
 
 pub async fn login(info: web::Json<UserLoginRequest>, req: HttpRequest) -> HttpResponse {
     let ip: String;
+
     if let Some(val) = req.peer_addr() {
         // println!("Address {:?}", val.ip());
         ip = val.ip().to_string();
@@ -58,6 +59,7 @@ pub async fn login(info: web::Json<UserLoginRequest>, req: HttpRequest) -> HttpR
                     message: err_str.as_str(),
                     data: None,
                 };
+
                 return HttpResponse::Ok().json(&b);
             }
         }
