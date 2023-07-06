@@ -108,51 +108,43 @@ pub async fn get_current_user_role_detail(user_id: Option<ReqData<UserId>>) -> H
 }
 
 #[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct UpdateRoleRequest {
     pub role_id: i64,
     pub routers: Vec<i64>,
     pub apis: Vec<i64>,
 }
 
-#[derive(Debug, serde::Deserialize)]
-struct Params {
-    token: String,
-}
-
 pub async fn update_role(
-    req: HttpRequest,
+    _req: HttpRequest,
     info: web::Json<UpdateRoleRequest>,
     srv: Data<Addr<Server>>,
 ) -> HttpResponse {
-    let q = web::Query::<Params>::from_query(req.query_string());
+    let pool = POOL.lock().unwrap();
+    let r = crate::services::role_service::RoleService::update_role(
+        info.role_id,
+        info.routers.clone(),
+        info.apis.clone(),
+        pool.get_pool(),
+    )
+    .await;
 
-    if let Ok(t) = q {
-        let pool = POOL.lock().unwrap();
-        let r = crate::services::role_service::RoleService::update_role(
-            info.role_id,
-            info.routers.clone(),
-            info.apis.clone(),
-            pool.get_pool(),
-        )
-        .await;
+    match r {
+        Ok(_) => {
+            let _ = srv.send(crate::websocket::message::UpdateRoleMessage {
+                msg: "log out".into(),
+                role_id: info.role_id,
+            }).await;
 
-        match r {
-            Ok(_) => {
-                let _ = srv.send(crate::websocket::message::ClientActorMessage {
-                    token: t.token.clone(),
-                    msg: "log out".into(),
-                });
-
-                let b: BaseResponse<Option<String>> = BaseResponse {
-                    code: crate::constants::OK,
-                    message: "更新成功",
-                    data: None,
-                };
-                return HttpResponse::Ok().json(&b);
-            }
-            Err(e) => {
-                println!("[rust] error :{:?}", e);
-            }
+            let b: BaseResponse<Option<String>> = BaseResponse {
+                code: crate::constants::OK,
+                message: "更新成功",
+                data: None,
+            };
+            return HttpResponse::Ok().json(&b);
+        }
+        Err(e) => {
+            println!("[rust] error :{:?}", e);
         }
     }
 

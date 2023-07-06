@@ -42,7 +42,7 @@ class ModifyRoleDialogState extends ConsumerState<ModifyRoleDialog> {
     final response = await ref.read(roleProvider).getApiByRoleId(widget.roleId);
     if (response != null) {
       apis = response.records ?? [];
-      apiRouters = apis.map((e) => e.apiRouter ?? "").toList();
+      apiRouters = apis.map((e) => e.apiId ?? -1).toList();
     }
 
     tree = TreeNode.root();
@@ -117,7 +117,11 @@ class ModifyRoleDialogState extends ConsumerState<ModifyRoleDialog> {
           Align(
             alignment: Alignment.topRight,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () async {
+                await ref
+                    .read(roleProvider)
+                    .updateRole(widget.roleId, menus.toList(), [1, 2, 3]);
+              },
               child: const Text("Submit"),
             ),
           ),
@@ -215,7 +219,7 @@ class ModifyRoleDialogState extends ConsumerState<ModifyRoleDialog> {
     );
   }
 
-  late List<String> apiRouters = [];
+  late List<int> apiRouters = [];
 
   Widget _buildApis() {
     return ListView.builder(
@@ -232,14 +236,14 @@ class ModifyRoleDialogState extends ConsumerState<ModifyRoleDialog> {
                   return;
                 }
 
-                if (apiRouters.contains(records[index].apiRouter)) {
-                  apiRouters.remove(records[index].apiRouter);
+                if (apiRouters.contains(records[index].apiId)) {
+                  apiRouters.remove(records[index].apiId);
                 } else {
-                  apiRouters.add(records[index].apiRouter!);
+                  apiRouters.add(records[index].apiId!);
                 }
                 setState(() {});
               },
-              child: apiRouters.contains(records[index].apiRouter)
+              child: apiRouters.contains(records[index].apiId)
                   ? const Icon(Icons.check_box)
                   : const Icon(Icons.square),
             ),

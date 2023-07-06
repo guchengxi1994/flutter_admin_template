@@ -163,6 +163,8 @@ impl RoleTrait for RoleService {
             let _ = quary.build().execute(&mut tx).await?;
         }
 
+        tx.commit().await?;
+
         anyhow::Ok(())
     }
 }

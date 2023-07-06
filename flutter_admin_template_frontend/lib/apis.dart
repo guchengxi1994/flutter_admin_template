@@ -14,6 +14,7 @@ const Map<String, String> apiDetails = {
   // role
   "getAllRoles": "/system/role/all", //get
   "getDetailsById": "/system/role/details", // get
+  "updateRole": "/system/role/update", // post
 
   // api
   "getApiByRouter": "/system/api/byRouter", //get

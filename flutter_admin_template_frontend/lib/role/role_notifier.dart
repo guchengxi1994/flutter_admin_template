@@ -8,6 +8,7 @@ import 'package:flutter_admin_template_frontend/role/models/api_by_role_response
     as api_by_role;
 import 'package:flutter_admin_template_frontend/role/models/role_list_response.dart'
     as role_list;
+import 'package:flutter_admin_template_frontend/role/models/update_role_request.dart';
 import 'package:flutter_admin_template_frontend/table/base_request.dart';
 import 'package:flutter_admin_template_frontend/table/base_table_notifier.dart';
 
@@ -112,5 +113,23 @@ class RoleNotifier<_ extends BaseRequest, RoleListResponse extends BaseResponse>
     }
 
     return null;
+  }
+
+  Future updateRole(int roleId, List<int> routers, List<int> apis) async {
+    String url = apiDetails["updateRole"]!;
+    UpdateRoleRequest request = UpdateRoleRequest();
+    request.apis = apis;
+    request.roleId = roleId;
+    request.routers = routers;
+
+    Response? r = await dioUtils.post(url, data: request.toJson());
+    if (r != null) {
+      if (r.data['code'] != httpCodeOK) {
+        SmartDialogUtils.error(r.data['message'].toString());
+        return;
+      }
+      return;
+    }
+    SmartDialogUtils.error("更新失败");
   }
 }

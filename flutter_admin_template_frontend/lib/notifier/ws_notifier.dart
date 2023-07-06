@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_template_frontend/apis.dart' show websocketUrl;
 import 'package:flutter_admin_template_frontend/common/local_storage.dart';
+import 'package:flutter_admin_template_frontend/common/smart_dialog_utils.dart';
+import 'package:flutter_admin_template_frontend/routers.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class WebsocketNotifier extends ChangeNotifier {
@@ -22,6 +24,11 @@ class WebsocketNotifier extends ChangeNotifier {
 
     channel!.stream.listen((event) {
       debugPrint("[flutter] ws recieved: ${event.toString()}");
+      if (event.toString() == "log out") {
+        SmartDialogUtils.warning("角色已变更");
+        FatRouters.navigatorKey.currentState!
+            .pushNamedAndRemoveUntil(FatRouters.loginScreen, (route) => false);
+      }
     });
   }
 }
