@@ -156,7 +156,7 @@ impl UserTrait for UserService {
                 // 先去获取role id
                 let role_id =
                     super::role_service::RoleService::get_role_id_by_user_id(_u.user_id, pool)
-                        .await?;
+                        .await.unwrap_or(Some(0));
 
                 let mut api_ids: HashSet<i64> = HashSet::new();
                 api_ids.extend([12, 13, 9, 5, 16]);

@@ -1,18 +1,16 @@
-use std::{
-    collections::{HashMap, HashSet},
-    sync::RwLock,
-};
+use std::{collections::HashMap, sync::RwLock};
 
 use actix::{Actor, Context, Handler, Recipient};
 
-use super::message::{ClientActorMessage, Connect, Disconnect, WsMessage};
+use super::message::{UpdateRoleMessage, Connect, Disconnect, WsMessage};
 use lazy_static::lazy_static;
 
 type Socket = Recipient<WsMessage>;
 
 pub struct Server {
     pub sessions: HashMap<String, Socket>,
-    pub clients: HashSet<String>,
+    // token, userid
+    pub clients: HashMap<String, (i64, i64)>,
 }
 
 lazy_static! {
@@ -23,13 +21,13 @@ impl Default for Server {
     fn default() -> Self {
         Self {
             sessions: HashMap::new(),
-            clients: HashSet::new(),
+            clients: HashMap::new(),
         }
     }
 }
 
 /// example
-/// 
+///
 /// pub async fn xxx(...,srv: Data<Addr<Server>>){
 ///     let _ = srv.send(crate::websocket::message::ClientActorMessage {
 ///       token: "11111".into(),
@@ -40,7 +38,7 @@ impl Server {
     pub fn send_message(&self, message: &str, token: String) {
         let ws_server = WS_SERVER.read();
         if let Ok(_ws) = ws_server {
-            if _ws.clients.contains(&token) {
+            if _ws.clients.contains_key(&token) {
                 if let Some(r) = _ws.sessions.get(&token) {
                     r.do_send(WsMessage(message.to_owned()));
                 } else {
@@ -49,7 +47,23 @@ impl Server {
             } else {
                 println!("attempting to send message but couldn't find [token].");
             }
-        }else{
+        } else {
+            println!("read server failed.");
+        }
+    }
+
+    pub fn send_update_role_message(&self, message: &str, role_id: i64) {
+        let ws_server = WS_SERVER.read();
+
+        if let Ok(_ws) = ws_server {
+            for (k, v) in &_ws.clients {
+                if v.1 == role_id {
+                    if let Some(r) = _ws.sessions.get(k) {
+                        r.do_send(WsMessage(message.to_owned()));
+                    }
+                }
+            }
+        } else {
             println!("read server failed.");
         }
     }
@@ -77,19 +91,17 @@ impl Handler<Connect> for Server {
     fn handle(&mut self, msg: Connect, _ctx: &mut Self::Context) -> Self::Result {
         {
             let mut ws = WS_SERVER.write().unwrap();
-            ws.clients.insert(msg.token.clone());
+            ws.clients.insert(msg.token.clone(), msg.user_info);
             ws.sessions.insert(msg.token.clone(), msg.addr.clone());
         }
         self.send_message(&"connected", msg.token);
     }
 }
 
-impl Handler<ClientActorMessage> for Server {
+impl Handler<UpdateRoleMessage> for Server {
     type Result = ();
 
-    fn handle(&mut self, msg: ClientActorMessage, _: &mut Self::Context) -> Self::Result {
-        self.send_message(&msg.msg, msg.token);
+    fn handle(&mut self, msg: UpdateRoleMessage, _: &mut Self::Context) -> Self::Result {
+        self.send_update_role_message(&msg.msg, msg.role_id);
     }
 }
-
-

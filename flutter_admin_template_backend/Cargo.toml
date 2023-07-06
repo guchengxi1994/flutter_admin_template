@@ -24,7 +24,7 @@ serde_json = "1.0.0"
 sqlx = { version = "0.6", features = [
     "runtime-tokio-native-tls",
     "mysql",
-    "chrono",
+    "chrono"
 ] }
 tokio = { version = "1", features = ["full"] }
 toml = "*"

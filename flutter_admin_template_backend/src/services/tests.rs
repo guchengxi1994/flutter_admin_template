@@ -62,4 +62,41 @@ mod tests {
             })
         }
     }
+
+    #[test]
+    fn batch_insert_test() -> anyhow::Result<()> {
+        {
+            let url = format!(
+                "mysql://{}:{}@{}:{}/{}",
+                "root", "123456", "localhost", "3306", "flutter_admin_template"
+            );
+            let rt = tokio::runtime::Runtime::new().unwrap();
+            rt.block_on(async {
+                crate::database::init::init(url).await;
+            })
+        }
+        let rt = tokio::runtime::Runtime::new()?;
+        rt.block_on(async {
+            let apis: Vec<i64> = vec![1, 2, 3, 4, 5];
+            let pool = crate::database::init::POOL.lock().unwrap();
+            let mut quary = sqlx::QueryBuilder::<sqlx::MySql>::new(
+                "insert into role_api (role_id,api_id) values",
+            );
+
+            for i in 0..apis.len() {
+                quary.push("(");
+                quary.push_bind(2);
+                quary.push(",");
+                quary.push_bind(apis[i]);
+                quary.push(")");
+                if i != apis.len() - 1 {
+                    quary.push(",");
+                }
+            }
+
+            let _ = quary.build().execute(pool.get_pool()).await?;
+
+            anyhow::Ok(())
+        })
+    }
 }
