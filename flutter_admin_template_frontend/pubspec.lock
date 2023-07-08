@@ -169,6 +169,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.3.1"
+  fat_widgets:
+    dependency: "direct main"
+    description:
+      path: "D:\\github_repo\\fat_widgets"
+      relative: false
+    source: path
+    version: "0.0.4"
   ffi:
     dependency: transitive
     description:

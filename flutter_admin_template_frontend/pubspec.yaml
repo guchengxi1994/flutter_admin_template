@@ -14,6 +14,9 @@ dependencies:
   d_chart: ^2.2.11
   dio: ^5.2.1+1
   dropdown_button2: ^1.9.2
+  fat_widgets:
+    git:
+      url: https://github.com/guchengxi1994/fat_widgets
   flutter:
     sdk: flutter
   flutter_layout_grid: ^2.0.0
@@ -36,6 +39,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+
+dependency_overrides:  
+  fat_widgets: 
+    path: D:\github_repo\fat_widgets
 
 deferred-components:
   - name: fat 

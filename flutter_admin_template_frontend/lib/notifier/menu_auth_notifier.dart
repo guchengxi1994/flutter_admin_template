@@ -14,10 +14,31 @@ class MenuAuthNotifier extends ChangeNotifier {
   final DioUtils dioUtils = DioUtils();
   final FatLocalStorage storage = FatLocalStorage();
 
+  int currentRouterId = 0;
+
+  static const Map<int, String> maps = {
+    0: "/main/dashboard",
+    1: "/main/user",
+    2: "/main/dept",
+    3: "/main/menu",
+    4: "/main/role",
+    5: "/main/logs",
+  };
+
+  changeRouterByRouterId(int i) {
+    debugPrint(
+        "[flutter] call navigate: before $currentRouter ,after ${maps[i]}");
+    if (currentRouterId != i) {
+      currentRouterId = i;
+      currentRouter = maps[i]!;
+      FatRouters.navigatorKey.currentState!
+          .pushNamedAndRemoveUntil(maps[i]!, (v) => false);
+    }
+  }
+
   String currentRouter = "/main/dashboard";
   changeRouter(String router) {
-    debugPrint(
-        "[flutter] call navigation: before :$currentRouter ,after $router");
+    debugPrint("[flutter] call navigate: before $currentRouter ,after $router");
     if (currentRouter != router) {
       currentRouter = router;
       FatRouters.navigatorKey.currentState!
@@ -28,6 +49,12 @@ class MenuAuthNotifier extends ChangeNotifier {
   changeRouterNoNavigation(String router) {
     if (currentRouter != router) {
       currentRouter = router;
+      for (final i in maps.entries) {
+        if (i.value == router) {
+          currentRouterId = i.key;
+        }
+      }
+
       notifyListeners();
     }
   }

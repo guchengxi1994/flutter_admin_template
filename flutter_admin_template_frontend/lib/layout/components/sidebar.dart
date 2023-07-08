@@ -12,6 +12,7 @@ import 'package:hovering/hovering.dart';
 
 import 'sidebar_item_with_children.dart';
 
+@Deprecated("Not recommend")
 class Sidebar extends ConsumerStatefulWidget {
   const Sidebar({super.key, this.header});
   final Widget? header;

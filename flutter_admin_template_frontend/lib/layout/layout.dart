@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'components/sidebar.dart';
 
+@Deprecated("Use `LayoutV2` instead")
 class Layout extends ConsumerWidget {
   const Layout({super.key, required this.body});
   final Widget body;

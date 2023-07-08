@@ -9,7 +9,7 @@ import 'package:flutter_admin_template_frontend/role/role_screen.dart'
     deferred as role;
 import 'package:flutter_admin_template_frontend/user/user_screen.dart'
     deferred as user;
-import 'package:flutter_admin_template_frontend/log/log_summary_screen.dart'
+import 'package:flutter_admin_template_frontend/log/log_screen.dart'
     deferred as log;
 import 'package:flutter_admin_template_frontend/log/sign_in_log_screen.dart'
     deferred as signin;
@@ -17,8 +17,8 @@ import 'package:flutter_admin_template_frontend/log/operation_log_screen.dart'
     deferred as operation;
 
 import 'common/future_builder.dart';
+import 'layout/layout_v2.dart';
 import 'signin/login_screen.dart' deferred as login;
-import 'layout/layout.dart';
 
 class FatRouters {
   static GlobalKey<NavigatorState> navigatorKey = GlobalKey();
@@ -34,35 +34,35 @@ class FatRouters {
   static String signInLogScreen = "/main/logs/signin";
 
   static Map<String, WidgetBuilder> routers = {
-    dashboardScreen: (context) => Layout(
+    dashboardScreen: (context) => LayoutV2(
         body: FutureLoaderWidget(
             builder: (context) => dashboard.DashboardScreen(),
             loadWidgetFuture: dashboard.loadLibrary())),
-    userScreen: (context) => Layout(
+    userScreen: (context) => LayoutV2(
         body: FutureLoaderWidget(
             builder: (context) => user.UserScreen(),
             loadWidgetFuture: user.loadLibrary())),
-    deptScreen: (context) => Layout(
+    deptScreen: (context) => LayoutV2(
         body: FutureLoaderWidget(
             builder: (context) => dept.DeptScreen(),
             loadWidgetFuture: dept.loadLibrary())),
-    menuScreen: (context) => Layout(
+    menuScreen: (context) => LayoutV2(
         body: FutureLoaderWidget(
             builder: (context) => menu.MenuScreen(),
             loadWidgetFuture: menu.loadLibrary())),
-    roleScreen: (context) => Layout(
+    roleScreen: (context) => LayoutV2(
         body: FutureLoaderWidget(
             builder: (context) => role.RoleScreen(),
             loadWidgetFuture: role.loadLibrary())),
-    logScreen: (context) => Layout(
+    logScreen: (context) => LayoutV2(
         body: FutureLoaderWidget(
-            builder: (context) => log.LogSummaryScreen(),
+            builder: (context) => log.LogScreen(),
             loadWidgetFuture: log.loadLibrary())),
-    operationLogScreen: (context) => Layout(
+    operationLogScreen: (context) => LayoutV2(
         body: FutureLoaderWidget(
             builder: (context) => operation.OperationLogScreen(),
             loadWidgetFuture: operation.loadLibrary())),
-    signInLogScreen: (context) => Layout(
+    signInLogScreen: (context) => LayoutV2(
         body: FutureLoaderWidget(
             builder: (context) => signin.SignInLogScreen(),
             loadWidgetFuture: signin.loadLibrary())),
