@@ -133,11 +133,15 @@ impl UserTrait for UserService {
 
                 // 如果没有超时
                 let duration = SystemTime::now().duration_since(log.login_time.into())?;
+
                 if let Some(t) = log.token {
-                    if duration.as_secs() < (*TOKEN_EXPIRE.lock().unwrap()).try_into()? {
-                        // 刷新token
-                        let _ = crate::database::refresh_token::refresh_token(t.clone(), &mut con);
-                        return anyhow::Ok(t);
+                    if let Ok(_id) = crate::database::validate_token::validate_token(t.clone()) {
+                        if duration.as_secs() < (*TOKEN_EXPIRE.lock().unwrap()).try_into()? {
+                            // 刷新token
+                            let _ =
+                                crate::database::refresh_token::refresh_token(t.clone(), &mut con);
+                            return anyhow::Ok(t);
+                        }
                     }
                 }
 
@@ -156,7 +160,8 @@ impl UserTrait for UserService {
                 // 先去获取role id
                 let role_id =
                     super::role_service::RoleService::get_role_id_by_user_id(_u.user_id, pool)
-                        .await.unwrap_or(Some(0));
+                        .await
+                        .unwrap_or(Some(0));
 
                 let mut api_ids: HashSet<i64> = HashSet::new();
                 api_ids.extend([12, 13, 9, 5, 16]);

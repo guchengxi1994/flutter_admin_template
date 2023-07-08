@@ -120,7 +120,7 @@ class ModifyRoleDialogState extends ConsumerState<ModifyRoleDialog> {
               onPressed: () async {
                 await ref
                     .read(roleProvider)
-                    .updateRole(widget.roleId, menus.toList(), [1, 2, 3]);
+                    .updateRole(widget.roleId, menus.toList(), apiRouters);
               },
               child: const Text("Submit"),
             ),
