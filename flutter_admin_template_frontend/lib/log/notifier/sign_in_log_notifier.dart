@@ -2,13 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter_admin_template_frontend/apis.dart';
 import 'package:flutter_admin_template_frontend/table/base_request.dart';
-import 'package:flutter_admin_template_frontend/table/base_response.dart';
 import 'package:flutter_admin_template_frontend/table/base_table_notifier.dart';
 
 import '../models/sign_in_response.dart';
 
-class SignInLogNotifier<_ extends BaseRequest,
-    SigninResponse extends BaseResponse> extends BaseTableNotifier {
+class SignInLogNotifier extends BaseTableNotifier {
   @override
   init(String url, String method, {BaseRequest? request}) async {
     String url = "${apiDetails["signinlog"]!}?pageNumber=1&pageSize=10";

@@ -13,11 +13,9 @@ import 'package:flutter_admin_template_frontend/table/base_request.dart';
 import 'package:flutter_admin_template_frontend/table/base_table_notifier.dart';
 
 import '../apis.dart';
-import '../table/base_response.dart';
 import 'models/role_detail_response.dart';
 
-class RoleNotifier<_ extends BaseRequest, RoleListResponse extends BaseResponse>
-    extends BaseTableNotifier {
+class RoleNotifier extends BaseTableNotifier {
   @override
   init(String url, String method, {BaseRequest? request}) async {
     String url = apiDetails["getAllRoles"]!;
