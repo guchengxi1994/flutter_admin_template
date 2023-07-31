@@ -1,5 +1,6 @@
 import 'package:fat_widgets/fat_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_admin_template_frontend/notifier/app_color_notifier.dart';
 import 'package:flutter_admin_template_frontend/styles/app_style.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -35,7 +36,7 @@ class LogScreenState extends ConsumerState<LogScreen>
           header: ConstrainedBox(
               constraints: const BoxConstraints(maxHeight: 50, minHeight: 50)),
           decoration: BoxDecoration(
-              color: Colors.lightBlue.withAlpha(75),
+              color: ref.watch(colorNotifier).currentColorTheme.$3,
               borderRadius: const BorderRadius.only(
                   topRight: Radius.circular(15),
                   bottomRight: Radius.circular(15))),

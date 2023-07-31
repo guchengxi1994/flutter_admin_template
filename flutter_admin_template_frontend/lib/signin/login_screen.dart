@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_admin_template_frontend/notifier/app_color_notifier.dart';
 import 'package:flutter_admin_template_frontend/signin/components/components.dart';
-import 'package:flutter_admin_template_frontend/styles/app_style.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -21,8 +27,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-              AppStyle.loginBackgroundColor1,
-              AppStyle.loginBackgroundColor2
+              // AppStyle.loginBackgroundColor1,
+              // AppStyle.loginBackgroundColor2
+              ref.watch(colorNotifier).currentColorTheme.$1,
+              ref.watch(colorNotifier).currentColorTheme.$2
             ])),
         child: Center(
           child: Container(

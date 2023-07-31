@@ -1,5 +1,6 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers, avoid_init_to_null
 
+import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_template_frontend/common/screen_fit_utils.dart';
 import 'package:flutter_admin_template_frontend/layout/notifier/sidebar_notifier.dart';
@@ -188,74 +189,63 @@ class SignInLogScreenState extends ConsumerState<SignInLogScreen> {
         : Expanded(
             child: Container(
             padding: const EdgeInsets.only(left: 16, right: 16),
-            child: Scrollbar(
-              controller: controller2,
-              thumbVisibility: true,
-              child: SingleChildScrollView(
-                controller: controller2,
-                scrollDirection: Axis.horizontal,
-                child: SingleChildScrollView(
-                  controller: controller,
-                  child: DataTable(
-                    columnSpacing: 0,
-                    showBottomBorder: true,
-                    horizontalMargin: 0,
-                    dividerThickness: 1,
-                    rows: records.map((e) => _buildRow(e)).toList(),
-                    columns: [
-                      DataColumn(
-                          label: SizedBox(
-                        width: w1,
-                        child: Text(
-                          "记录编号".i18n,
-                          style: AppStyle.tableColumnStyle,
-                        ),
-                      )),
-                      DataColumn(
-                        label: SizedBox(
-                          width: w2,
-                          child: Text(
-                            "用户编号".i18n,
-                            style: AppStyle.tableColumnStyle,
-                          ),
-                        ),
-                      ),
-                      DataColumn(
-                          label: SizedBox(
-                        width: w3,
-                        child: Text(
-                          "用户名".i18n,
-                          style: AppStyle.tableColumnStyle,
-                        ),
-                      )),
-                      DataColumn(
-                          label: SizedBox(
-                        width: w4,
-                        child: Text(
-                          "登录IP".i18n,
-                          style: AppStyle.tableColumnStyle,
-                        ),
-                      )),
-                      DataColumn(
-                          label: SizedBox(
-                        width: w5,
-                        child: Text(
-                          "登录状态".i18n,
-                          style: AppStyle.tableColumnStyle,
-                        ),
-                      )),
-                      DataColumn(
-                          label: SizedBox(
-                        width: w6,
-                        child: Text(
-                          "登录时间".i18n,
-                          style: AppStyle.tableColumnStyle,
-                        ),
-                      )),
-                    ],
+            child: DataTable2(
+              columnSpacing: 0,
+              showBottomBorder: true,
+              horizontalMargin: 0,
+              dividerThickness: 1,
+              rows: records.map((e) => _buildRow(e)).toList(),
+              columns: [
+                DataColumn(
+                    label: SizedBox(
+                  width: w1,
+                  child: Text(
+                    "记录编号".i18n,
+                    style: AppStyle.tableColumnStyle,
+                  ),
+                )),
+                DataColumn(
+                  label: SizedBox(
+                    width: w2,
+                    child: Text(
+                      "用户编号".i18n,
+                      style: AppStyle.tableColumnStyle,
+                    ),
                   ),
                 ),
-              ),
+                DataColumn(
+                    label: SizedBox(
+                  width: w3,
+                  child: Text(
+                    "用户名".i18n,
+                    style: AppStyle.tableColumnStyle,
+                  ),
+                )),
+                DataColumn(
+                    label: SizedBox(
+                  width: w4,
+                  child: Text(
+                    "登录IP".i18n,
+                    style: AppStyle.tableColumnStyle,
+                  ),
+                )),
+                DataColumn(
+                    label: SizedBox(
+                  width: w5,
+                  child: Text(
+                    "登录状态".i18n,
+                    style: AppStyle.tableColumnStyle,
+                  ),
+                )),
+                DataColumn(
+                    label: SizedBox(
+                  width: w6,
+                  child: Text(
+                    "登录时间".i18n,
+                    style: AppStyle.tableColumnStyle,
+                  ),
+                )),
+              ],
             ),
           ));
   }

@@ -1,7 +1,9 @@
 // ignore_for_file: avoid_init_to_null
 
 import 'package:flutter/material.dart';
+import 'package:flutter_admin_template_frontend/notifier/app_color_notifier.dart';
 import 'package:flutter_admin_template_frontend/styles/app_style.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'custom_dropdown_button.dart';
 import 'range_dates_selector.dart';
@@ -10,7 +12,7 @@ typedef OnSubmitButtonClicked = dynamic Function(DateTime? first,
     DateTime? last, String? status, String? keyword, bool isDateSelected);
 typedef OnResetButtonClicked = dynamic Function();
 
-class OperationSearchArea extends StatefulWidget {
+class OperationSearchArea extends ConsumerStatefulWidget {
   const OperationSearchArea(
       {Key? key,
       required this.onSubmitButtonClicked,
@@ -34,10 +36,11 @@ class OperationSearchArea extends StatefulWidget {
   final String inputHintText;
 
   @override
-  State<OperationSearchArea> createState() => OperationSearchAreaState();
+  ConsumerState<OperationSearchArea> createState() =>
+      OperationSearchAreaState();
 }
 
-class OperationSearchAreaState extends State<OperationSearchArea> {
+class OperationSearchAreaState extends ConsumerState<OperationSearchArea> {
   late bool searchEnabled = false;
   late bool resetEnable = false;
 
@@ -153,9 +156,9 @@ class OperationSearchAreaState extends State<OperationSearchArea> {
     super.dispose();
   }
 
-  final onActivateDecorate = const BoxDecoration(
-    color: AppStyle.appBlue,
-    borderRadius: BorderRadius.all(Radius.circular(19)),
+  late final onActivateDecorate = BoxDecoration(
+    color: ref.watch(colorNotifier).currentColorTheme.$0,
+    borderRadius: const BorderRadius.all(Radius.circular(19)),
   );
 
   final disabledDecorate = const BoxDecoration(

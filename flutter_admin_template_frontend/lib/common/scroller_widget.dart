@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+@Deprecated("Use `DataTable2` instead")
 class ScrollerWidget extends StatelessWidget {
   ScrollerWidget({super.key, required this.child});
   final Widget child;

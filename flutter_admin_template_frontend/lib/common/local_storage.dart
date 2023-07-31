@@ -45,4 +45,14 @@ class FatLocalStorage {
     await _initStorage();
     return _storage!.getStringList("apiAuth") ?? [];
   }
+
+  Future<int> getThemeColor() async {
+    await _initStorage();
+    return _storage!.getInt("themeColor") ?? 2;
+  }
+
+  Future setThemeColor(int c) async {
+    await _initStorage();
+    _storage!.setInt("themeColor", c);
+  }
 }

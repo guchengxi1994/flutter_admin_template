@@ -2,7 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter_admin_template_frontend/styles/app_style.dart';
+import 'package:flutter_admin_template_frontend/notifier/app_color_notifier.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 typedef QueryInitialData<T> = dynamic Function();
 typedef QueryByIndex<T> = dynamic Function(int index);
@@ -10,7 +11,7 @@ typedef IndicatorBuilder = Widget Function(Widget child);
 
 const double size = 30;
 
-class DatatableIndicator extends StatefulWidget {
+class DatatableIndicator extends ConsumerStatefulWidget {
   const DatatableIndicator(
       {Key? key,
       this.initialIndex = 1,
@@ -26,10 +27,10 @@ class DatatableIndicator extends StatefulWidget {
   final IndicatorBuilder? indicatorBuilder;
 
   @override
-  State<DatatableIndicator> createState() => DatatableIndicatorState();
+  ConsumerState<DatatableIndicator> createState() => DatatableIndicatorState();
 }
 
-class DatatableIndicatorState extends State<DatatableIndicator> {
+class DatatableIndicatorState extends ConsumerState<DatatableIndicator> {
   List _list = []; // 存放页码的数组
   late int _total = 0; // 页码数量（总数据量/一页需要展示多少条数据）
   late int _pageIndex = widget.initialIndex; // 当前页码
@@ -104,7 +105,9 @@ class DatatableIndicatorState extends State<DatatableIndicator> {
                     border: Border.all(
                         color: const Color.fromARGB(255, 230, 223, 223)),
                     borderRadius: const BorderRadius.all(Radius.circular(4)),
-                    color: ele == _pageIndex ? AppStyle.appBlue : Colors.white),
+                    color: ele == _pageIndex
+                        ? ref.watch(colorNotifier).currentColorTheme.$0
+                        : Colors.white),
                 child: const Icon(Icons.chevron_left),
               ),
             ),
@@ -131,7 +134,9 @@ class DatatableIndicatorState extends State<DatatableIndicator> {
                     border: Border.all(
                         color: const Color.fromARGB(255, 230, 223, 223)),
                     borderRadius: const BorderRadius.all(Radius.circular(4)),
-                    color: ele == _pageIndex ? AppStyle.appBlue : Colors.white),
+                    color: ele == _pageIndex
+                        ? ref.watch(colorNotifier).currentColorTheme.$0
+                        : Colors.white),
                 child: const Icon(Icons.chevron_right),
               ),
             ),
@@ -158,7 +163,9 @@ class DatatableIndicatorState extends State<DatatableIndicator> {
                   border: Border.all(
                       color: const Color.fromARGB(255, 230, 223, 223)),
                   borderRadius: const BorderRadius.all(Radius.circular(4)),
-                  color: ele == _pageIndex ? AppStyle.appBlue : Colors.white),
+                  color: ele == _pageIndex
+                      ? ref.watch(colorNotifier).currentColorTheme.$0
+                      : Colors.white),
               child: Center(
                 child: Text("$ele",
                     // 当前页码对应的组件的样式

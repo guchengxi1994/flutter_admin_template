@@ -1,6 +1,6 @@
+import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_template_frontend/common/screen_fit_utils.dart';
-import 'package:flutter_admin_template_frontend/common/scroller_widget.dart';
 import 'package:flutter_admin_template_frontend/layout/notifier/sidebar_notifier.dart';
 import 'package:flutter_admin_template_frontend/role/models/role_list_response.dart'
     as role_list;
@@ -77,8 +77,7 @@ class RoleScreenState extends ConsumerState<RoleScreen> {
   Widget _buildContent() {
     final records = ref.watch(roleProvider).records;
     return records.isNotEmpty
-        ? ScrollerWidget(
-            child: DataTable(
+        ? DataTable2(
             columnSpacing: 0,
             showBottomBorder: true,
             horizontalMargin: 0,
@@ -135,7 +134,7 @@ class RoleScreenState extends ConsumerState<RoleScreen> {
                 ),
               )),
             ],
-          ))
+          )
         : Center(
             child: SizedBox(
                 child: Column(
