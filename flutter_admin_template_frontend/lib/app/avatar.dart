@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_admin_template_frontend/routers.dart';
 import 'package:flutter_admin_template_frontend/styles/app_style.dart';
 
 class AvatarWidget extends StatelessWidget {
@@ -9,6 +10,8 @@ class AvatarWidget extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         debugPrint("aaa");
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil(FatRouters.loginScreen, (route) => false);
       },
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),

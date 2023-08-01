@@ -17,6 +17,8 @@ class AppWrapper extends ConsumerStatefulWidget {
 class _AppWrapperState extends ConsumerState<AppWrapper> with WindowListener {
   @override
   Widget build(BuildContext context) {
+    var routePath = ModalRoute.of(context)!.settings.name;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -28,10 +30,11 @@ class _AppWrapperState extends ConsumerState<AppWrapper> with WindowListener {
             ),
             child: Scaffold(
               backgroundColor: ref.watch(colorNotifier).current,
-              appBar: const PreferredSize(
-                preferredSize: Size.fromHeight(AppStyle.appbarHeight),
+              appBar: PreferredSize(
+                preferredSize: const Size.fromHeight(AppStyle.appbarHeight),
                 child: WindowCaption(
-                  title: CustomAppbar(),
+                  title:
+                      routePath == "/loginScreen" ? null : const CustomAppbar(),
                   brightness: Brightness.dark,
                   backgroundColor: Colors.transparent,
                 ),

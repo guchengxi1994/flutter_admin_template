@@ -71,14 +71,14 @@ class LayoutV2State extends ConsumerState<LayoutV2> {
       key: globalKey,
       decoration: BoxDecoration(
         color: ref.watch(colorNotifier).currentColorTheme.$1,
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.grey,
-            blurRadius: 5,
-            spreadRadius: 0.0,
-            offset: Offset(5, 0), // shadow direction: bottom right
-          )
-        ],
+        // boxShadow: const [
+        //   BoxShadow(
+        //     color: Colors.grey,
+        //     blurRadius: 5,
+        //     spreadRadius: 0.0,
+        //     offset: Offset(5, 0), // shadow direction: bottom right
+        //   )
+        // ],
       ),
       initialIndex: ref.watch(menuAuthProvider).currentRouterId,
       body: widget.body,

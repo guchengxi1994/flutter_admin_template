@@ -56,13 +56,6 @@ class MyApp extends StatelessWidget {
               settings: settings,
               pageBuilder: (_, __, ___) => page.call(context),
               transitionsBuilder: (_, anim, __, child) {
-                if (uri.path == "/loginScreen") {
-                  return FadeTransition(
-                    opacity: anim,
-                    child: child,
-                  );
-                }
-
                 return FadeTransition(
                   opacity: anim,
                   child: AppWrapper(child: child),

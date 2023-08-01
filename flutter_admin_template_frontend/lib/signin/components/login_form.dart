@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_template_frontend/common/screen_fit_utils.dart';
+import 'package:flutter_admin_template_frontend/notifier/app_color_notifier.dart';
 import 'package:flutter_admin_template_frontend/notifier/global_notifier.dart';
 import 'package:flutter_admin_template_frontend/routers.dart';
 import 'package:flutter_admin_template_frontend/styles/app_style.dart';
@@ -177,15 +178,17 @@ class LoginForm extends ConsumerWidget {
             }
           },
           child: Container(
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(122)),
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(122)),
                 // color: Color.fromARGB(255, 40, 40, 255),
                 gradient: LinearGradient(
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                   colors: [
-                    Color.fromARGB(255, 72, 78, 238),
-                    Color.fromARGB(255, 62, 154, 208),
+                    // Color.fromARGB(255, 72, 78, 238),
+                    // Color.fromARGB(255, 62, 154, 208),
+                    ref.watch(colorNotifier).currentColorTheme.$1,
+                    ref.watch(colorNotifier).currentColorTheme.$3,
                   ],
                 ),
               ),
