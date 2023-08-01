@@ -6,6 +6,8 @@ part 'table.dart';
 
 class AppStyle {
   AppStyle._();
+  static const double appbarHeight = 48;
+  static const double avatarSize = 36;
 
   @Deprecated("use `ColorTheme` instead")
   static const Color appBlue = Color.fromARGB(193, 15, 84, 188);

@@ -30,7 +30,7 @@ class AppColorNotifier extends ChangeNotifier {
 
   late BaseTheme _baseTheme = ColorTheme.choices[0];
 
-  Color get current => _baseTheme.$0;
+  Color get current => _baseTheme.$1;
   BaseTheme get currentColorTheme => _baseTheme;
 }
 

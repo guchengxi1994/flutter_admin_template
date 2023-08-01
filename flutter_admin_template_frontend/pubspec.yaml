@@ -35,6 +35,7 @@ dependencies:
   sm_crypto: ^1.0.3
   super_context_menu: ^0.1.0
   web_socket_channel: ^2.4.0
+  window_manager: ^0.3.2
 
 
 dev_dependencies:
