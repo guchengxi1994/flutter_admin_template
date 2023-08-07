@@ -99,4 +99,28 @@ mod tests {
             anyhow::Ok(())
         })
     }
+
+    #[test]
+    fn get_structured_depts_test() -> anyhow::Result<()> {
+        {
+            let url = format!(
+                "mysql://{}:{}@{}:{}/{}",
+                "root", "123456", "localhost", "3306", "flutter_admin_template"
+            );
+            let rt = tokio::runtime::Runtime::new().unwrap();
+            rt.block_on(async {
+                crate::database::init::init(url).await;
+            })
+        }
+        let rt = tokio::runtime::Runtime::new()?;
+        rt.block_on(async {
+            let pool = crate::database::init::POOL.lock().unwrap();
+            let s = <crate::services::department_service::DepartmentService as crate::services::department_service::DepartmentTrait>::query_structured_depts(1,pool.get_pool()).await?;
+            // println!("[result]: {:?}",s);
+            let j = serde_json::to_string(&s);
+            println!("[result]: {}",j.unwrap());
+
+            anyhow::Ok(())
+        })
+    }
 }

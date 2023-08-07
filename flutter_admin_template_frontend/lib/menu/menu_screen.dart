@@ -84,8 +84,14 @@ class MenuScreenState extends ConsumerState<MenuScreen> {
                                 padding:
                                     const EdgeInsets.only(top: 22, right: 22),
                               ),
+
+                          /// will throw `combinePaths not implemented in HTML renderer`
+                          ///
+                          /// exception on web with `--web-renderer html` if `IndentStyle`
+                          ///
+                          /// is not `none`
                           indentation:
-                              const Indentation(style: IndentStyle.squareJoint),
+                              const Indentation(style: IndentStyle.none),
                           onItemTap: (item) {},
                           showRootNode: false,
                           builder: (ctx, node) {
