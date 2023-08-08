@@ -13,3 +13,4 @@ pub struct Department {
     pub is_deleted: i64,
     pub remark: Option<String>,
 }
+

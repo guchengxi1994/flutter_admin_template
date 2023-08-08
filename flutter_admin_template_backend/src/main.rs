@@ -35,6 +35,7 @@ async fn main() -> std::io::Result<()> {
             .configure(crate::routers::router::router_group)
             .configure(crate::routers::role::role_group)
             .configure(crate::routers::api::api_group)
+            .configure(crate::routers::department::dept_group)
             .service(crate::websocket::controller::websocket)
             .app_data(Data::new(ws_server))
     })

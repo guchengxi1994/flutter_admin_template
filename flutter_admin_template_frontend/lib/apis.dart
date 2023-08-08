@@ -20,6 +20,9 @@ const Map<String, String> apiDetails = {
   "getApiByRouter": "/system/api/byRouter", //get
   "getApiByRole": "/system/api/byRole", //get
   "getApiCurrent": "/system/api/current", //get
+
+  // dept
+  "getDeptTree": "/system/dept/tree",
 };
 
 const List<String> reservedApis = [
