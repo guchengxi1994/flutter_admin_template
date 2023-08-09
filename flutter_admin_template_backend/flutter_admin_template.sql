@@ -11,7 +11,7 @@
  Target Server Version : 80023
  File Encoding         : 65001
 
- Date: 06/07/2023 13:05:12
+ Date: 09/08/2023 15:02:39
 */
 
 SET NAMES utf8mb4;
@@ -31,7 +31,7 @@ CREATE TABLE `api`  (
   `is_deleted` tinyint(1) NULL DEFAULT 0,
   `remark` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`api_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of api
@@ -52,7 +52,33 @@ INSERT INTO `api` VALUES (13, '获取用户信息', '/system/user/info', 'get', 
 INSERT INTO `api` VALUES (14, '根据页面路由获取api路由', '/system/api/byRouter', 'get', '2023-07-03 11:34:30', '2023-07-03 11:34:30', 0, NULL);
 INSERT INTO `api` VALUES (15, '根据role id获取api路由', '/system/api/byRole', 'get', '2023-07-03 16:53:27', '2023-07-03 16:53:27', 0, NULL);
 INSERT INTO `api` VALUES (16, '当前用户的api', '/system/api/current', 'get', '2023-07-04 15:39:34', '2023-07-04 15:39:34', 0, NULL);
-INSERT INTO `api` VALUES (17, '根据roleid修改role', '/system/role/update', '', '2023-07-06 13:03:48', '2023-07-06 13:03:48', 0, NULL);
+INSERT INTO `api` VALUES (17, '根据roleid修改role', '/system/role/update', 'post', '2023-07-06 13:03:48', '2023-08-08 15:23:00', 0, NULL);
+INSERT INTO `api` VALUES (18, '获取部门树', '/system/dept/tree', 'get', '2023-08-08 15:22:57', '2023-08-08 15:34:36', 0, NULL);
+INSERT INTO `api` VALUES (19, '根据部门id获取部门详情', '/system/dept/query', 'get', '2023-08-09 14:46:38', '2023-08-09 14:46:38', 0, NULL);
+INSERT INTO `api` VALUES (20, '获取不包含id的部门树', '/system/dept/tree/without', 'get', '2023-08-09 14:54:39', '2023-08-09 14:54:39', 0, NULL);
+INSERT INTO `api` VALUES (21, '创建新部门', '/system/dept/new', 'post', '2023-08-09 14:59:12', '2023-08-09 14:59:12', 0, NULL);
+INSERT INTO `api` VALUES (22, '更新部门', '/system/dept/update', 'post', '2023-08-09 15:01:08', '2023-08-09 15:01:08', 0, NULL);
+
+-- ----------------------------
+-- Table structure for department
+-- ----------------------------
+DROP TABLE IF EXISTS `department`;
+CREATE TABLE `department`  (
+  `dept_id` int NOT NULL AUTO_INCREMENT,
+  `parent_id` int NOT NULL DEFAULT 0,
+  `dept_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `order_number` int NULL DEFAULT 0,
+  `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `is_deleted` tinyint(1) NULL DEFAULT 0,
+  `remark` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`dept_id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of department
+-- ----------------------------
+INSERT INTO `department` VALUES (1, 0, '总部', 0, '2023-08-07 15:25:48', '2023-08-07 15:25:48', 0, NULL);
 
 -- ----------------------------
 -- Table structure for role
@@ -86,7 +112,6 @@ CREATE TABLE `role_api`  (
 -- ----------------------------
 -- Records of role_api
 -- ----------------------------
-INSERT INTO `role_api` VALUES (1, 1);
 INSERT INTO `role_api` VALUES (1, 2);
 INSERT INTO `role_api` VALUES (1, 3);
 INSERT INTO `role_api` VALUES (1, 4);
@@ -103,6 +128,12 @@ INSERT INTO `role_api` VALUES (1, 14);
 INSERT INTO `role_api` VALUES (1, 15);
 INSERT INTO `role_api` VALUES (1, 16);
 INSERT INTO `role_api` VALUES (1, 17);
+INSERT INTO `role_api` VALUES (1, 1);
+INSERT INTO `role_api` VALUES (1, 18);
+INSERT INTO `role_api` VALUES (1, 19);
+INSERT INTO `role_api` VALUES (1, 20);
+INSERT INTO `role_api` VALUES (1, 21);
+INSERT INTO `role_api` VALUES (1, 22);
 
 -- ----------------------------
 -- Table structure for role_router
@@ -125,6 +156,7 @@ INSERT INTO `role_router` VALUES (1, 6);
 INSERT INTO `role_router` VALUES (1, 7);
 INSERT INTO `role_router` VALUES (1, 8);
 INSERT INTO `role_router` VALUES (1, 9);
+INSERT INTO `role_router` VALUES (1, -1);
 
 -- ----------------------------
 -- Table structure for router
@@ -185,6 +217,11 @@ INSERT INTO `router_api` VALUES (9, 14);
 INSERT INTO `router_api` VALUES (9, 15);
 INSERT INTO `router_api` VALUES (0, 16);
 INSERT INTO `router_api` VALUES (9, 17);
+INSERT INTO `router_api` VALUES (5, 18);
+INSERT INTO `router_api` VALUES (5, 19);
+INSERT INTO `router_api` VALUES (5, 20);
+INSERT INTO `router_api` VALUES (5, 21);
+INSERT INTO `router_api` VALUES (5, 22);
 
 -- ----------------------------
 -- Table structure for user
@@ -222,11 +259,7 @@ CREATE TABLE `user_login`  (
   `login_state` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `token` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   PRIMARY KEY (`login_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 117 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of user_login
--- ----------------------------
+) ENGINE = InnoDB AUTO_INCREMENT = 144 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 
 -- ----------------------------
@@ -242,27 +275,5 @@ CREATE TABLE `user_role`  (
 -- Records of user_role
 -- ----------------------------
 INSERT INTO `user_role` VALUES (1, 1);
-
-
--- ----------------------------
--- Table structure for department
--- ----------------------------
-DROP TABLE IF EXISTS `department`;
-CREATE TABLE `department`  (
-  `dept_id` int NOT NULL AUTO_INCREMENT,
-  `parent_id` int NOT NULL DEFAULT 0,
-  `dept_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `order_number` int NULL DEFAULT 0,
-  `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `is_deleted` tinyint(1) NULL DEFAULT 0,
-  `remark` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
-  PRIMARY KEY (`dept_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of department
--- ----------------------------
-INSERT INTO `department` VALUES (1, 0, '总部', 0, '2023-08-07 15:25:48', '2023-08-07 15:25:48', 0, NULL);
 
 SET FOREIGN_KEY_CHECKS = 1;

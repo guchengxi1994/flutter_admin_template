@@ -17,8 +17,8 @@ pub struct WsConnection {
     pub token: String,
     pub addr: Addr<Server>,
     pub hb: Instant,
-    pub user_id : i64,
-    pub role_id : i64
+    pub user_id: i64,
+    pub role_id: i64,
 }
 
 impl Actor for WsConnection {
@@ -34,7 +34,7 @@ impl Actor for WsConnection {
             .send(Connect {
                 addr: addr.recipient(),
                 token: self.token.clone(),
-                user_info : (self.user_id,self.role_id)
+                user_info: (self.user_id, self.role_id),
             })
             .into_actor(self)
             .then(|res, _, ctx| {

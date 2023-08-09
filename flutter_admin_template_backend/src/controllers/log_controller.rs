@@ -6,7 +6,7 @@ use crate::{
     middleware::UserId,
     services::Query,
     services::{
-        log_service::{SignInSummary, UserSignInSummary,SignInRecordWithName},
+        log_service::{SignInRecordWithName, SignInSummary, UserSignInSummary},
         query_params::{DataList, Pagination, QueryParam, SigninRecordsQueryParam},
     },
 };
@@ -40,8 +40,7 @@ pub async fn sign_in_get_all(req: HttpRequest, c: Option<web::ReqData<UserId>>) 
         } else {
             let pool = POOL.lock().unwrap();
             let logs =
-            SignInRecordWithName::all(pool.get_pool(), QueryParam { data: pagination })
-                    .await;
+                SignInRecordWithName::all(pool.get_pool(), QueryParam { data: pagination }).await;
             match logs {
                 Ok(_logs) => {
                     let b: BaseResponse<DataList<SignInRecordWithName>> = BaseResponse {

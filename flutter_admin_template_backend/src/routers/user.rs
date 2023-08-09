@@ -20,6 +20,9 @@ pub fn user_group(config: &mut web::ServiceConfig) {
             }))
             .route("/create", web::post().to(user_controller::new_user))
             .route("/login", web::post().to(user_controller::login))
-            .route("/info", web::get().to(user_controller::get_current_user_info)),
+            .route(
+                "/info",
+                web::get().to(user_controller::get_current_user_info),
+            ),
     );
 }

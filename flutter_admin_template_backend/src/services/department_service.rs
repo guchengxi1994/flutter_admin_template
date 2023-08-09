@@ -1,3 +1,5 @@
+extern crate fat_macros;
+
 use serde::Deserialize;
 use sqlx::{types::chrono, MySql, Pool};
 use validator::Validate;
@@ -9,7 +11,9 @@ use crate::models::department::Department;
 pub struct NewDeptRequest {
     #[validate(length(max = 30))]
     pub dept_name: String,
+    #[validate(range(min = 0))]
     pub parent_id: i64,
+    #[validate(range(min = 0))]
     pub order_number: i64,
     #[validate(length(max = 50))]
     pub remark: Option<String>,
@@ -20,10 +24,13 @@ pub struct NewDeptRequest {
 pub struct UpdateDeptRequest {
     #[validate(length(max = 30))]
     pub dept_name: String,
+    #[validate(range(min = 0))]
     pub parent_id: i64,
+    #[validate(range(min = 0))]
     pub order_number: i64,
     #[validate(length(max = 50))]
     pub remark: Option<String>,
+    #[validate(range(min = 1))]
     pub dept_id: i64,
 }
 
@@ -78,22 +85,41 @@ pub struct StructuredDepartment {
 
 #[async_trait::async_trait]
 pub trait DepartmentTrait {
+    /// 根据id获取单个department
     async fn query_by_dept_id(dept_id: i64, pool: &Pool<MySql>) -> anyhow::Result<Department>;
 
+    /// 根据parent_id获取该节点下所有departments
     async fn query_by_parent_id(
         parent_id: i64,
         pool: &Pool<MySql>,
     ) -> anyhow::Result<StructuredDepartment>;
 
+    /// 获取部门树
     async fn query_structured_depts(pool: &Pool<MySql>) -> anyhow::Result<StructuredDepartment>;
 
+    /// 判断是否存在
     async fn exists(dept_id: i64, pool: &Pool<MySql>) -> bool;
 
+    /// 获取所有部门
     async fn get_all_departments(pool: &Pool<MySql>) -> anyhow::Result<Vec<Department>>;
 
+    /// 获取不包括该id的所有部门
+    async fn get_departments_without(
+        without: i64,
+        pool: &Pool<MySql>,
+    ) -> anyhow::Result<Vec<Department>>;
+
+    /// 创建新的部门
     async fn create_new_dept(req: NewDeptRequest, pool: &Pool<MySql>) -> anyhow::Result<()>;
 
+    /// 更新部门
     async fn update_dept(req: UpdateDeptRequest, pool: &Pool<MySql>) -> anyhow::Result<()>;
+
+    /// 获取不包含自身及自身下所有子部门的部门树
+    async fn get_structured_depts_without_self(
+        dept_id: i64,
+        pool: &Pool<MySql>,
+    ) -> anyhow::Result<StructuredDepartment>;
 }
 
 pub struct DepartmentService;
@@ -184,8 +210,22 @@ impl DepartmentTrait for DepartmentService {
 
     async fn get_all_departments(pool: &Pool<MySql>) -> anyhow::Result<Vec<Department>> {
         let r = sqlx::query_as::<sqlx::MySql, Department>(
-            r#"select * from department where is_deleted = 0  order by parent_id"#,
+            r#"select * from department where is_deleted = 0  order by parent_id,order_number"#,
         )
+        .fetch_all(pool)
+        .await?;
+
+        anyhow::Ok(r)
+    }
+
+    async fn get_departments_without(
+        without: i64,
+        pool: &Pool<MySql>,
+    ) -> anyhow::Result<Vec<Department>> {
+        let r = sqlx::query_as::<sqlx::MySql, Department>(
+            r#"select * from department where is_deleted = 0 and dept_id!= ?  order by parent_id,order_number"#,
+        )
+        .bind(without)
         .fetch_all(pool)
         .await?;
 
@@ -226,6 +266,7 @@ impl DepartmentTrait for DepartmentService {
         anyhow::Ok(())
     }
 
+    #[fat_macros::need_more_tests]
     async fn update_dept(req: UpdateDeptRequest, pool: &Pool<MySql>) -> anyhow::Result<()> {
         if let Err(_e) = req.validate() {
             anyhow::bail!("参数错误")
@@ -262,6 +303,42 @@ impl DepartmentTrait for DepartmentService {
         let  _ = sqlx::query(r#"update department set parent_id = ?,dept_name=?,order_number=?,remark=? where is_deleted = 0 and dept_id = ?"#).bind(req.parent_id).bind(req.dept_name).bind(req.order_number).bind(req.remark).bind(req.dept_id).execute(pool).await?;
 
         anyhow::Ok(())
+    }
+
+    #[fat_macros::need_more_tests]
+    async fn get_structured_depts_without_self(
+        dept_id: i64,
+        pool: &Pool<MySql>,
+    ) -> anyhow::Result<StructuredDepartment> {
+        let b = Self::exists(dept_id, pool).await;
+        if !b {
+            anyhow::bail!("record not found")
+        }
+
+        if dept_id == 1 {
+            anyhow::bail!("wrong parameter")
+        }
+
+        let depts = Self::get_departments_without(dept_id, pool).await?;
+
+        if depts.len() == 0 {
+            anyhow::bail!("records not found")
+        }
+
+        let mut s_dept: StructuredDepartment = StructuredDepartment {
+            dept_id: depts[0].dept_id,
+            parent_id: depts[0].parent_id,
+            dept_name: depts[0].dept_name.clone(),
+            order_number: depts[0].order_number,
+            create_time: depts[0].create_time,
+            remark: depts[0].remark.clone(),
+            children: Vec::new(),
+            level: 1,
+        };
+
+        s_dept = get_structed(depts[1..].to_vec(), &mut s_dept, 1).clone();
+
+        anyhow::Ok(s_dept)
     }
 }
 

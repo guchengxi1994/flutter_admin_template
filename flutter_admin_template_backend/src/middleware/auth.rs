@@ -58,7 +58,9 @@ where
     fn call(&self, req: ServiceRequest) -> Self::Future {
         println!("[rust] current query :{:?}", req.path().to_string());
 
-        if req.path().to_string() != "/system/user/login" && !req.path().to_string().starts_with("/ws/") {
+        if req.path().to_string() != "/system/user/login"
+            && !req.path().to_string().starts_with("/ws/")
+        {
             let auth = web::Query::<Params>::from_query(req.query_string());
             match auth {
                 Ok(_auth) => {

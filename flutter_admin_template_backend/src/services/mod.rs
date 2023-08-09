@@ -3,14 +3,14 @@ use self::query_params::{
 };
 use sqlx::{MySql, Pool};
 
+pub mod api_service;
+pub mod department_service;
 pub mod log_service;
 pub mod query_params;
+pub mod role_service;
 pub mod router_service;
 mod tests;
 pub mod user_service;
-pub mod role_service;
-pub mod api_service;
-pub mod department_service;
 
 #[async_trait::async_trait]
 pub trait Query<T> {

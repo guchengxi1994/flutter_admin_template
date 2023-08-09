@@ -1,5 +1,5 @@
 use actix::Actor;
-use actix_web::{middleware::Logger, App, HttpServer, web::Data};
+use actix_web::{middleware::Logger, web::Data, App, HttpServer};
 
 mod common;
 mod constants;

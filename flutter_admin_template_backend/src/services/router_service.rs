@@ -7,8 +7,8 @@ use crate::models::router::Router;
 pub struct RouterSummary {
     pub router_id: i64,
     pub router: String,
-    pub router_name:String,
-    pub parent_id:i64
+    pub router_name: String,
+    pub parent_id: i64,
 }
 
 #[async_trait::async_trait]
@@ -47,7 +47,11 @@ impl RouterTrait for RouterService {
     }
 
     async fn query_all(pool: &Pool<MySql>) -> anyhow::Result<Vec<Router>> {
-        let result = sqlx::query_as::<sqlx::MySql,Router>(r#"select * from router where is_deleted = 0 order by parent_id"#).fetch_all(pool).await?;
+        let result = sqlx::query_as::<sqlx::MySql, Router>(
+            r#"select * from router where is_deleted = 0 order by parent_id"#,
+        )
+        .fetch_all(pool)
+        .await?;
 
         anyhow::Ok(result)
     }

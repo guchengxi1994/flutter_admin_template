@@ -131,10 +131,12 @@ pub async fn update_role(
 
     match r {
         Ok(_) => {
-            let _ = srv.send(crate::websocket::message::UpdateRoleMessage {
-                msg: "log out".into(),
-                role_id: info.role_id,
-            }).await;
+            let _ = srv
+                .send(crate::websocket::message::UpdateRoleMessage {
+                    msg: "log out".into(),
+                    role_id: info.role_id,
+                })
+                .await;
 
             let b: BaseResponse<Option<String>> = BaseResponse {
                 code: crate::constants::OK,

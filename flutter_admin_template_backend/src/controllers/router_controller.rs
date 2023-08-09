@@ -10,7 +10,7 @@ use crate::{
     models::router::Router,
     services::{
         query_params::DataList,
-        router_service::{RouterTrait, RouterSummary},
+        router_service::{RouterSummary, RouterTrait},
     },
 };
 
@@ -85,7 +85,7 @@ pub async fn get_current_summary(user_id: Option<ReqData<UserId>>) -> HttpRespon
             _id.user_id,
         )
         .await;
-    
+
         if let Ok(_r) = r {
             let b: BaseResponse<DataList<RouterSummary>> = BaseResponse {
                 code: crate::constants::OK,

@@ -62,7 +62,7 @@ pub struct SigninRecordsQueryParam {
     pub user_id: Option<i64>,
     pub start_time: Option<i64>,
     pub end_time: Option<i64>,
-    pub state : Option<String>
+    pub state: Option<String>,
 }
 
 impl Display for SigninRecordsQueryParam {

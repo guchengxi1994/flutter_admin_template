@@ -14,6 +14,7 @@ async-trait = "0.1.68"
 anyhow = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
 env_logger = "0.9"
+fat_macros = {path = "../fat_macros"}
 futures-util = "0.3.28"
 gm-sm3 = "0.10.0"
 hex = "0.4.0"

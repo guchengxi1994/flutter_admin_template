@@ -18,6 +18,22 @@ pub fn dept_group(config: &mut web::ServiceConfig) {
 
                 error::InternalError::from_response(err, HttpResponse::Ok().body(body)).into()
             }))
-            .route("/tree", web::get().to(department_controller::get_department_tree))
+            .route(
+                "/tree",
+                web::get().to(department_controller::get_department_tree),
+            )
+            .route(
+                "/tree/without",
+                web::get().to(department_controller::get_department_tree_without),
+            )
+            .route(
+                "/query",
+                web::get().to(department_controller::get_dept_by_id),
+            )
+            .route("/new", web::post().to(department_controller::new_dept))
+            .route(
+                "/update",
+                web::post().to(department_controller::update_dept),
+            ),
     );
 }
