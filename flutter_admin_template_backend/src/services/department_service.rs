@@ -1,7 +1,33 @@
+use serde::Deserialize;
 use sqlx::{types::chrono, MySql, Pool};
+use validator::Validate;
 
 use crate::models::department::Department;
 
+#[derive(Debug, Validate, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct NewDeptRequest {
+    #[validate(length(max = 30))]
+    pub dept_name: String,
+    pub parent_id: i64,
+    pub order_number: i64,
+    #[validate(length(max = 50))]
+    pub remark: Option<String>,
+}
+
+#[derive(Debug, Validate, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateDeptRequest {
+    #[validate(length(max = 30))]
+    pub dept_name: String,
+    pub parent_id: i64,
+    pub order_number: i64,
+    #[validate(length(max = 50))]
+    pub remark: Option<String>,
+    pub dept_id: i64,
+}
+
+#[allow(dead_code)]
 impl Department {
     pub async fn parent(self, pool: &Pool<MySql>) -> Option<Self> {
         if self.parent_id == 0 {
@@ -64,6 +90,10 @@ pub trait DepartmentTrait {
     async fn exists(dept_id: i64, pool: &Pool<MySql>) -> bool;
 
     async fn get_all_departments(pool: &Pool<MySql>) -> anyhow::Result<Vec<Department>>;
+
+    async fn create_new_dept(req: NewDeptRequest, pool: &Pool<MySql>) -> anyhow::Result<()>;
+
+    async fn update_dept(req: UpdateDeptRequest, pool: &Pool<MySql>) -> anyhow::Result<()>;
 }
 
 pub struct DepartmentService;
@@ -161,6 +191,92 @@ impl DepartmentTrait for DepartmentService {
 
         anyhow::Ok(r)
     }
+
+    async fn create_new_dept(req: NewDeptRequest, pool: &Pool<MySql>) -> anyhow::Result<()> {
+        if let Err(_e) = req.validate() {
+            anyhow::bail!("参数错误")
+        }
+
+        let b = Self::exists(req.parent_id, pool).await;
+        if !b {
+            anyhow::bail!("record not found")
+        }
+
+        let r = sqlx::query_as::<sqlx::MySql, Department>(
+            r#"select * from department where is_deleted = 0  and parent_id = ? and dept_name = ?"#,
+        )
+        .bind(req.parent_id)
+        .bind(&req.dept_name)
+        .fetch_one(pool)
+        .await;
+        if let Ok(_r) = r {
+            anyhow::bail!("duplicated department name")
+        }
+
+        let _ = sqlx::query(
+            r#"insert into department (parent_id,dept_name,order_number,remark) values (?,?,?,?)"#,
+        )
+        .bind(req.parent_id)
+        .bind(req.dept_name)
+        .bind(req.order_number)
+        .bind(req.remark)
+        .execute(pool)
+        .await?;
+
+        anyhow::Ok(())
+    }
+
+    async fn update_dept(req: UpdateDeptRequest, pool: &Pool<MySql>) -> anyhow::Result<()> {
+        if let Err(_e) = req.validate() {
+            anyhow::bail!("参数错误")
+        }
+
+        let b = Self::exists(req.parent_id, pool).await;
+        if !b {
+            anyhow::bail!("record not found")
+        }
+
+        let b = Self::exists(req.dept_id, pool).await;
+        if !b {
+            anyhow::bail!("record not found")
+        }
+
+        let s = Self::query_by_parent_id(req.dept_id, pool).await;
+        if let Ok(_s) = s {
+            if if_has_root(req.parent_id, &_s) {
+                anyhow::bail!("cannot move parent node to child node")
+            }
+        }
+
+        let r = sqlx::query_as::<sqlx::MySql, Department>(
+            r#"select * from department where is_deleted = 0  and parent_id = ? and dept_name = ?"#,
+        )
+        .bind(req.parent_id)
+        .bind(&req.dept_name)
+        .fetch_one(pool)
+        .await;
+        if let Ok(_r) = r {
+            anyhow::bail!("duplicated department name")
+        }
+
+        let  _ = sqlx::query(r#"update department set parent_id = ?,dept_name=?,order_number=?,remark=? where is_deleted = 0 and dept_id = ?"#).bind(req.parent_id).bind(req.dept_name).bind(req.order_number).bind(req.remark).bind(req.dept_id).execute(pool).await?;
+
+        anyhow::Ok(())
+    }
+}
+
+fn if_has_root(parent_id: i64, s: &StructuredDepartment) -> bool {
+    if parent_id == s.dept_id {
+        return true;
+    }
+    for child_dept in s.children.iter() {
+        if child_dept.dept_id == parent_id {
+            return true;
+        }
+        return if_has_root(parent_id, child_dept);
+    }
+
+    false
 }
 
 fn get_structed(

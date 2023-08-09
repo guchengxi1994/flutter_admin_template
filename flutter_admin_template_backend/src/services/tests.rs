@@ -147,4 +147,65 @@ mod tests {
             anyhow::Ok(())
         })
     }
+
+    #[test]
+    fn create_new_dept() -> anyhow::Result<()> {
+        {
+            let url = format!(
+                "mysql://{}:{}@{}:{}/{}",
+                "root", "123456", "localhost", "3306", "flutter_admin_template"
+            );
+            let rt = tokio::runtime::Runtime::new().unwrap();
+            rt.block_on(async {
+                crate::database::init::init(url).await;
+            })
+        }
+        let rt = tokio::runtime::Runtime::new()?;
+        rt.block_on(async {
+            let pool = crate::database::init::POOL.lock().unwrap();
+            let req = crate::services::department_service::NewDeptRequest{ dept_name: "sub-1-1-1-1".to_string(), parent_id: 100, order_number: 1, remark: Some("".to_string()) };
+
+            let s = <crate::services::department_service::DepartmentService as crate::services::department_service::DepartmentTrait>::create_new_dept(req,pool.get_pool()).await;
+            
+            match s {
+                Ok(_) => {},
+                Err(e) => {
+                    println!("[rust error] :{:?}",e)
+                },
+            }
+
+            anyhow::Ok(())
+        })
+    }
+
+
+    #[test]
+    fn update_dept() -> anyhow::Result<()> {
+        {
+            let url = format!(
+                "mysql://{}:{}@{}:{}/{}",
+                "root", "123456", "localhost", "3306", "flutter_admin_template"
+            );
+            let rt = tokio::runtime::Runtime::new().unwrap();
+            rt.block_on(async {
+                crate::database::init::init(url).await;
+            })
+        }
+        let rt = tokio::runtime::Runtime::new()?;
+        rt.block_on(async {
+            let pool = crate::database::init::POOL.lock().unwrap();
+            let req = crate::services::department_service::UpdateDeptRequest{ dept_name: "sub-1-1-1-1".to_string(), parent_id: 2, order_number: 1, remark: Some("".to_string()), dept_id: 5 };
+
+            let s = <crate::services::department_service::DepartmentService as crate::services::department_service::DepartmentTrait>::update_dept(req,pool.get_pool()).await;
+            
+            match s {
+                Ok(_) => {},
+                Err(e) => {
+                    println!("[rust error] :{:?}",e)
+                },
+            }
+
+            anyhow::Ok(())
+        })
+    }
 }
