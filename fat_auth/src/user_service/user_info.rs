@@ -20,4 +20,12 @@ impl Display for UserInfo {
     }
 }
 
-pub trait UserInfoTrait {}
+pub trait UserInfoTrait {
+    fn new(user_id: Option<i64>, token: Option<String>) -> Self;
+}
+
+impl UserInfoTrait for UserInfo {
+    fn new(user_id: Option<i64>, token: Option<String>) -> Self {
+        UserInfo { user_id, token }
+    }
+}

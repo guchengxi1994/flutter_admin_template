@@ -1,9 +1,11 @@
 mod tests {
+    use std::fmt::Display;
+
     use crate::user_service::{
         auth::{
             Auth, AuthenticatorTrait, AuthenticatorTraitSync, AuthorizerTrait, AuthorizerTraitSync,
         },
-        user_info::UserLoginInfo,
+        user_info::{UserInfo, UserInfoTrait, UserLoginInfo},
     };
 
     pub struct CustomAuthenticator;
@@ -11,23 +13,27 @@ mod tests {
     pub struct CustomAuthorizer;
 
     #[async_trait::async_trait]
-    impl AuthenticatorTrait for CustomAuthenticator {
-        async fn authenticate(info: UserLoginInfo) {
+    impl<U: Display + UserInfoTrait> AuthenticatorTrait<U> for CustomAuthenticator {
+        async fn authenticate(info: UserLoginInfo) -> U {
             if info.username == "abc" && info.password == "123" {
                 println!("OK")
             } else {
                 println!("ERROR")
             }
+            // UserInfo{token:None,user_id:0}
+            U::new(Some(0), None)
         }
     }
 
-    impl AuthenticatorTraitSync for CustomAuthenticator {
-        fn authenticate(info: UserLoginInfo) {
+    impl<U: Display + UserInfoTrait> AuthenticatorTraitSync<U> for CustomAuthenticator {
+        fn authenticate(info: UserLoginInfo) -> U {
             if info.username == "abc" && info.password == "123" {
                 println!("OK")
             } else {
                 println!("ERROR")
             }
+
+            U::new(Some(0), None)
         }
     }
 
@@ -52,9 +58,10 @@ mod tests {
 
     #[tokio::test]
     async fn test_auth() {
-        let auth = Auth {
+        let auth = Auth::<_, _, UserInfo> {
             authenticator: CustomAuthenticator {},
             authorizer: CustomAuthorizer {},
+            storage: Vec::new(),
         };
 
         auth.authenticate(UserLoginInfo {
