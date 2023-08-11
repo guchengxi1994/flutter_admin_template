@@ -13,7 +13,7 @@ pub trait AuthenticatorTrait<U>
 where
     U: Display + UserInfoTrait,
 {
-    async fn authenticate(info: UserLoginInfo) -> U {
+    async fn authenticate(info: UserLoginInfo) -> anyhow::Result<U> {
         println!(
             "[user-login-info] : name: {}, password: {}",
             info.username, info.password
@@ -21,7 +21,7 @@ where
 
         let u = U::new(Some(0), None);
 
-        return u;
+        return anyhow::Ok(u);
     }
 }
 
@@ -29,14 +29,14 @@ pub trait AuthenticatorTraitSync<U>
 where
     U: Display + UserInfoTrait,
 {
-    fn authenticate(info: UserLoginInfo) -> U {
+    fn authenticate(info: UserLoginInfo) -> anyhow::Result<U> {
         println!(
             "[user-login-info] : name: {}, password: {}",
             info.username, info.password
         );
         let u = U::new(Some(0), None);
 
-        return u;
+        return anyhow::Ok(u);
     }
 }
 
@@ -82,11 +82,22 @@ impl<
 {
     pub async fn authenticate(&self, info: UserLoginInfo) {
         let u = <T as AuthenticatorTrait<U>>::authenticate(info).await;
-        println!("{}", u)
+        match u {
+            Ok(_u) => {
+                println!("{}", _u);
+            }
+            Err(_) => {}
+        }
     }
 
     pub fn authenticate_sync(&self, info: UserLoginInfo) {
-        <T as AuthenticatorTraitSync<U>>::authenticate(info);
+        let u = <T as AuthenticatorTraitSync<U>>::authenticate(info);
+        match u {
+            Ok(_u) => {
+                println!("{}", _u);
+            }
+            Err(_) => {}
+        }
     }
 
     pub async fn authorize(&self, uid: i64, resource: String) -> bool {

@@ -10,12 +10,14 @@ actix = "0.13.0"
 actix-cors = "0.6.4"
 actix-web = "4"
 actix-web-actors = "4.2.0"
-async-trait = "0.1.68"
 anyhow = "1.0"
+async-trait = "0.1.68"
 chrono = { version = "0.4", features = ["serde"] }
 env_logger = "0.9"
+fat_auth ={ path = "../fat_auth"}
 fat_macros = {path = "../fat_macros"}
 futures-util = "0.3.28"
+futures = "0.3.28"
 gm-sm3 = "0.10.0"
 hex = "0.4.0"
 lazy_static = "*"

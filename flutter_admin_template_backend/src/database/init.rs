@@ -1,4 +1,4 @@
-use std::sync::Mutex;
+use futures::lock::Mutex;
 
 use lazy_static::lazy_static;
 use sqlx::{MySql, MySqlPool, Pool};
@@ -65,14 +65,14 @@ pub async fn init_from_config_file(conf_path: &str) {
     }
 }
 
-pub fn init_redis(url: String) -> anyhow::Result<()> {
+pub async fn init_redis(url: String) -> anyhow::Result<()> {
     let client = redis::Client::open(url)?;
-    let mut c = REDIS_CLIENT.lock().unwrap();
+    let mut c = REDIS_CLIENT.lock().await;
     *c = Some(client);
     anyhow::Ok(())
 }
 
 pub async fn init(url: String) {
-    let mut pool = POOL.lock().unwrap();
+    let mut pool = POOL.lock().await;
     *pool = MyPool::new(&url).await
 }

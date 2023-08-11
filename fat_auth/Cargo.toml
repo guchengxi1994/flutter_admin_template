@@ -12,6 +12,3 @@ crate-type = ["lib","staticlib","cdylib",]
 anyhow = "1.0"
 async-trait = "0.1.68"
 fat_macros ={ path = "../fat_macros"}
-
-[dev-dependencies]
-tokio = { version = "1.30.0", features = ["full"] }
