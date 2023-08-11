@@ -20,7 +20,7 @@ struct QueryParams {
 }
 
 pub async fn get_all_routers() -> HttpResponse {
-    let pool = POOL.lock().unwrap();
+    let pool = POOL.lock().await;
     let routers = crate::services::router_service::RouterService::query_all(pool.get_pool()).await;
 
     match routers {
@@ -51,7 +51,7 @@ pub async fn get_summary_by_user_id(req: HttpRequest) -> HttpResponse {
     let q = web::Query::<QueryParams>::from_query(req.query_string());
 
     if let Ok(_q) = q {
-        let pool = POOL.lock().unwrap();
+        let pool = POOL.lock().await;
         let r = crate::services::router_service::RouterService::query_by_id(pool.get_pool(), _q.id)
             .await;
         if let Ok(_r) = r {
@@ -79,7 +79,7 @@ pub async fn get_summary_by_user_id(req: HttpRequest) -> HttpResponse {
 
 pub async fn get_current_summary(user_id: Option<ReqData<UserId>>) -> HttpResponse {
     if let Some(_id) = user_id {
-        let pool = POOL.lock().unwrap();
+        let pool = POOL.lock().await;
         let r = crate::services::router_service::RouterService::query_by_id(
             pool.get_pool(),
             _id.user_id,
@@ -113,7 +113,7 @@ pub async fn get_summary_by_role_id(req: HttpRequest) -> HttpResponse {
     let q = web::Query::<QueryParams>::from_query(req.query_string());
 
     if let Ok(_q) = q {
-        let pool = POOL.lock().unwrap();
+        let pool = POOL.lock().await;
         let r = crate::services::router_service::RouterService::query_by_role_id(
             pool.get_pool(),
             _q.id,

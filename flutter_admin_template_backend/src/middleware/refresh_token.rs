@@ -1,4 +1,4 @@
-use crate::database::init::REDIS_CLIENT;
+use crate::database::init::REDIS_CLIENT_SYNC;
 use std::future::{ready, Ready};
 
 use actix_web::{
@@ -52,7 +52,7 @@ where
             let auth = web::Query::<Params>::from_query(req.query_string());
             match auth {
                 Ok(_auth) => {
-                    let client = REDIS_CLIENT.lock().unwrap().clone().unwrap();
+                    let client = REDIS_CLIENT_SYNC.lock().unwrap().clone().unwrap();
                     let mut con = client.get_connection().unwrap();
                     let _ = crate::database::refresh_token::refresh_token(_auth.0.token, &mut con);
                 }

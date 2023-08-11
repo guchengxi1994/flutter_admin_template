@@ -1,10 +1,5 @@
 use std::fmt::Display;
 
-pub struct UserLoginInfo {
-    pub username: String,
-    pub password: String,
-}
-
 pub struct UserInfo {
     pub user_id: Option<i64>,
     pub token: Option<String>,

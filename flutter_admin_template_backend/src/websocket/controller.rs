@@ -28,7 +28,7 @@ async fn websocket(
     srv: Data<Addr<Server>>,
 ) -> HttpResponse {
     println!("token : {:?}", token.token.clone());
-    let pool = POOL.lock().unwrap();
+    let pool = POOL.lock().await;
     let id = crate::database::validate_token::validate_token(token.token.clone()).unwrap_or(0);
     let role_id =
         crate::services::role_service::RoleService::get_role_id_by_user_id(id, pool.get_pool())

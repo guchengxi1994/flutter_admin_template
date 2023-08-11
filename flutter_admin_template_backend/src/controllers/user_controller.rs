@@ -11,7 +11,7 @@ use crate::{
 };
 
 pub async fn new_user(info: web::Json<NewUserRequest>) -> HttpResponse {
-    let pool = crate::database::init::POOL.lock().unwrap();
+    let pool = crate::database::init::POOL.lock().await;
     let r = crate::services::user_service::UserService::new_user(pool.get_pool(), info.0).await;
     match r {
         Ok(_) => {
@@ -40,9 +40,8 @@ pub async fn login(info: web::Json<UserLoginRequest>, req: HttpRequest) -> HttpR
     if let Some(val) = req.peer_addr() {
         // println!("Address {:?}", val.ip());
         ip = val.ip().to_string();
-        let pool = crate::database::init::POOL.lock().unwrap();
         let r =
-            crate::services::user_service::UserService::login(pool.get_pool(), info.0, ip).await;
+            crate::services::user_service::UserService::login(info.0, ip).await;
         match r {
             Ok(_r) => {
                 let b: BaseResponse<Option<String>> = BaseResponse {
@@ -74,7 +73,7 @@ pub async fn login(info: web::Json<UserLoginRequest>, req: HttpRequest) -> HttpR
 
 pub async fn get_current_user_info(user_id: Option<ReqData<UserId>>) -> HttpResponse {
     if let Some(_id) = user_id {
-        let pool = crate::database::init::POOL.lock().unwrap();
+        let pool = crate::database::init::POOL.lock().await;
         let u =
             crate::services::user_service::UserService::get_user_info(pool.get_pool(), _id.user_id)
                 .await;

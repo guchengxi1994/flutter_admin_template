@@ -18,7 +18,7 @@ use crate::{
 };
 
 pub async fn get_all_roles() -> HttpResponse {
-    let pool = POOL.lock().unwrap();
+    let pool = POOL.lock().await;
     let roles = crate::services::role_service::RoleService::query_all(pool.get_pool()).await;
     match roles {
         Ok(_r) => {
@@ -53,7 +53,7 @@ pub async fn get_detail_by_id(req: HttpRequest) -> HttpResponse {
     let q = web::Query::<QueryParams>::from_query(req.query_string());
 
     if let Ok(_q) = q {
-        let pool = POOL.lock().unwrap();
+        let pool = POOL.lock().await;
         let r =
             crate::services::role_service::RoleService::query_details_by_id(_q.id, pool.get_pool())
                 .await;
@@ -80,7 +80,7 @@ pub async fn get_detail_by_id(req: HttpRequest) -> HttpResponse {
 
 pub async fn get_current_user_role_detail(user_id: Option<ReqData<UserId>>) -> HttpResponse {
     if let Some(_id) = user_id {
-        let pool = POOL.lock().unwrap();
+        let pool = POOL.lock().await;
         let r = crate::services::role_service::RoleService::get_current_role_details(
             _id.user_id,
             pool.get_pool(),
@@ -120,7 +120,7 @@ pub async fn update_role(
     info: web::Json<UpdateRoleRequest>,
     srv: Data<Addr<Server>>,
 ) -> HttpResponse {
-    let pool = POOL.lock().unwrap();
+    let pool = POOL.lock().await;
     let r = crate::services::role_service::RoleService::update_role(
         info.role_id,
         info.routers.clone(),

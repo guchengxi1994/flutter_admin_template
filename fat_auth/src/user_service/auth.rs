@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use super::user_info::{UserInfoTrait, UserLoginInfo};
+use super::user_info::UserInfoTrait;
 
 // 认证器
 pub struct Authenticator;
@@ -13,10 +13,10 @@ pub trait AuthenticatorTrait<U>
 where
     U: Display + UserInfoTrait,
 {
-    async fn authenticate(info: UserLoginInfo) -> anyhow::Result<U> {
+    async fn authenticate(username: String, password: String) -> anyhow::Result<U> {
         println!(
             "[user-login-info] : name: {}, password: {}",
-            info.username, info.password
+            username, password
         );
 
         let u = U::new(Some(0), None);
@@ -29,10 +29,10 @@ pub trait AuthenticatorTraitSync<U>
 where
     U: Display + UserInfoTrait,
 {
-    fn authenticate(info: UserLoginInfo) -> anyhow::Result<U> {
+    fn authenticate(username: String, password: String) -> anyhow::Result<U> {
         println!(
             "[user-login-info] : name: {}, password: {}",
-            info.username, info.password
+            username, password
         );
         let u = U::new(Some(0), None);
 
@@ -80,18 +80,13 @@ impl<
         U: Display + UserInfoTrait,
     > Auth<T, E, U>
 {
-    pub async fn authenticate(&self, info: UserLoginInfo) {
-        let u = <T as AuthenticatorTrait<U>>::authenticate(info).await;
-        match u {
-            Ok(_u) => {
-                println!("{}", _u);
-            }
-            Err(_) => {}
-        }
+    pub async fn authenticate(&self, username: String, password: String)->anyhow::Result<U> {
+        let u = <T as AuthenticatorTrait<U>>::authenticate(username, password).await;
+        return u;
     }
 
-    pub fn authenticate_sync(&self, info: UserLoginInfo) {
-        let u = <T as AuthenticatorTraitSync<U>>::authenticate(info);
+    pub fn authenticate_sync(&self, username: String, password: String) {
+        let u = <T as AuthenticatorTraitSync<U>>::authenticate(username, password);
         match u {
             Ok(_u) => {
                 println!("{}", _u);

@@ -22,7 +22,7 @@ mod tests {
             };
             let rt = tokio::runtime::Runtime::new().unwrap();
             rt.block_on(async {
-                let pool = crate::database::init::POOL.lock().unwrap();
+                let pool = crate::database::init::POOL.lock().await;
                 let r = <crate::services::user_service::UserService as crate::services::user_service::UserTrait>::new_user(pool.get_pool(),req).await;
                 match r {
                     Ok(_) => {
@@ -51,7 +51,7 @@ mod tests {
         {
             let rt = tokio::runtime::Runtime::new().unwrap();
             rt.block_on(async {
-                let pool = crate::database::init::POOL.lock().unwrap();
+                let pool = crate::database::init::POOL.lock().await;
                 let u = sqlx::query_as::<sqlx::MySql, crate::models::user::User>(
                     r#"SELECT * from user where is_deleted = 0 and user_name = ?"#,
                 )
@@ -78,7 +78,7 @@ mod tests {
         let rt = tokio::runtime::Runtime::new()?;
         rt.block_on(async {
             let apis: Vec<i64> = vec![1, 2, 3, 4, 5];
-            let pool = crate::database::init::POOL.lock().unwrap();
+            let pool = crate::database::init::POOL.lock().await;
             let mut quary = sqlx::QueryBuilder::<sqlx::MySql>::new(
                 "insert into role_api (role_id,api_id) values",
             );
@@ -114,7 +114,7 @@ mod tests {
         }
         let rt = tokio::runtime::Runtime::new()?;
         rt.block_on(async {
-            let pool = crate::database::init::POOL.lock().unwrap();
+            let pool = crate::database::init::POOL.lock().await;
             let s = <crate::services::department_service::DepartmentService as crate::services::department_service::DepartmentTrait>::query_structured_depts(pool.get_pool()).await?;
             // println!("[result]: {:?}",s);
             let j = serde_json::to_string(&s);
@@ -138,7 +138,7 @@ mod tests {
         }
         let rt = tokio::runtime::Runtime::new()?;
         rt.block_on(async {
-            let pool = crate::database::init::POOL.lock().unwrap();
+            let pool = crate::database::init::POOL.lock().await;
             let s = <crate::services::department_service::DepartmentService as crate::services::department_service::DepartmentTrait>::query_by_parent_id(2,pool.get_pool()).await?;
             // println!("[result]: {:?}",s);
             let j = serde_json::to_string(&s);
@@ -162,7 +162,7 @@ mod tests {
         }
         let rt = tokio::runtime::Runtime::new()?;
         rt.block_on(async {
-            let pool = crate::database::init::POOL.lock().unwrap();
+            let pool = crate::database::init::POOL.lock().await;
             let req = crate::services::department_service::NewDeptRequest{ dept_name: "sub-1-1-1-1".to_string(), parent_id: 100, order_number: 1, remark: Some("".to_string()) };
 
             let s = <crate::services::department_service::DepartmentService as crate::services::department_service::DepartmentTrait>::create_new_dept(req,pool.get_pool()).await;
@@ -191,7 +191,7 @@ mod tests {
         }
         let rt = tokio::runtime::Runtime::new()?;
         rt.block_on(async {
-            let pool = crate::database::init::POOL.lock().unwrap();
+            let pool = crate::database::init::POOL.lock().await;
             let req = crate::services::department_service::UpdateDeptRequest{ dept_name: "sub-1-1-1-1".to_string(), parent_id: 2, order_number: 1, remark: Some("".to_string()), dept_id: 2 };
 
             let s = <crate::services::department_service::DepartmentService as crate::services::department_service::DepartmentTrait>::update_dept(req,pool.get_pool()).await;
@@ -220,7 +220,7 @@ mod tests {
         }
         let rt = tokio::runtime::Runtime::new()?;
         rt.block_on(async {
-            let pool = crate::database::init::POOL.lock().unwrap();
+            let pool = crate::database::init::POOL.lock().await;
 
             let s = <crate::services::department_service::DepartmentService as crate::services::department_service::DepartmentTrait>::get_structured_depts_without_self(2,pool.get_pool()).await;
             match s {

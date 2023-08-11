@@ -1,4 +1,5 @@
-use std::{fmt::Display, sync::Mutex};
+use futures::lock::Mutex;
+use std::{fmt::Display, time::SystemTime};
 
 use lazy_static::lazy_static;
 
@@ -6,14 +7,23 @@ use fat_auth::user_service::{
     auth::{
         Auth, AuthenticatorTrait, AuthenticatorTraitSync, AuthorizerTrait, AuthorizerTraitSync,
     },
-    user_info::{UserInfoTrait, UserLoginInfo},
+    user_info::UserInfoTrait,
 };
 
-use crate::database::init::POOL;
+use crate::{
+    constants::TOKEN_EXPIRE,
+    database::init::{POOL, REDIS_CLIENT_SYNC},
+    models::{sign_in_record::SignInState, user::User},
+    services::Query,
+};
 
 lazy_static! {
-    static ref AUTH: Mutex<Option<Auth<FatAuthenticator, FatAuthorizer, FatUserInfo>>> =
-        Mutex::new(None);
+    pub static ref AUTH: Mutex<Auth<FatAuthenticator, FatAuthorizer, FatUserInfo>> =
+        Mutex::new(Auth {
+            authenticator: FatAuthenticator {},
+            authorizer: FatAuthorizer {},
+            storage: Vec::new()
+        });
 }
 
 pub struct FatAuthenticator;
@@ -43,25 +53,64 @@ impl UserInfoTrait for FatUserInfo {
 
 #[async_trait::async_trait]
 impl<U: Display + UserInfoTrait> AuthenticatorTrait<U> for FatAuthenticator {
-    async fn authenticate(info: UserLoginInfo) -> anyhow::Result<U> {
-        let _pool = POOL.lock().unwrap();
+    async fn authenticate(username: String, password: String) -> anyhow::Result<U> {
+        let _pool = POOL.lock().await;
         let pool = _pool.get_pool();
         let mut tx = pool.begin().await?;
+        let u = sqlx::query_as::<sqlx::MySql, User>(
+            r#"SELECT * from user where is_deleted = 0 and user_name = ?"#,
+        )
+        .bind(username.as_str())
+        .fetch_one(&mut tx)
+        .await;
 
-        if info.username == "abc" && info.password == "123" {
-            println!("OK")
-        } else {
-            println!("ERROR")
+        match u {
+            Ok(_u) => {
+                // return anyhow::Ok(U::new(Some(_u.user_id), None));
+                if let Err(_) = sqlx::query_as::<sqlx::MySql, User>(
+                    r#"SELECT * from user where is_deleted = 0 and user_name = ? AND password = ?"#,
+                )
+                .bind(username.as_str())
+                .bind(password)
+                .fetch_one(&mut tx)
+                .await
+                {
+                    anyhow::bail!(SignInState::ErrPwd.to_string())
+                }
+                let cli = REDIS_CLIENT_SYNC.lock().unwrap().clone().unwrap();
+                let mut con = cli.get_connection().unwrap();
+                // 获取最后一次登录的时间和token
+                let log = crate::services::log_service::SignInRecordWithName::current_single(
+                    _u.user_id, pool,
+                )
+                .await?;
+                // 如果没有超时
+                let duration = SystemTime::now().duration_since(log.login_time.into())?;
+                if let Some(t) = log.token {
+                    if let Ok(_id) = crate::database::validate_token::validate_token(t.clone()) {
+                        if duration.as_secs() < (*TOKEN_EXPIRE.lock().unwrap()).try_into()? {
+                            // 刷新token
+                            let _ =
+                                crate::database::refresh_token::refresh_token(t.clone(), &mut con);
+                            return anyhow::Ok(U::new(Some(_u.user_id), Some(t)));
+                        }
+                    }
+                }
+                tx.commit().await?;
+
+                let token = crate::common::hash::get_token(username);
+                return anyhow::Ok(U::new(Some(_u.user_id), Some(token)));
+            }
+            Err(_) => {
+                anyhow::bail!(SignInState::NoUser.to_string())
+            }
         }
-        // UserInfo{token:None,user_id:0}
-        anyhow::Ok(U::new(Some(0), None))
     }
 }
 
 impl<U: Display + UserInfoTrait> AuthenticatorTraitSync<U> for FatAuthenticator {
-    fn authenticate(info: UserLoginInfo) -> anyhow::Result<U> {
-
-        if info.username == "abc" && info.password == "123" {
+    fn authenticate(username: String, password: String) -> anyhow::Result<U> {
+        if username == "abc" && password == "123" {
             println!("OK")
         } else {
             println!("ERROR")

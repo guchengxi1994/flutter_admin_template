@@ -17,7 +17,7 @@ struct QueryParams {
 pub async fn get_dept_by_id(_req: HttpRequest) -> HttpResponse {
     let q = web::Query::<QueryParams>::from_query(_req.query_string());
     if let Ok(_q) = q {
-        let pool = POOL.lock().unwrap();
+        let pool = POOL.lock().await;
         let result = crate::services::department_service::DepartmentService::query_by_dept_id(
             _q.id,
             pool.get_pool(),
@@ -44,7 +44,7 @@ pub async fn get_dept_by_id(_req: HttpRequest) -> HttpResponse {
 }
 
 pub async fn get_department_tree(_req: HttpRequest) -> HttpResponse {
-    let pool = POOL.lock().unwrap();
+    let pool = POOL.lock().await;
     let department =
         crate::services::department_service::DepartmentService::query_structured_depts(
             pool.get_pool(),
@@ -75,7 +75,7 @@ pub async fn get_department_tree_without(_req: HttpRequest) -> HttpResponse {
     let q = web::Query::<QueryParams>::from_query(_req.query_string());
 
     if let Ok(_q) = q {
-        let pool = POOL.lock().unwrap();
+        let pool = POOL.lock().await;
         let department =
             crate::services::department_service::DepartmentService::query_structured_depts(
                 pool.get_pool(),
@@ -104,7 +104,7 @@ pub async fn get_department_tree_without(_req: HttpRequest) -> HttpResponse {
 }
 
 pub async fn new_dept(info: web::Json<NewDeptRequest>) -> HttpResponse {
-    let pool = crate::database::init::POOL.lock().unwrap();
+    let pool = crate::database::init::POOL.lock().await;
     let r = crate::services::department_service::DepartmentService::create_new_dept(
         info.0,
         pool.get_pool(),
@@ -132,7 +132,7 @@ pub async fn new_dept(info: web::Json<NewDeptRequest>) -> HttpResponse {
 }
 
 pub async fn update_dept(info: web::Json<UpdateDeptRequest>) -> HttpResponse {
-    let pool = crate::database::init::POOL.lock().unwrap();
+    let pool = crate::database::init::POOL.lock().await;
     let r = crate::services::department_service::DepartmentService::update_dept(
         info.0,
         pool.get_pool(),

@@ -13,7 +13,7 @@ mod tests {
         auth::{
             Auth, AuthenticatorTrait, AuthenticatorTraitSync, AuthorizerTrait, AuthorizerTraitSync,
         },
-        user_info::{UserInfo, UserInfoTrait, UserLoginInfo},
+        user_info::{UserInfo, UserInfoTrait},
     };
 
     pub struct CustomAuthenticator;
@@ -22,8 +22,8 @@ mod tests {
 
     #[async_trait::async_trait]
     impl<U: Display + UserInfoTrait> AuthenticatorTrait<U> for CustomAuthenticator {
-        async fn authenticate(info: UserLoginInfo) -> anyhow::Result<U> {
-            if info.username == "abc" && info.password == "123" {
+        async fn authenticate(username: String, password: String) -> anyhow::Result<U> {
+            if username == "abc" && password == "123" {
                 println!("OK")
             } else {
                 println!("ERROR")
@@ -34,8 +34,8 @@ mod tests {
     }
 
     impl<U: Display + UserInfoTrait> AuthenticatorTraitSync<U> for CustomAuthenticator {
-        fn authenticate(info: UserLoginInfo) -> anyhow::Result<U> {
-            if info.username == "abc" && info.password == "123" {
+        fn authenticate(username: String, password: String) -> anyhow::Result<U> {
+            if username == "abc" && password == "123" {
                 println!("OK")
             } else {
                 println!("ERROR")
@@ -72,11 +72,8 @@ mod tests {
             storage: Vec::new(),
         };
 
-        auth.authenticate(UserLoginInfo {
-            username: "张三".to_string(),
-            password: "123".to_string(),
-        })
-        .await;
+        let _ = auth.authenticate("张三".to_string(), "123".to_string())
+            .await;
 
         let r = auth.authorize(1, "/a/b/c".to_string()).await;
 

@@ -38,7 +38,7 @@ pub async fn sign_in_get_all(req: HttpRequest, c: Option<web::ReqData<UserId>>) 
         if user_id != 1 {
             return sign_in_get_current(req, c1).await;
         } else {
-            let pool = POOL.lock().unwrap();
+            let pool = POOL.lock().await;
             let logs =
                 SignInRecordWithName::all(pool.get_pool(), QueryParam { data: pagination }).await;
             match logs {
@@ -92,7 +92,7 @@ pub async fn sign_in_get_current(
     if let Some(c) = c {
         let user_id = c.into_inner().user_id;
 
-        let pool = POOL.lock().unwrap();
+        let pool = POOL.lock().await;
         let logs = SignInRecordWithName::current_many(
             user_id,
             pool.get_pool(),
@@ -148,7 +148,7 @@ pub async fn get_log_summary(_req: HttpRequest, c: Option<web::ReqData<UserId>>)
         return HttpResponse::Ok().json(&b);
     }
 
-    let pool = POOL.lock().unwrap();
+    let pool = POOL.lock().await;
     let summary =
         crate::services::log_service::get_sign_in_log_summary(pool.get_pool(), user_id).await;
 
