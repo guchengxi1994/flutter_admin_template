@@ -1,6 +1,8 @@
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_admin_template_frontend/layout/notifier/sidebar_notifier.dart';
 import 'package:flutter_admin_template_frontend/notifier/app_color_notifier.dart';
+import 'package:flutter_admin_template_frontend/routers.dart';
 import 'package:flutter_admin_template_frontend/styles/app_style.dart';
 import 'package:flutter_admin_template_frontend/styles/theme/color_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -71,17 +73,18 @@ class LayoutV2State extends ConsumerState<LayoutV2> {
       key: globalKey,
       decoration: BoxDecoration(
         color: ref.watch(colorNotifier).currentColorTheme.$1,
-        // boxShadow: const [
-        //   BoxShadow(
-        //     color: Colors.grey,
-        //     blurRadius: 5,
-        //     spreadRadius: 0.0,
-        //     offset: Offset(5, 0), // shadow direction: bottom right
-        //   )
-        // ],
       ),
       initialIndex: ref.watch(menuAuthProvider).currentRouterId,
+      onExpansionChanged: (p0) {
+        ref.read(sidebarProvider).changeIsCollapse(p0);
+      },
       body: widget.body,
+      errWidget: TextButton(
+        child: const Text("Log out"),
+        onPressed: () {
+          Navigator.of(context).popAndPushNamed(FatRouters.loginScreen);
+        },
+      ),
       destinations: [
         if (auths.contains("/main/dashboard"))
           const NavigationRailDestination(

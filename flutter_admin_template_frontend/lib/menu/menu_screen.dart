@@ -1,5 +1,6 @@
 import 'package:animated_tree_view/animated_tree_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_admin_template_frontend/common/platform_utils.dart';
 import 'package:flutter_admin_template_frontend/notifier/global_notifier.dart';
 import 'package:flutter_admin_template_frontend/notifier/models/all_router_response.dart';
 import 'package:flutter_admin_template_frontend/styles/app_style.dart';
@@ -90,8 +91,10 @@ class MenuScreenState extends ConsumerState<MenuScreen> {
                           /// exception on web with `--web-renderer html` if `IndentStyle`
                           ///
                           /// is not `none`
-                          indentation:
-                              const Indentation(style: IndentStyle.none),
+                          indentation: Indentation(
+                              style: PlatformUtils.isDesktop
+                                  ? IndentStyle.roundJoint
+                                  : IndentStyle.none),
                           onItemTap: (item) {},
                           showRootNode: false,
                           builder: (ctx, node) {
