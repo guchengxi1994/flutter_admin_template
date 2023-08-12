@@ -11,6 +11,8 @@ pub mod role_service;
 pub mod router_service;
 mod tests;
 pub mod user_service;
+pub mod sys_dict_service;
+pub mod sys_config_service;
 
 #[async_trait::async_trait]
 pub trait Query<T> {

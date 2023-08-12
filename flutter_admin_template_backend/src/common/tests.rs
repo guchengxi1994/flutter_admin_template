@@ -72,7 +72,8 @@ mod tests {
             storage: Vec::new(),
         };
 
-        let _ = auth.authenticate("张三".to_string(), "123".to_string())
+        let _ = auth
+            .authenticate("张三".to_string(), "123".to_string())
             .await;
 
         let r = auth.authorize(1, "/a/b/c".to_string()).await;

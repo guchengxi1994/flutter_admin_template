@@ -86,36 +86,16 @@ class LayoutV2State extends ConsumerState<LayoutV2> {
         },
       ),
       destinations: [
-        if (auths.contains("/main/dashboard"))
-          const NavigationRailDestination(
-            icon: SidebarIcons.dashBoard,
-            selectedIcon: SidebarIcons.dashBoardOnHover,
-            label: Text('Dashboard'),
-          ),
-        if (auths.contains("/main/user"))
-          const NavigationRailDestination(
-            icon: SidebarIcons.user,
-            selectedIcon: SidebarIcons.userOnHover,
-            label: Text('User'),
-          ),
-        if (auths.contains("/main/dept"))
-          const NavigationRailDestination(
-            icon: SidebarIcons.dept,
-            selectedIcon: SidebarIcons.deptOnHover,
-            label: Text('Department'),
-          ),
-        if (auths.contains("/main/menu"))
-          const NavigationRailDestination(
-            icon: SidebarIcons.menu,
-            selectedIcon: SidebarIcons.menuOnHover,
-            label: Text('Menu'),
-          ),
-        if (auths.contains("/main/role"))
-          const NavigationRailDestination(
-            icon: SidebarIcons.role,
-            selectedIcon: SidebarIcons.roleOnHover,
-            label: Text('Role'),
-          ),
+        const NavigationRailDestination(
+          icon: SidebarIcons.dashBoard,
+          selectedIcon: SidebarIcons.dashBoardOnHover,
+          label: Text('Dashboard'),
+        ),
+        const NavigationRailDestination(
+          icon: SidebarIcons.sysManagement,
+          selectedIcon: SidebarIcons.sysManagementOnHover,
+          label: Text('System Management'),
+        ),
         if (auths.contains("/main/logs"))
           const NavigationRailDestination(
             icon: SidebarIcons.log,

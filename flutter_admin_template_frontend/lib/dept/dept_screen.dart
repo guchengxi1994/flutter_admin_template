@@ -20,13 +20,8 @@ class DeptScreen extends ConsumerStatefulWidget {
   }
 }
 
-class DeptScreenState extends ConsumerState<DeptScreen> {
-  @override
-  void initState() {
-    super.initState();
-    loadTreeFuture = ref.read(deptProvider).init();
-  }
-
+class DeptScreenState extends ConsumerState<DeptScreen>
+    with AutomaticKeepAliveClientMixin {
   @override
   void dispose() {
     scrollController.dispose();
@@ -36,6 +31,16 @@ class DeptScreenState extends ConsumerState<DeptScreen> {
   // ignore: prefer_typing_uninitialized_variables
   var loadTreeFuture;
 
+  loadTree() async {
+    await ref.read(deptProvider).init();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    loadTreeFuture = loadTree();
+  }
+
   late IndexedTreeNode<DepartmentTreeSummary> tree = IndexedTreeNode.root();
 
   // ignore: unused_field
@@ -43,70 +48,72 @@ class DeptScreenState extends ConsumerState<DeptScreen> {
 
   final ScrollController scrollController = ScrollController();
 
-  late double screenWidth;
+  late double screenWidth = total;
 
   @override
   Widget build(BuildContext context) {
-    if (ref.read(sidebarProvider).isCollapse) {
-      screenWidth = MediaQuery.of(context).size.width -
-          AppStyle.sidebarCollapseWidth -
-          /*padding*/ 40;
-    } else {
-      screenWidth = MediaQuery.of(context).size.width -
-          AppStyle.sidebarWidth - /*padding*/
-          40;
-    }
+    super.build(context);
+    return FutureBuilder(
+      future: loadTreeFuture,
+      builder: (c, s) {
+        if (s.connectionState == ConnectionState.done) {
+          if (ref.read(sidebarProvider).isCollapse) {
+            screenWidth = MediaQuery.of(context).size.width -
+                AppStyle.sidebarCollapseWidth -
+                /*padding*/ 240;
+          } else {
+            screenWidth = MediaQuery.of(context).size.width -
+                AppStyle.sidebarWidth - /*padding*/
+                240;
+          }
+          if (ref.read(deptProvider).tree != null) {
+            tree = IndexedTreeNode<DepartmentTreeSummary>()
+                    .buildFromDeptTree(ref.read(deptProvider).tree) ??
+                IndexedTreeNode<DepartmentTreeSummary>();
+            return RawScrollbar(
+                controller: scrollController,
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  scrollDirection: Axis.horizontal,
+                  child: SizedBox(
+                    width: screenWidth > total ? screenWidth : total,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _tableColumn(),
+                          Expanded(
+                            child: TreeView.indexed<DepartmentTreeSummary>(
+                              expansionIndicatorBuilder: (ctx, node) {
+                                return ChevronIndicator.upDown(
+                                  tree: node,
+                                  alignment: Alignment.centerLeft,
+                                );
+                              },
+                              indentation: const Indentation(
+                                  width: 0, style: IndentStyle.none),
+                              onTreeReady: (controller) {
+                                _controller = controller;
+                                controller.expandAllChildren(tree);
+                              },
+                              builder: _buildContent,
+                              tree: tree,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ));
+          }
+        }
 
-    return RawScrollbar(
-        controller: scrollController,
-        child: SingleChildScrollView(
-          controller: scrollController,
-          scrollDirection: Axis.horizontal,
-          child: SizedBox(
-            width: screenWidth > total ? screenWidth : total,
-            child: FutureBuilder(
-                future: loadTreeFuture,
-                builder: (c, s) {
-                  if (s.connectionState == ConnectionState.done) {
-                    if (ref.read(deptProvider).tree != null) {
-                      tree = IndexedTreeNode<DepartmentTreeSummary>()
-                              .buildFromDeptTree(ref.read(deptProvider).tree) ??
-                          IndexedTreeNode<DepartmentTreeSummary>();
-                      return Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _tableColumn(),
-                            Expanded(
-                              child: TreeView.indexed<DepartmentTreeSummary>(
-                                expansionIndicatorBuilder: (ctx, node) {
-                                  return ChevronIndicator.upDown(
-                                    tree: node,
-                                    alignment: Alignment.centerLeft,
-                                  );
-                                },
-                                indentation: const Indentation(
-                                    width: 0, style: IndentStyle.none),
-                                onTreeReady: (controller) {
-                                  _controller = controller;
-                                  controller.expandAllChildren(tree);
-                                },
-                                builder: _buildContent,
-                                tree: tree,
-                              ),
-                            )
-                          ],
-                        ),
-                      );
-                    }
-                  }
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }),
-          ),
-        ));
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
   }
 
   static const double indent = 30;
@@ -327,4 +334,7 @@ class DeptScreenState extends ConsumerState<DeptScreen> {
           onPressed: () => item.clear()),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

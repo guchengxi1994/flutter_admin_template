@@ -40,8 +40,7 @@ pub async fn login(info: web::Json<UserLoginRequest>, req: HttpRequest) -> HttpR
     if let Some(val) = req.peer_addr() {
         // println!("Address {:?}", val.ip());
         ip = val.ip().to_string();
-        let r =
-            crate::services::user_service::UserService::login(info.0, ip).await;
+        let r = crate::services::user_service::UserService::login(info.0, ip).await;
         match r {
             Ok(_r) => {
                 let b: BaseResponse<Option<String>> = BaseResponse {
