@@ -46,7 +46,40 @@ class SysManagementScreenState extends ConsumerState<SysManagementScreen>
 
   loadAuth() async {
     auths = await ref.read(menuAuthProvider).loadCache();
+    if (auths.contains("/main/user")) {
+      pages.add(userPage);
+    }
+
+    if (auths.contains("/main/dept")) {
+      pages.add(deptPage);
+    }
+
+    if (auths.contains("/main/role")) {
+      pages.add(rolePage);
+    }
+
+    if (auths.contains("/main/menu")) {
+      pages.add(menuPage);
+    }
   }
+
+  late Widget userPage = FutureLoaderWidget(
+      builder: (context) => user.UserScreen(),
+      loadWidgetFuture: user.loadLibrary());
+
+  late Widget deptPage = FutureLoaderWidget(
+      builder: (context) => dept.DeptScreen(),
+      loadWidgetFuture: dept.loadLibrary());
+
+  late Widget rolePage = FutureLoaderWidget(
+      builder: (context) => role.RoleScreen(),
+      loadWidgetFuture: role.loadLibrary());
+
+  late Widget menuPage = FutureLoaderWidget(
+      builder: (context) => menu.MenuScreen(),
+      loadWidgetFuture: menu.loadLibrary());
+
+  late List<Widget> pages = [];
 
   @override
   Widget build(BuildContext context) {
@@ -54,31 +87,12 @@ class SysManagementScreenState extends ConsumerState<SysManagementScreen>
     return FutureBuilder(
       builder: (c, s) {
         if (s.connectionState == ConnectionState.done) {
-          late List<Widget> pages = [
-            if (auths.contains("/main/user"))
-              FutureLoaderWidget(
-                  builder: (context) => user.UserScreen(),
-                  loadWidgetFuture: user.loadLibrary()),
-            if (auths.contains("/main/dept"))
-              FutureLoaderWidget(
-                  builder: (context) => dept.DeptScreen(),
-                  loadWidgetFuture: dept.loadLibrary()),
-            if (auths.contains("/main/role"))
-              FutureLoaderWidget(
-                  builder: (context) => role.RoleScreen(),
-                  loadWidgetFuture: role.loadLibrary()),
-            if (auths.contains("/main/menu"))
-              FutureLoaderWidget(
-                  builder: (context) => menu.MenuScreen(),
-                  loadWidgetFuture: menu.loadLibrary()),
-          ];
-
           return Row(
             children: [
               AnimatedSingleLevelSidemenu(
                 header: ConstrainedBox(
                     constraints:
-                        const BoxConstraints(maxHeight: 50, minHeight: 50)),
+                        const BoxConstraints(maxHeight: 1, minHeight: 1)),
                 decoration: BoxDecoration(
                     color: ref.watch(colorNotifier).currentColorTheme.$3,
                     borderRadius: const BorderRadius.only(

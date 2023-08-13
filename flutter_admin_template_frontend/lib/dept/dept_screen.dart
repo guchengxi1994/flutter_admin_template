@@ -32,12 +32,13 @@ class DeptScreenState extends ConsumerState<DeptScreen>
   var loadTreeFuture;
 
   loadTree() async {
+    debugPrint("[flutter] dept repaint here");
     await ref.read(deptProvider).init();
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
     loadTreeFuture = loadTree();
   }
 

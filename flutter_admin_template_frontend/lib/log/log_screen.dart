@@ -34,7 +34,7 @@ class LogScreenState extends ConsumerState<LogScreen>
       children: [
         AnimatedSingleLevelSidemenu(
           header: ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 50, minHeight: 50)),
+              constraints: const BoxConstraints(maxHeight: 1, minHeight: 1)),
           decoration: BoxDecoration(
               color: ref.watch(colorNotifier).currentColorTheme.$3,
               borderRadius: const BorderRadius.only(

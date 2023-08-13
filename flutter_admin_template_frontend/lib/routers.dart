@@ -8,7 +8,7 @@ import 'package:flutter_admin_template_frontend/log/sign_in_log_screen.dart'
 import 'package:flutter_admin_template_frontend/log/operation_log_screen.dart'
     deferred as operation;
 import 'package:flutter_admin_template_frontend/sys_management/sys_management_screen.dart'
-    deferred as sys_management;
+    as sys_management;
 
 import 'common/future_builder.dart';
 import 'layout/layout_v2.dart';
@@ -64,9 +64,7 @@ class FatRouters {
     loginScreen: (context) => FutureLoaderWidget(
         builder: (context) => login.LoginScreen(),
         loadWidgetFuture: login.loadLibrary()),
-    sysManagement: (context) => LayoutV2(
-        body: FutureLoaderWidget(
-            builder: (context) => sys_management.SysManagementScreen(),
-            loadWidgetFuture: sys_management.loadLibrary()))
+    sysManagement: (context) =>
+        const LayoutV2(body: sys_management.SysManagementScreen())
   };
 }

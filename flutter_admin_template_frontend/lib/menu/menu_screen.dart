@@ -22,6 +22,7 @@ class MenuScreenState extends ConsumerState<MenuScreen> {
   late final TreeNode<Records> tree;
 
   loadRouters() async {
+    debugPrint("[flutter] menu repaint here");
     List<Records> routers = await ref.read(menuAuthProvider).getAll();
     tree = TreeNode.root();
     while (routers.isNotEmpty) {
