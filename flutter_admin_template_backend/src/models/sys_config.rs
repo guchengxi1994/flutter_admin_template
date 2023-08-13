@@ -1,1 +1,1 @@
-pub struct SysConfig{}
+pub struct SysConfig {}

@@ -22,7 +22,8 @@ const Map<String, String> apiDetails = {
   "getApiCurrent": "/system/api/current", //get
 
   // dept
-  "getDeptTree": "/system/dept/tree",
+  "getDeptTree": "/system/dept/tree", // get
+  "getDeptDetail": "/system/dept/query/single", // get
 };
 
 const List<String> reservedApis = [

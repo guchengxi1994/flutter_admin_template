@@ -7,8 +7,13 @@ import 'package:flutter_admin_template_frontend/layout/notifier/sidebar_notifier
 import 'package:flutter_admin_template_frontend/notifier/app_color_notifier.dart';
 import 'package:flutter_admin_template_frontend/styles/app_style.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'dart:ui' as ui;
 
+import 'components/dept_detail_dialog.dart';
+import 'components/new_dept_dialog.dart';
+import 'components/popup_menu.dart';
 import 'dept_notifier.dart';
 
 class DeptScreen extends ConsumerStatefulWidget {
@@ -61,11 +66,13 @@ class DeptScreenState extends ConsumerState<DeptScreen>
           if (ref.read(sidebarProvider).isCollapse) {
             screenWidth = MediaQuery.of(context).size.width -
                 AppStyle.sidebarCollapseWidth -
-                /*padding*/ 240;
+                /*padding*/ AppStyle.submenuWidth -
+                30;
           } else {
             screenWidth = MediaQuery.of(context).size.width -
                 AppStyle.sidebarWidth - /*padding*/
-                240;
+                AppStyle.submenuWidth -
+                30;
           }
           if (ref.read(deptProvider).tree != null) {
             tree = IndexedTreeNode<DepartmentTreeSummary>()
@@ -122,7 +129,8 @@ class DeptScreenState extends ConsumerState<DeptScreen>
   static const double orderNum = 100;
   static const double time = 300;
   static const double operation = 300;
-  late double total = nameWidth + orderNum + time + operation;
+  static const double extraOperation = 50;
+  late double total = nameWidth + orderNum + time + operation + extraOperation;
 
   Widget _tableColumn() {
     return Container(
@@ -163,6 +171,9 @@ class DeptScreenState extends ConsumerState<DeptScreen>
               alignment: Alignment.center,
               child: Text("Operation", style: AppStyle.tableColumnStyle),
             ),
+          ),
+          const SizedBox(
+            width: extraOperation,
           ),
         ],
       ),
@@ -217,21 +228,18 @@ class DeptScreenState extends ConsumerState<DeptScreen>
           ),
           Expanded(
             // width: operation,
+
             child: Align(
               alignment: Alignment.center,
               child: !node.isRoot
-                  ? FittedBox(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          buildAddItemChildButton(node),
-                          buildInsertAboveButton(node),
-                          buildInsertBelowButton(node),
-                          buildRemoveItemButton(node)
-                        ],
-                      ),
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        buildAddItemChildButton(node),
+                        // buildRemoveItemButton(node)
+                        buildModifyItemButton(node)
+                      ],
                     )
                   : Row(
                       mainAxisSize: MainAxisSize.max,
@@ -239,12 +247,35 @@ class DeptScreenState extends ConsumerState<DeptScreen>
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         buildAddItemChildButton(node),
-                        if (node.children.isNotEmpty)
-                          buildClearAllItemButton(node),
+                        buildModifyItemButton(node)
+                        // if (node.children.isNotEmpty)
+                        //   buildClearAllItemButton(node),
                       ],
                     ),
             ),
           ),
+          SizedBox(
+            child: TabllePopupMenu(
+              onDetails: () async {
+                final d = await ref
+                    .read(deptProvider)
+                    .querySingleById(node.data!.deptId!);
+                if (d != null) {
+                  // ignore: use_build_context_synchronously
+                  showGeneralDialog(
+                      context: context,
+                      pageBuilder: (c, a, b) {
+                        return Center(
+                          child: DeptDetailDialog(
+                            response: d,
+                          ),
+                        );
+                      });
+                }
+              },
+              isRoot: node.isRoot,
+            ),
+          )
         ],
       ),
     );
@@ -261,8 +292,23 @@ class DeptScreenState extends ConsumerState<DeptScreen>
           ),
         ),
         icon: const Icon(Icons.add_circle, color: Colors.green),
-        label: const Text("Child", style: TextStyle(color: Colors.green)),
-        onPressed: () => item.add(IndexedTreeNode()),
+        label: screenWidth < total
+            ? const Text("")
+            : const Text("Add Sub Dept", style: TextStyle(color: Colors.green)),
+        onPressed: () {
+          // item.add(IndexedTreeNode());
+          if (ref.read(deptProvider).tree != null) {
+            showGeneralDialog(
+                context: context,
+                pageBuilder: (c, a, b) {
+                  return Center(
+                    child: NewDeptDialog(
+                      tree: ref.read(deptProvider).tree!,
+                    ),
+                  );
+                });
+          }
+        },
       ),
     );
   }
@@ -270,17 +316,28 @@ class DeptScreenState extends ConsumerState<DeptScreen>
   Widget buildInsertAboveButton(IndexedTreeNode item) {
     return Padding(
       padding: const EdgeInsets.only(right: 16.0),
-      child: TextButton(
+      child: TextButton.icon(
         style: TextButton.styleFrom(
           foregroundColor: Colors.green[800],
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(4)),
           ),
         ),
-        child:
-            const Text("Insert Above", style: TextStyle(color: Colors.green)),
+        icon: SizedBox(
+          width: 20,
+          height: 20,
+          child: SvgPicture.asset(
+            "assets/icons/ainsert.svg",
+            // color: Colors.green,
+            colorFilter:
+                const ColorFilter.mode(Colors.green, ui.BlendMode.srcIn),
+          ),
+        ),
+        label: screenWidth < total
+            ? const Text("")
+            : const Text("Insert Above", style: TextStyle(color: Colors.green)),
         onPressed: () {
-          item.parent?.insertBefore(item, IndexedTreeNode());
+          // item.parent?.insertBefore(item, IndexedTreeNode());
         },
       ),
     );
@@ -289,17 +346,28 @@ class DeptScreenState extends ConsumerState<DeptScreen>
   Widget buildInsertBelowButton(IndexedTreeNode item) {
     return Padding(
       padding: const EdgeInsets.only(right: 16.0),
-      child: TextButton(
+      child: TextButton.icon(
         style: TextButton.styleFrom(
           foregroundColor: Colors.green[800],
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(4)),
           ),
         ),
-        child:
-            const Text("Insert Below", style: TextStyle(color: Colors.green)),
+        icon: SizedBox(
+          width: 20,
+          height: 20,
+          child: SvgPicture.asset(
+            "assets/icons/binsert.svg",
+            // theme: const SvgTheme(currentColor: Colors.green),
+            colorFilter:
+                const ColorFilter.mode(Colors.green, ui.BlendMode.srcIn),
+          ),
+        ),
+        label: screenWidth < total
+            ? const Text("")
+            : const Text("Insert Below", style: TextStyle(color: Colors.green)),
         onPressed: () {
-          item.parent?.insertAfter(item, IndexedTreeNode());
+          // item.parent?.insertAfter(item, IndexedTreeNode());
         },
       ),
     );
@@ -308,15 +376,20 @@ class DeptScreenState extends ConsumerState<DeptScreen>
   Widget buildRemoveItemButton(IndexedTreeNode item) {
     return Padding(
       padding: const EdgeInsets.only(right: 16.0),
-      child: TextButton(
+      child: TextButton.icon(
           style: TextButton.styleFrom(
             foregroundColor: Colors.red[800],
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(4)),
             ),
           ),
-          child: const Icon(Icons.delete, color: Colors.red),
-          onPressed: () => item.delete()),
+          icon: const Icon(Icons.delete, color: Colors.red),
+          label: screenWidth < total
+              ? const Text("")
+              : const Text("Delete", style: TextStyle(color: Colors.red)),
+          onPressed: () {
+            // item.delete();
+          }),
     );
   }
 
@@ -331,8 +404,32 @@ class DeptScreenState extends ConsumerState<DeptScreen>
             ),
           ),
           icon: const Icon(Icons.delete, color: Colors.red),
-          label: const Text("Clear All", style: TextStyle(color: Colors.red)),
-          onPressed: () => item.clear()),
+          label: screenWidth < total
+              ? const Text("")
+              : const Text("Delete All", style: TextStyle(color: Colors.red)),
+          onPressed: () {
+            // item.clear();
+          }),
+    );
+  }
+
+  Widget buildModifyItemButton(IndexedTreeNode item) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 16.0),
+      child: TextButton.icon(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.green[800],
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(4)),
+            ),
+          ),
+          icon: const Icon(Icons.change_circle, color: Colors.green),
+          label: screenWidth < total
+              ? const Text("")
+              : const Text("Modify", style: TextStyle(color: Colors.green)),
+          onPressed: () {
+            // item.clear();
+          }),
     );
   }
 

@@ -98,7 +98,7 @@ class SysManagementScreenState extends ConsumerState<SysManagementScreen>
                     borderRadius: const BorderRadius.only(
                         topRight: Radius.circular(15),
                         bottomRight: Radius.circular(15))),
-                indicatorSize: 30,
+                indicatorSize: AppStyle.subMenuIndicatorSize,
                 height: MediaQuery.of(context).size.height,
                 items: [
                   if (auths.contains("/main/user"))
@@ -111,7 +111,7 @@ class SysManagementScreenState extends ConsumerState<SysManagementScreen>
                         onItemClicked: (p0) {
                           controller.jumpToPage(p0);
                         },
-                        title: const Text("User")),
+                        title: const Text("User Management")),
                   if (auths.contains("/main/dept"))
                     BaseSidemenuData(
                         leading: SidebarIcons.dept,
@@ -122,7 +122,7 @@ class SysManagementScreenState extends ConsumerState<SysManagementScreen>
                         onItemClicked: (p0) {
                           controller.jumpToPage(p0);
                         },
-                        title: const Text("Dept")),
+                        title: const Text("Dept Management")),
                   if (auths.contains("/main/role"))
                     BaseSidemenuData(
                         leading: SidebarIcons.role,
@@ -133,7 +133,7 @@ class SysManagementScreenState extends ConsumerState<SysManagementScreen>
                         onItemClicked: (p0) {
                           controller.jumpToPage(p0);
                         },
-                        title: const Text("Role")),
+                        title: const Text("Role Management")),
                   if (auths.contains("/main/menu"))
                     BaseSidemenuData(
                         leading: SidebarIcons.menu,
@@ -144,9 +144,9 @@ class SysManagementScreenState extends ConsumerState<SysManagementScreen>
                         onItemClicked: (p0) {
                           controller.jumpToPage(p0);
                         },
-                        title: const Text("Menu")),
+                        title: const Text("Menu Management")),
                 ],
-                width: 200,
+                width: AppStyle.submenuWidth,
               ),
               Expanded(
                   child: PageView(

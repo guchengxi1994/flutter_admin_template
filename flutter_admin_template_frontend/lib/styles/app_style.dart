@@ -6,6 +6,9 @@ part 'table.dart';
 
 class AppStyle {
   AppStyle._();
+  static const double submenuWidth = 250;
+  static const double subMenuIndicatorSize = 20;
+
   static const double appbarHeight = 48;
   static const double avatarSize = 36;
 

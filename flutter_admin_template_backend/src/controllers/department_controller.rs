@@ -5,7 +5,7 @@ use crate::{
     database::init::POOL,
     models::department::Department,
     services::department_service::{
-        DepartmentTrait, NewDeptRequest, StructuredDepartment, UpdateDeptRequest,
+        DepartmentTrait, NewDeptRequest, SingleDepartment, StructuredDepartment, UpdateDeptRequest,
     },
 };
 
@@ -157,4 +157,34 @@ pub async fn update_dept(info: web::Json<UpdateDeptRequest>) -> HttpResponse {
             return HttpResponse::Ok().json(&b);
         }
     }
+}
+
+pub async fn get_single_dept_details(_req: HttpRequest) -> HttpResponse {
+    let q = web::Query::<QueryParams>::from_query(_req.query_string());
+    if let Ok(_q) = q {
+        let pool = POOL.lock().await;
+        let result =
+            crate::services::department_service::DepartmentService::query_single_dept_detail_by_id(
+                _q.id,
+                pool.get_pool(),
+            )
+            .await;
+        if let Ok(_r) = result {
+            let b: BaseResponse<SingleDepartment> = BaseResponse {
+                code: crate::constants::OK,
+                message: "查询成功",
+                data: _r,
+            };
+            return HttpResponse::Ok().json(&b);
+        } else {
+            println!("[rust] :{:?}", result.err());
+        }
+    }
+
+    let b: BaseResponse<Option<String>> = BaseResponse {
+        code: crate::constants::BAD_REQUEST,
+        message: "查询失败",
+        data: None,
+    };
+    return HttpResponse::Ok().json(&b);
 }

@@ -83,6 +83,17 @@ pub struct StructuredDepartment {
     pub level: u8,
 }
 
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SingleDepartment {
+    pub dept_id: i64,
+    pub parent_dept_name: String,
+    pub dept_name: String,
+    pub order_number: i64,
+    pub create_time: chrono::DateTime<chrono::Local>,
+    pub remark: Option<String>,
+}
+
 #[async_trait::async_trait]
 pub trait DepartmentTrait {
     /// 根据id获取单个department
@@ -120,6 +131,12 @@ pub trait DepartmentTrait {
         dept_id: i64,
         pool: &Pool<MySql>,
     ) -> anyhow::Result<StructuredDepartment>;
+
+    /// 根据id获取dept详情
+    async fn query_single_dept_detail_by_id(
+        dept_id: i64,
+        pool: &Pool<MySql>,
+    ) -> anyhow::Result<SingleDepartment>;
 }
 
 pub struct DepartmentService;
@@ -339,6 +356,38 @@ impl DepartmentTrait for DepartmentService {
         s_dept = get_structed(depts[1..].to_vec(), &mut s_dept, 1).clone();
 
         anyhow::Ok(s_dept)
+    }
+
+    async fn query_single_dept_detail_by_id(
+        dept_id: i64,
+        pool: &Pool<MySql>,
+    ) -> anyhow::Result<SingleDepartment> {
+        let dept = Self::query_by_dept_id(dept_id, pool).await?;
+        let result: SingleDepartment;
+
+        if dept.parent_id == 0 {
+            result = SingleDepartment {
+                dept_id: dept.dept_id,
+                parent_dept_name: "--".to_string(),
+                dept_name: dept.dept_name,
+                create_time: dept.create_time,
+                order_number: dept.order_number,
+                remark: dept.remark,
+            };
+        } else {
+            let parent_dept = Self::query_by_dept_id(dept.parent_id, pool).await?;
+
+            result = SingleDepartment {
+                dept_id: dept.dept_id,
+                parent_dept_name: parent_dept.dept_name,
+                dept_name: dept.dept_name,
+                create_time: dept.create_time,
+                order_number: dept.order_number,
+                remark: dept.remark,
+            };
+        }
+
+        anyhow::Ok(result)
     }
 }
 

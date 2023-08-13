@@ -176,7 +176,7 @@ impl UserTrait for UserService {
                 .bind(e.to_string())
                 .execute(pool.get_pool())
                 .await?;
-                println!("[rust error] : {:?}",e);
+                println!("[rust error] : {:?}", e);
                 anyhow::bail!(e.to_string())
             }
         }
@@ -251,7 +251,7 @@ impl UserTrait for UserService {
 
         let count: Count = count_query.build_query_as().fetch_one(pool).await?;
 
-        println!("[query] : {:?}",count_query.sql());
+        println!("[query] : {:?}", count_query.sql());
 
         query.push(" limit");
         query.push_bind((req.page_number - 1) * req.page_size);
@@ -260,7 +260,7 @@ impl UserTrait for UserService {
 
         let result: Vec<User> = query.build_query_as().fetch_all(pool).await?;
 
-        println!("[query] : {:?}",query.sql());
+        println!("[query] : {:?}", query.sql());
 
         anyhow::Ok(super::DataList {
             count: count.count,

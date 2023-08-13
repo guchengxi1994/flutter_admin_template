@@ -40,7 +40,7 @@ class LogScreenState extends ConsumerState<LogScreen>
               borderRadius: const BorderRadius.only(
                   topRight: Radius.circular(15),
                   bottomRight: Radius.circular(15))),
-          indicatorSize: 30,
+          indicatorSize: AppStyle.subMenuIndicatorSize,
           height: MediaQuery.of(context).size.height,
           items: [
             BaseSidemenuData(
@@ -77,7 +77,7 @@ class LogScreenState extends ConsumerState<LogScreen>
                 },
                 title: const Text("Sign in"))
           ],
-          width: 200,
+          width: AppStyle.submenuWidth,
         ),
         Expanded(
             child: PageView(

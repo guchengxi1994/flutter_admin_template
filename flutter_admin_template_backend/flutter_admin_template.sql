@@ -78,12 +78,7 @@ CREATE TABLE `department`  (
 -- ----------------------------
 -- Records of department
 -- ----------------------------
-INSERT INTO `department` VALUES (1, 0, '总部', 0, '2023-08-07 15:25:48', '2023-08-07 15:25:48', 0, NULL);
-INSERT INTO `department` VALUES (2, 1, 'sub-1-1', 0, '2023-08-07 18:49:58', '2023-08-07 18:49:58', 0, NULL);
-INSERT INTO `department` VALUES (3, 2, 'sub-2-1', 2, '2023-08-07 18:50:07', '2023-08-09 14:11:46', 0, NULL);
-INSERT INTO `department` VALUES (4, 2, 'sub-2-2', 0, '2023-08-07 18:50:21', '2023-08-07 18:50:21', 0, NULL);
-INSERT INTO `department` VALUES (5, 1, 'sub-1-1-1-1', 1, '2023-08-09 02:31:56', '2023-08-09 02:31:56', 0, '');
-
+INSERT INTO `department` VALUES (1, 0, '总部', 0, '2023-08-07 15:25:48', '2023-08-07 15:25:48', 0, '系统自带部门，无法删除');
 -- ----------------------------
 -- Table structure for role
 -- ----------------------------

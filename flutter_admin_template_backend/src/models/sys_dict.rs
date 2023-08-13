@@ -1,3 +1,1 @@
-pub struct SysDict {
-
-}
+pub struct SysDict {}

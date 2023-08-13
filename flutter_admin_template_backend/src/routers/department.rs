@@ -30,6 +30,10 @@ pub fn dept_group(config: &mut web::ServiceConfig) {
                 "/query",
                 web::get().to(department_controller::get_dept_by_id),
             )
+            .route(
+                "/query/single",
+                web::get().to(department_controller::get_single_dept_details),
+            )
             .route("/new", web::post().to(department_controller::new_dept))
             .route(
                 "/update",
