@@ -1,4 +1,5 @@
-use std::sync::Mutex;
+use futures::lock::Mutex;
+use std::sync::Mutex as MutexSync;
 
 use lazy_static::lazy_static;
 use sqlx::{MySql, MySqlPool, Pool};
@@ -31,7 +32,7 @@ impl Default for MyPool {
 // 声明创建静态连接池
 lazy_static! {
     pub static ref POOL: Mutex<MyPool> = Mutex::new(Default::default());
-    pub static ref REDIS_CLIENT: Mutex<Option<redis::Client>> = Mutex::new(None);
+    pub static ref REDIS_CLIENT_SYNC: MutexSync<Option<redis::Client>> = MutexSync::new(None);
 }
 
 pub async fn init_from_config_file(conf_path: &str) {
@@ -67,12 +68,12 @@ pub async fn init_from_config_file(conf_path: &str) {
 
 pub fn init_redis(url: String) -> anyhow::Result<()> {
     let client = redis::Client::open(url)?;
-    let mut c = REDIS_CLIENT.lock().unwrap();
+    let mut c = REDIS_CLIENT_SYNC.lock().unwrap();
     *c = Some(client);
     anyhow::Ok(())
 }
 
 pub async fn init(url: String) {
-    let mut pool = POOL.lock().unwrap();
+    let mut pool = POOL.lock().await;
     *pool = MyPool::new(&url).await
 }

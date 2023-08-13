@@ -7,7 +7,7 @@ pub struct Router {
     pub router_name: String,
     pub router: String,
     #[serde(skip)]
-    pub create_by: Option<i64>,
+    pub create_by: Option<String>,
     pub create_time: chrono::DateTime<chrono::Local>,
     pub update_time: chrono::DateTime<chrono::Local>,
     #[serde(skip)]

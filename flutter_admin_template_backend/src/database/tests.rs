@@ -14,7 +14,7 @@ mod tests {
         {
             let rt = tokio::runtime::Runtime::new().unwrap();
             rt.block_on(async {
-                let pool = crate::database::init::POOL.lock().unwrap();
+                let pool = crate::database::init::POOL.lock().await;
                 let sql = sqlx::query(
                     r#"INSERT INTO file (file_name,file_path,file_hash) VALUES(?,?,?) "#,
                 )

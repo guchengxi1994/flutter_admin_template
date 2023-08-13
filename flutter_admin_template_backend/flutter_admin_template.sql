@@ -11,7 +11,7 @@
  Target Server Version : 80023
  File Encoding         : 65001
 
- Date: 09/08/2023 15:02:39
+ Date: 12/08/2023 21:38:46
 */
 
 SET NAMES utf8mb4;
@@ -31,7 +31,7 @@ CREATE TABLE `api`  (
   `is_deleted` tinyint(1) NULL DEFAULT 0,
   `remark` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`api_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of api
@@ -73,12 +73,16 @@ CREATE TABLE `department`  (
   `is_deleted` tinyint(1) NULL DEFAULT 0,
   `remark` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`dept_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of department
 -- ----------------------------
 INSERT INTO `department` VALUES (1, 0, '总部', 0, '2023-08-07 15:25:48', '2023-08-07 15:25:48', 0, NULL);
+INSERT INTO `department` VALUES (2, 1, 'sub-1-1', 0, '2023-08-07 18:49:58', '2023-08-07 18:49:58', 0, NULL);
+INSERT INTO `department` VALUES (3, 2, 'sub-2-1', 2, '2023-08-07 18:50:07', '2023-08-09 14:11:46', 0, NULL);
+INSERT INTO `department` VALUES (4, 2, 'sub-2-2', 0, '2023-08-07 18:50:21', '2023-08-07 18:50:21', 0, NULL);
+INSERT INTO `department` VALUES (5, 1, 'sub-1-1-1-1', 1, '2023-08-09 02:31:56', '2023-08-09 02:31:56', 0, '');
 
 -- ----------------------------
 -- Table structure for role
@@ -87,7 +91,7 @@ DROP TABLE IF EXISTS `role`;
 CREATE TABLE `role`  (
   `role_id` int NOT NULL AUTO_INCREMENT,
   `role_name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `create_by` int NULL DEFAULT NULL COMMENT '创建者',
+  `create_by` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'admin' COMMENT '创建者',
   `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `is_deleted` tinyint(1) NULL DEFAULT 0,
@@ -170,7 +174,7 @@ CREATE TABLE `router`  (
   `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `is_deleted` tinyint(1) NULL DEFAULT 0,
   `remark` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
-  `create_by` int NULL DEFAULT 1,
+  `create_by` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'admin',
   `parent_id` int NOT NULL DEFAULT 0,
   PRIMARY KEY (`router_id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
@@ -178,15 +182,15 @@ CREATE TABLE `router`  (
 -- ----------------------------
 -- Records of router
 -- ----------------------------
-INSERT INTO `router` VALUES (1, '登录', '/loginScreen', '2023-06-29 16:18:46', '2023-06-29 16:22:54', 0, '登录', 1, 0);
-INSERT INTO `router` VALUES (2, 'dashboard', '/main/dashboard', '2023-06-29 16:19:19', '2023-06-29 16:22:56', 0, NULL, 1, 0);
-INSERT INTO `router` VALUES (3, 'user', '/main/user', '2023-06-29 16:20:11', '2023-06-29 16:22:59', 0, NULL, 1, 0);
-INSERT INTO `router` VALUES (4, 'menu', '/main/menu', '2023-06-29 16:20:26', '2023-06-29 16:23:00', 0, NULL, 1, 0);
-INSERT INTO `router` VALUES (5, 'department', '/main/dept', '2023-06-29 16:20:40', '2023-06-29 16:23:01', 0, NULL, 1, 0);
-INSERT INTO `router` VALUES (6, 'logs', '/main/logs', '2023-06-29 16:20:53', '2023-06-29 16:23:02', 0, NULL, 1, 0);
-INSERT INTO `router` VALUES (7, 'operation', '/main/logs/operation', '2023-06-29 16:21:11', '2023-06-29 16:23:06', 0, NULL, 1, 6);
-INSERT INTO `router` VALUES (8, 'signin', '/main/logs/signin', '2023-06-29 16:21:31', '2023-06-29 16:23:08', 0, NULL, 1, 6);
-INSERT INTO `router` VALUES (9, 'role', '/main/role', '2023-07-01 10:38:12', '2023-07-01 10:38:12', 0, NULL, 1, 0);
+INSERT INTO `router` VALUES (1, '登录', '/loginScreen', '2023-06-29 16:18:46', '2023-08-12 21:36:21', 0, '登录', 'admin', 0);
+INSERT INTO `router` VALUES (2, 'dashboard', '/main/dashboard', '2023-06-29 16:19:19', '2023-08-12 21:36:22', 0, NULL, 'admin', 0);
+INSERT INTO `router` VALUES (3, 'user', '/main/user', '2023-06-29 16:20:11', '2023-08-12 21:36:23', 0, NULL, 'admin', 0);
+INSERT INTO `router` VALUES (4, 'menu', '/main/menu', '2023-06-29 16:20:26', '2023-08-12 21:36:23', 0, NULL, 'admin', 0);
+INSERT INTO `router` VALUES (5, 'department', '/main/dept', '2023-06-29 16:20:40', '2023-08-12 21:36:24', 0, NULL, 'admin', 0);
+INSERT INTO `router` VALUES (6, 'logs', '/main/logs', '2023-06-29 16:20:53', '2023-08-12 21:36:24', 0, NULL, 'admin', 0);
+INSERT INTO `router` VALUES (7, 'operation', '/main/logs/operation', '2023-06-29 16:21:11', '2023-08-12 21:36:25', 0, NULL, 'admin', 6);
+INSERT INTO `router` VALUES (8, 'signin', '/main/logs/signin', '2023-06-29 16:21:31', '2023-08-12 21:36:25', 0, NULL, 'admin', 6);
+INSERT INTO `router` VALUES (9, 'role', '/main/role', '2023-07-01 10:38:12', '2023-08-12 21:36:27', 0, NULL, 'admin', 0);
 
 -- ----------------------------
 -- Table structure for router_api
@@ -229,10 +233,10 @@ INSERT INTO `router_api` VALUES (5, 22);
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user`  (
   `user_id` int NOT NULL AUTO_INCREMENT COMMENT '用户id',
-  `dept_id` int NULL DEFAULT NULL COMMENT '(可为空)部门id',
+  `dept_id` int NULL DEFAULT 1 COMMENT '(可为空)部门id',
   `user_name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '用户名',
   `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '密码',
-  `create_by` int NULL DEFAULT 1 COMMENT '创建者',
+  `create_by` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'admin' COMMENT '创建者',
   `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `is_deleted` tinyint(1) NULL DEFAULT 0,
@@ -243,9 +247,8 @@ CREATE TABLE `user`  (
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES (1, NULL, 'admin', '123456', 1, '2023-06-13 02:08:38', '2023-06-29 16:12:22', 0, 'this is admin');
-INSERT INTO `user` VALUES (2, NULL, 'test', '123456', 1, '2023-06-13 03:32:35', '2023-07-06 11:46:44', 0, 'in officia');
-INSERT INTO `user` VALUES (3, NULL, '黎芳1', 'Lorem', 1, '2023-06-14 05:33:52', '2023-06-29 16:12:24', 0, 'in officia');
+INSERT INTO `user` VALUES (1, 1, 'admin', '123456', 'admin', '2023-06-13 02:08:38', '2023-08-12 21:37:55', 0, 'this is admin');
+INSERT INTO `user` VALUES (2, 1, 'test', '123456', 'admin', '2023-06-13 03:32:35', '2023-08-12 21:37:55', 0, 'in officia');
 
 -- ----------------------------
 -- Table structure for user_login
@@ -259,8 +262,7 @@ CREATE TABLE `user_login`  (
   `login_state` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `token` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   PRIMARY KEY (`login_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 144 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
-
+) ENGINE = InnoDB AUTO_INCREMENT = 158 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for user_role

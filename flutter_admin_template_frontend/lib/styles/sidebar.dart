@@ -34,6 +34,11 @@ class SidebarIcons {
   static const Widget logOnHover =
       Icon(Icons.details_outlined, color: Colors.lightBlueAccent);
 
+  static const Widget sysManagement = Icon(Icons.settings_system_daydream);
+  static const Widget sysManagementOnHover = Icon(
+      Icons.settings_system_daydream_outlined,
+      color: Colors.lightBlueAccent);
+
   static const Widget operation = Icon(Icons.change_history);
   static const Widget operationOnHover =
       Icon(Icons.change_history_outlined, color: Colors.lightBlueAccent);

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class SidebarNotifier extends ChangeNotifier {
-  bool isCollapse = false;
+  bool isCollapse = true;
 
   changeIsCollapse(bool b) {
     if (isCollapse != b) {

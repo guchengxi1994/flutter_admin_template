@@ -3,7 +3,7 @@ use std::{collections::HashMap, sync::RwLock};
 use actix::{Actor, Context, Handler, Recipient};
 use redis::Commands;
 
-use crate::database::init::REDIS_CLIENT;
+use crate::database::init::REDIS_CLIENT_SYNC;
 
 use super::message::{Connect, Disconnect, UpdateRoleMessage, WsMessage};
 use lazy_static::lazy_static;
@@ -63,7 +63,7 @@ impl Server {
                 if v.1 == role_id {
                     if let Some(r) = _ws.sessions.get(k) {
                         r.do_send(WsMessage(message.to_owned()));
-                        let client = REDIS_CLIENT.lock().unwrap().clone().unwrap();
+                        let client = REDIS_CLIENT_SYNC.lock().unwrap().clone().unwrap();
                         let mut con = client.get_connection().unwrap();
                         // redis::Commands::del(&mut con, k);
                         let _: () = con.del(k.to_string()).unwrap();

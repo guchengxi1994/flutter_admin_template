@@ -3,7 +3,7 @@
 
 use crate::common::base_response::BaseResponse;
 use crate::constants::REJECT_TIMES;
-use crate::database::init::REDIS_CLIENT;
+use crate::database::init::REDIS_CLIENT_SYNC;
 use std::future::{ready, Ready};
 
 use actix_web::body::EitherBody;
@@ -53,7 +53,7 @@ where
         let ip = req.peer_addr();
         if let Some(_ip) = ip {
             let path = req.path().to_string();
-            let client = REDIS_CLIENT.lock().unwrap().clone().unwrap();
+            let client = REDIS_CLIENT_SYNC.lock().unwrap().clone().unwrap();
             let mut con = client.get_connection().unwrap();
             let s = format!("{:?}_{:?}", _ip.ip().to_string(), path);
 

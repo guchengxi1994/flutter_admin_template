@@ -1,6 +1,6 @@
 use crate::constants::API_ID_MAP;
 
-use super::init::REDIS_CLIENT;
+use super::init::REDIS_CLIENT_SYNC;
 
 #[derive(Clone, Debug, sqlx::FromRow)]
 pub struct ApiIdMap {
@@ -9,7 +9,7 @@ pub struct ApiIdMap {
 }
 
 pub async fn init_api() -> anyhow::Result<()> {
-    let pool = crate::database::init::POOL.lock().unwrap();
+    let pool = crate::database::init::POOL.lock().await;
 
     let r = sqlx::query_as::<sqlx::MySql, ApiIdMap>(
         r#"select api_id,api_router from api where is_deleted = 0"#,
@@ -41,7 +41,7 @@ pub fn can_api_be_visited(api_router: String, token: String) -> bool {
     }
 
     let api_key = format!("{}_apis", token);
-    let cli = REDIS_CLIENT.lock().unwrap().clone().unwrap();
+    let cli = REDIS_CLIENT_SYNC.lock().unwrap().clone().unwrap();
     let mut con = cli.get_connection().unwrap();
     let api_ids: Vec<i64> = redis::Commands::lrange(&mut con, api_key, 0, -1).unwrap();
 

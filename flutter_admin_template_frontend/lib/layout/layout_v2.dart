@@ -1,6 +1,8 @@
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_admin_template_frontend/layout/notifier/sidebar_notifier.dart';
 import 'package:flutter_admin_template_frontend/notifier/app_color_notifier.dart';
+import 'package:flutter_admin_template_frontend/routers.dart';
 import 'package:flutter_admin_template_frontend/styles/app_style.dart';
 import 'package:flutter_admin_template_frontend/styles/theme/color_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -71,48 +73,29 @@ class LayoutV2State extends ConsumerState<LayoutV2> {
       key: globalKey,
       decoration: BoxDecoration(
         color: ref.watch(colorNotifier).currentColorTheme.$1,
-        // boxShadow: const [
-        //   BoxShadow(
-        //     color: Colors.grey,
-        //     blurRadius: 5,
-        //     spreadRadius: 0.0,
-        //     offset: Offset(5, 0), // shadow direction: bottom right
-        //   )
-        // ],
       ),
       initialIndex: ref.watch(menuAuthProvider).currentRouterId,
+      onExpansionChanged: (p0) {
+        ref.read(sidebarProvider).changeIsCollapse(p0);
+      },
       body: widget.body,
+      errWidget: TextButton(
+        child: const Text("Log out"),
+        onPressed: () {
+          Navigator.of(context).popAndPushNamed(FatRouters.loginScreen);
+        },
+      ),
       destinations: [
-        if (auths.contains("/main/dashboard"))
-          const NavigationRailDestination(
-            icon: SidebarIcons.dashBoard,
-            selectedIcon: SidebarIcons.dashBoardOnHover,
-            label: Text('Dashboard'),
-          ),
-        if (auths.contains("/main/user"))
-          const NavigationRailDestination(
-            icon: SidebarIcons.user,
-            selectedIcon: SidebarIcons.userOnHover,
-            label: Text('User'),
-          ),
-        if (auths.contains("/main/dept"))
-          const NavigationRailDestination(
-            icon: SidebarIcons.dept,
-            selectedIcon: SidebarIcons.deptOnHover,
-            label: Text('Department'),
-          ),
-        if (auths.contains("/main/menu"))
-          const NavigationRailDestination(
-            icon: SidebarIcons.menu,
-            selectedIcon: SidebarIcons.menuOnHover,
-            label: Text('Menu'),
-          ),
-        if (auths.contains("/main/role"))
-          const NavigationRailDestination(
-            icon: SidebarIcons.role,
-            selectedIcon: SidebarIcons.roleOnHover,
-            label: Text('Role'),
-          ),
+        const NavigationRailDestination(
+          icon: SidebarIcons.dashBoard,
+          selectedIcon: SidebarIcons.dashBoardOnHover,
+          label: Text('Dashboard'),
+        ),
+        const NavigationRailDestination(
+          icon: SidebarIcons.sysManagement,
+          selectedIcon: SidebarIcons.sysManagementOnHover,
+          label: Text('System Management'),
+        ),
         if (auths.contains("/main/logs"))
           const NavigationRailDestination(
             icon: SidebarIcons.log,
