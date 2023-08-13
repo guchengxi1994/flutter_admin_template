@@ -18,11 +18,8 @@ class MenuAuthNotifier extends ChangeNotifier {
 
   static const Map<int, String> maps = {
     0: "/main/dashboard",
-    1: "/main/user",
-    2: "/main/dept",
-    3: "/main/menu",
-    4: "/main/role",
-    5: "/main/logs",
+    1: "/main/sys_management",
+    2: "/main/logs",
   };
 
   changeRouterByRouterId(int i) {

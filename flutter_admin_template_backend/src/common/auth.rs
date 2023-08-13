@@ -83,19 +83,24 @@ impl<U: Display + UserInfoTrait> AuthenticatorTrait<U> for FatAuthenticator {
                 let log = crate::services::log_service::SignInRecordWithName::current_single(
                     _u.user_id, pool,
                 )
-                .await?;
-                // 如果没有超时
-                let duration = SystemTime::now().duration_since(log.login_time.into())?;
-                if let Some(t) = log.token {
-                    if let Ok(_id) = crate::database::validate_token::validate_token(t.clone()) {
-                        if duration.as_secs() < (*TOKEN_EXPIRE.lock().unwrap()).try_into()? {
-                            // 刷新token
-                            let _ =
-                                crate::database::refresh_token::refresh_token(t.clone(), &mut con);
-                            return anyhow::Ok(U::new(Some(_u.user_id), Some(t)));
+                .await;
+
+                if let Ok(_log) = log {
+                    // 如果没有超时
+                    let duration = SystemTime::now().duration_since(_log.login_time.into())?;
+                    if let Some(t) = _log.token {
+                        if let Ok(_id) = crate::database::validate_token::validate_token(t.clone()) {
+                            if duration.as_secs() < (*TOKEN_EXPIRE.lock().unwrap()).try_into()? {
+                                // 刷新token
+                                let _ =
+                                    crate::database::refresh_token::refresh_token(t.clone(), &mut con);
+                                return anyhow::Ok(U::new(Some(_u.user_id), Some(t)));
+                            }
                         }
                     }
                 }
+
+                
                 tx.commit().await?;
 
                 let token = crate::common::hash::get_token(username);

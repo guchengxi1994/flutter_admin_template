@@ -5,13 +5,15 @@ use crate::constants::TOKEN_EXPIRE;
 use crate::models::sign_in_record::SignInState;
 use crate::{database::init::REDIS_CLIENT_SYNC, models::user::User};
 use serde::Deserialize;
-use sqlx::{MySql, Pool};
+use sqlx::{MySql, Pool, QueryBuilder};
 use validator::Validate;
 
 use super::api_service::ApiTrait;
+use super::query_params::Count;
 use super::role_service::RoleTrait;
 
 #[derive(Debug, Validate, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct NewUserRequest {
     pub dept_id: Option<i64>,
     #[validate(length(max = 30))]
@@ -29,6 +31,16 @@ pub struct UserLoginRequest {
     pub password: String,
 }
 
+#[derive(Debug, Validate, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UserQueryRequest {
+    pub user_name: Option<String>,
+    pub user_id: Option<i64>,
+    pub create_by: Option<String>,
+    pub page_number: i64,
+    pub page_size: i64,
+}
+
 #[async_trait::async_trait]
 pub trait UserTrait {
     async fn new_user(pool: &Pool<MySql>, req: NewUserRequest) -> anyhow::Result<()>;
@@ -36,6 +48,15 @@ pub trait UserTrait {
     async fn get_user_info(pool: &Pool<MySql>, user_id: i64) -> anyhow::Result<User>;
 
     async fn login(req: UserLoginRequest, login_ip: String) -> anyhow::Result<String>;
+
+    async fn query_by_dept_id(pool: &Pool<MySql>, dept_id: i64) -> anyhow::Result<Vec<User>>;
+
+    async fn query_by_id(pool: &Pool<MySql>, user_id: i64) -> anyhow::Result<User>;
+
+    async fn query_user(
+        pool: &Pool<MySql>,
+        req: UserQueryRequest,
+    ) -> anyhow::Result<super::DataList<User>>;
 }
 
 pub struct UserService;
@@ -155,9 +176,95 @@ impl UserTrait for UserService {
                 .bind(e.to_string())
                 .execute(pool.get_pool())
                 .await?;
-
+                println!("[rust error] : {:?}",e);
                 anyhow::bail!(e.to_string())
             }
         }
+    }
+
+    async fn query_by_dept_id(pool: &Pool<MySql>, dept_id: i64) -> anyhow::Result<Vec<User>> {
+        let result = sqlx::query_as::<sqlx::MySql, User>(
+            r#"SELECT
+            `user`.user_id,
+            `user`.dept_id,
+            `user`.user_name,
+            `user`.`password`,
+            `user`.create_by,
+            `user`.create_time,
+            `user`.update_time,
+            `user`.is_deleted,
+            `user`.remark 
+        FROM
+            `user`
+            LEFT JOIN department ON `user`.dept_id = department.dept_id 
+        WHERE
+            `user`.is_deleted = 0 
+            AND department.is_deleted = 0 and department.dept_id = ?"#,
+        )
+        .bind(dept_id)
+        .fetch_all(pool)
+        .await?;
+        anyhow::Ok(result)
+    }
+
+    async fn query_by_id(pool: &Pool<MySql>, user_id: i64) -> anyhow::Result<User> {
+        let result = sqlx::query_as(r#"select * from user where is_deleted = 0 and user_id = ?"#)
+            .bind(user_id)
+            .fetch_one(pool)
+            .await?;
+        anyhow::Ok(result)
+    }
+
+    async fn query_user(
+        pool: &Pool<MySql>,
+        req: UserQueryRequest,
+    ) -> anyhow::Result<super::DataList<User>> {
+        let mut query = QueryBuilder::<MySql>::new("select * from user");
+        let mut count_query =
+            QueryBuilder::<MySql>::new("SELECT COUNT(user_id) as count FROM ( select * from user ");
+        if let Some(user_name) = req.user_name {
+            query.push(" and user_name LIKE ");
+            let l = format!("'%{}%'", user_name);
+            query.push(l.clone());
+
+            count_query.push(" and user_name LIKE ");
+            count_query.push(l);
+        }
+
+        if let Some(user_id) = req.user_id {
+            query.push(" and user_id = ");
+            query.push_bind(user_id);
+
+            count_query.push(" and user_id = ");
+            count_query.push_bind(user_id);
+        }
+
+        if let Some(create_by) = req.create_by {
+            query.push(" and create_by = ");
+            query.push_bind(create_by.clone());
+
+            count_query.push(" and create_by = ");
+            count_query.push_bind(create_by);
+        }
+
+        count_query.push(" ) as t");
+
+        let count: Count = count_query.build_query_as().fetch_one(pool).await?;
+
+        println!("[query] : {:?}",count_query.sql());
+
+        query.push(" limit");
+        query.push_bind((req.page_number - 1) * req.page_size);
+        query.push(",");
+        query.push_bind(req.page_size);
+
+        let result: Vec<User> = query.build_query_as().fetch_all(pool).await?;
+
+        println!("[query] : {:?}",query.sql());
+
+        anyhow::Ok(super::DataList {
+            count: count.count,
+            records: result,
+        })
     }
 }
