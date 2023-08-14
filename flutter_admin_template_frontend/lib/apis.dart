@@ -24,6 +24,7 @@ const Map<String, String> apiDetails = {
   // dept
   "getDeptTree": "/system/dept/tree", // get
   "getDeptDetail": "/system/dept/query/single", // get
+  "getDeptTreeWithout": "/system/dept/tree/without", // get without
 };
 
 const List<String> reservedApis = [

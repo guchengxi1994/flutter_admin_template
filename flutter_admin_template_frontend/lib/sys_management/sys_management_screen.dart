@@ -104,6 +104,7 @@ class SysManagementScreenState extends ConsumerState<SysManagementScreen>
                   if (auths.contains("/main/user"))
                     BaseSidemenuData(
                         leading: SidebarIcons.user,
+                        leadingOnSelected: SidebarIcons.userOnHover,
                         padding: const EdgeInsets.only(bottom: 12, left: 10),
                         height: 60,
                         width: 280,
@@ -111,10 +112,15 @@ class SysManagementScreenState extends ConsumerState<SysManagementScreen>
                         onItemClicked: (p0) {
                           controller.jumpToPage(p0);
                         },
-                        title: const Text("User Management")),
+                        title: const Text("User Management"),
+                        titleOnSelected: const Text(
+                          "User Management",
+                          style: TextStyle(color: Colors.white),
+                        )),
                   if (auths.contains("/main/dept"))
                     BaseSidemenuData(
                         leading: SidebarIcons.dept,
+                        leadingOnSelected: SidebarIcons.deptOnHover,
                         padding: const EdgeInsets.only(bottom: 12, left: 10),
                         height: 60,
                         width: 280,
@@ -122,10 +128,15 @@ class SysManagementScreenState extends ConsumerState<SysManagementScreen>
                         onItemClicked: (p0) {
                           controller.jumpToPage(p0);
                         },
-                        title: const Text("Dept Management")),
+                        title: const Text("Dept Management"),
+                        titleOnSelected: const Text(
+                          "Dept Management",
+                          style: TextStyle(color: Colors.white),
+                        )),
                   if (auths.contains("/main/role"))
                     BaseSidemenuData(
                         leading: SidebarIcons.role,
+                        leadingOnSelected: SidebarIcons.roleOnHover,
                         padding: const EdgeInsets.only(bottom: 12, left: 10),
                         height: 60,
                         width: 280,
@@ -133,10 +144,15 @@ class SysManagementScreenState extends ConsumerState<SysManagementScreen>
                         onItemClicked: (p0) {
                           controller.jumpToPage(p0);
                         },
-                        title: const Text("Role Management")),
+                        title: const Text("Role Management"),
+                        titleOnSelected: const Text(
+                          "Role Management",
+                          style: TextStyle(color: Colors.white),
+                        )),
                   if (auths.contains("/main/menu"))
                     BaseSidemenuData(
                         leading: SidebarIcons.menu,
+                        leadingOnSelected: SidebarIcons.menuOnHover,
                         padding: const EdgeInsets.only(bottom: 12, left: 10),
                         height: 60,
                         width: 280,
@@ -144,7 +160,11 @@ class SysManagementScreenState extends ConsumerState<SysManagementScreen>
                         onItemClicked: (p0) {
                           controller.jumpToPage(p0);
                         },
-                        title: const Text("Menu Management")),
+                        title: const Text("Menu Management"),
+                        titleOnSelected: const Text(
+                          "Menu Management",
+                          style: TextStyle(color: Colors.white),
+                        )),
                 ],
                 width: AppStyle.submenuWidth,
               ),

@@ -77,8 +77,8 @@ pub async fn get_department_tree_without(_req: HttpRequest) -> HttpResponse {
     if let Ok(_q) = q {
         let pool = POOL.lock().await;
         let department =
-            crate::services::department_service::DepartmentService::query_structured_depts(
-                pool.get_pool(),
+            crate::services::department_service::DepartmentService::get_structured_depts_without_self(
+                _q.id, pool.get_pool(),
             )
             .await;
         match department {

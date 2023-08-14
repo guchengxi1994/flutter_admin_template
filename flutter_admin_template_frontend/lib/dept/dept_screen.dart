@@ -2,6 +2,7 @@
 
 import 'package:animated_tree_view/animated_tree_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_admin_template_frontend/dept/components/modify_dept_dialog.dart';
 import 'package:flutter_admin_template_frontend/dept/extension.dart';
 import 'package:flutter_admin_template_frontend/layout/notifier/sidebar_notifier.dart';
 import 'package:flutter_admin_template_frontend/notifier/app_color_notifier.dart';
@@ -30,6 +31,7 @@ class DeptScreenState extends ConsumerState<DeptScreen>
   @override
   void dispose() {
     scrollController.dispose();
+    searchStringController.dispose();
     super.dispose();
   }
 
@@ -55,6 +57,32 @@ class DeptScreenState extends ConsumerState<DeptScreen>
   final ScrollController scrollController = ScrollController();
 
   late double screenWidth = total;
+
+  final searchStringController = TextEditingController();
+
+  Widget _search() {
+    return Container(
+      padding: const EdgeInsets.all(5),
+      width: 180,
+      height: 30,
+      decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(Radius.circular(19)),
+          border: Border.all(color: const Color.fromARGB(255, 232, 232, 232))),
+      child: TextField(
+        controller: searchStringController,
+        onChanged: (value) {},
+        style: const TextStyle(
+            color: Color.fromARGB(255, 159, 159, 159), fontSize: 12),
+        decoration: const InputDecoration(
+          hintStyle: TextStyle(
+              color: Color.fromARGB(255, 159, 159, 159), fontSize: 12),
+          contentPadding: EdgeInsets.only(left: 10, bottom: 15),
+          hintText: "输入部门名称",
+          border: InputBorder.none,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,6 +118,24 @@ class DeptScreenState extends ConsumerState<DeptScreen>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          SizedBox(
+                            height: 40,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                _search(),
+                                const SizedBox(
+                                  width: 20,
+                                ),
+                                ElevatedButton(
+                                    onPressed: () {}, child: const Text("检索"))
+                              ],
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
                           _tableColumn(),
                           Expanded(
                             child: TreeView.indexed<DepartmentTreeSummary>(
@@ -295,18 +341,20 @@ class DeptScreenState extends ConsumerState<DeptScreen>
         label: screenWidth < total
             ? const Text("")
             : const Text("Add Sub Dept", style: TextStyle(color: Colors.green)),
-        onPressed: () {
+        onPressed: () async {
           // item.add(IndexedTreeNode());
           if (ref.read(deptProvider).tree != null) {
-            showGeneralDialog(
+            final r = await showGeneralDialog(
                 context: context,
                 pageBuilder: (c, a, b) {
                   return Center(
                     child: NewDeptDialog(
-                      tree: ref.read(deptProvider).tree!,
+                      // tree: ref.read(deptProvider).tree!,
+                      parentName: item.data.deptName,
                     ),
                   );
                 });
+            if (r != null) {}
           }
         },
       ),
@@ -427,7 +475,28 @@ class DeptScreenState extends ConsumerState<DeptScreen>
           label: screenWidth < total
               ? const Text("")
               : const Text("Modify", style: TextStyle(color: Colors.green)),
-          onPressed: () {
+          onPressed: () async {
+            final _tree =
+                await ref.read(deptProvider).getWithout(item.data.deptId);
+
+            if (_tree != null) {
+              // ignore: use_build_context_synchronously
+              final r = await showGeneralDialog(
+                  context: context,
+                  pageBuilder: (c, a, b) {
+                    return Center(
+                      child: ModifyDeptDialog(
+                        tree: _tree,
+                        // tree: ref.read(deptProvider).tree!,
+                        parentName: item.data.deptName,
+                        currentId: item.data.deptId,
+                        currentParentId: item.data.parentId,
+                      ),
+                    );
+                  });
+              if (r != null) {}
+            }
+
             // item.clear();
           }),
     );

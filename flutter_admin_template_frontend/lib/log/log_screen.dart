@@ -48,6 +48,11 @@ class LogScreenState extends ConsumerState<LogScreen>
                   Icons.abc,
                   size: 25,
                 ),
+                leadingOnSelected: const Icon(
+                  Icons.abc,
+                  size: 25,
+                  color: Colors.white,
+                ),
                 padding: const EdgeInsets.only(bottom: 12, left: 10),
                 height: 60,
                 width: 280,
@@ -55,9 +60,14 @@ class LogScreenState extends ConsumerState<LogScreen>
                 onItemClicked: (p0) {
                   controller.jumpToPage(p0);
                 },
+                titleOnSelected: const Text(
+                  "Summary",
+                  style: TextStyle(color: Colors.white),
+                ),
                 title: const Text("Summary")),
             BaseSidemenuData(
                 leading: SidebarIcons.operation,
+                leadingOnSelected: SidebarIcons.operationOnHover,
                 padding: const EdgeInsets.only(bottom: 12, left: 10),
                 height: 60,
                 width: 280,
@@ -65,9 +75,14 @@ class LogScreenState extends ConsumerState<LogScreen>
                 onItemClicked: (p0) {
                   controller.jumpToPage(p0);
                 },
+                titleOnSelected: const Text(
+                  "Operation",
+                  style: TextStyle(color: Colors.white),
+                ),
                 title: const Text("Operation")),
             BaseSidemenuData(
                 leading: SidebarIcons.signin,
+                leadingOnSelected: SidebarIcons.signinOnHover,
                 padding: const EdgeInsets.only(bottom: 12, left: 10),
                 height: 60,
                 width: 280,
@@ -75,6 +90,10 @@ class LogScreenState extends ConsumerState<LogScreen>
                 onItemClicked: (p0) {
                   controller.jumpToPage(p0);
                 },
+                titleOnSelected: const Text(
+                  "Sign in",
+                  style: TextStyle(color: Colors.white),
+                ),
                 title: const Text("Sign in"))
           ],
           width: AppStyle.submenuWidth,

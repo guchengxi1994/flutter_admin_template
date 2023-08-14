@@ -7,32 +7,40 @@ import 'package:just_the_tooltip/just_the_tooltip.dart';
 
 import '../models/dept_tree_response.dart';
 
-class NewDeptModel {
+class ModifyDeptModel {
   final String deptName;
   final int parentId;
   final int orderNum;
   final String remark;
+  final int deptId;
 
-  NewDeptModel(
+  ModifyDeptModel(
       {required this.deptName,
       required this.orderNum,
       required this.parentId,
+      required this.deptId,
       this.remark = ""});
 }
 
-class NewDeptDialog extends ConsumerStatefulWidget {
-  const NewDeptDialog({super.key, this.tree, this.parentName})
-      : assert(tree != null || parentName != null);
-  final DepartmentTree? tree;
-  final String? parentName;
+class ModifyDeptDialog extends ConsumerStatefulWidget {
+  const ModifyDeptDialog(
+      {super.key,
+      required this.tree,
+      required this.parentName,
+      required this.currentId,
+      required this.currentParentId});
+  final DepartmentTree tree;
+  final String parentName;
+  final int currentId;
+  final int currentParentId;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return NewDeptDialogState();
+    return ModifyDeptDialogState();
   }
 }
 
-class NewDeptDialogState extends ConsumerState<NewDeptDialog> {
+class ModifyDeptDialogState extends ConsumerState<ModifyDeptDialog> {
   late IndexedTreeNode<DepartmentTreeSummary> tree = IndexedTreeNode.root();
 
   // ignore: unused_field
@@ -43,10 +51,12 @@ class NewDeptDialogState extends ConsumerState<NewDeptDialog> {
   @override
   void initState() {
     super.initState();
-    if (widget.tree != null) {
-      tree = IndexedTreeNode<DepartmentTreeSummary>()
-          .buildFromDeptTree(widget.tree)!;
-    }
+
+    tree = IndexedTreeNode<DepartmentTreeSummary>()
+        .buildFromDeptTree(widget.tree)!;
+
+    selectedParentName = widget.parentName;
+    selectedParentId = widget.currentParentId;
   }
 
   String selectedParentName = "";
@@ -84,7 +94,7 @@ class NewDeptDialogState extends ConsumerState<NewDeptDialog> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const Text(
-                    "新建部门",
+                    "修改部门",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                   const Expanded(child: SizedBox()),
@@ -112,11 +122,12 @@ class NewDeptDialogState extends ConsumerState<NewDeptDialog> {
                       onPressed: () {
                         final b = _formKey.currentState!.validate();
                         if (b) {
-                          NewDeptModel model = NewDeptModel(
+                          ModifyDeptModel model = ModifyDeptModel(
                               deptName: deptNameController.text,
                               orderNum: int.parse(orderNumber.text),
                               parentId: selectedParentId,
-                              remark: remark.text);
+                              remark: remark.text,
+                              deptId: widget.currentId);
                           Navigator.of(context).pop(model);
                         }
                       },
@@ -134,96 +145,70 @@ class NewDeptDialogState extends ConsumerState<NewDeptDialog> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         _titleWrapper(const Text("父级部门")),
-        if (widget.tree != null)
-          Expanded(
-            child: GestureDetector(
-              child: JustTheTooltip(
-                  onShow: () {
-                    // _controller!.collapseNode(tree);
-                    collapseAllChildren(tree);
-                  },
-                  onDismiss: () {
-                    setState(() {});
-                  },
-                  controller: _justTheController,
-                  offset: -15,
-                  tailBuilder: (point1, point2, point3) {
-                    return Path()
-                      ..moveTo(point1.dx, point1.dy)
-                      ..lineTo(point3.dx, point3.dy)
-                      ..close();
-                  },
-                  isModal: true,
-                  content: Container(
-                    width: 420,
-                    height: 300,
+        Expanded(
+          child: GestureDetector(
+            child: JustTheTooltip(
+                onShow: () {
+                  // _controller!.collapseNode(tree);
+                  collapseAllChildren(tree);
+                },
+                onDismiss: () {
+                  setState(() {});
+                },
+                controller: _justTheController,
+                offset: -15,
+                tailBuilder: (point1, point2, point3) {
+                  return Path()
+                    ..moveTo(point1.dx, point1.dy)
+                    ..lineTo(point3.dx, point3.dy)
+                    ..close();
+                },
+                isModal: true,
+                content: Container(
+                  width: 420,
+                  height: 300,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(
+                          color: ref.read(colorNotifier).currentColorTheme.$3)),
+                  child: TreeView.indexed(
+                    expansionIndicatorBuilder: (ctx, node) {
+                      return ChevronIndicator.upDown(
+                        tree: node,
+                        alignment: Alignment.centerLeft,
+                      );
+                    },
+                    indentation:
+                        const Indentation(width: 0, style: IndentStyle.none),
+                    onTreeReady: (controller) {
+                      _controller = controller;
+                      // controller.expandAllChildren(tree);
+                    },
+                    builder: _buildContent,
+                    tree: tree,
+                  ),
+                ),
+                child: Center(
+                  child: Container(
                     decoration: BoxDecoration(
-                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(3),
                         border: Border.all(
                             color:
                                 ref.read(colorNotifier).currentColorTheme.$3)),
-                    child: TreeView.indexed(
-                      expansionIndicatorBuilder: (ctx, node) {
-                        return ChevronIndicator.upDown(
-                          tree: node,
-                          alignment: Alignment.centerLeft,
-                        );
-                      },
-                      indentation:
-                          const Indentation(width: 0, style: IndentStyle.none),
-                      onTreeReady: (controller) {
-                        _controller = controller;
-                        // controller.expandAllChildren(tree);
-                      },
-                      builder: _buildContent,
-                      tree: tree,
-                    ),
-                  ),
-                  child: Center(
-                    child: Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(3),
-                          border: Border.all(
-                              color: ref
-                                  .read(colorNotifier)
-                                  .currentColorTheme
-                                  .$3)),
-                      height: 40,
-                      child: SizedBox.expand(
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 10),
-                            child: Text(selectedParentName),
-                          ),
+                    height: 40,
+                    child: SizedBox.expand(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: Text(selectedParentName),
                         ),
                       ),
                     ),
-                  )),
-            ),
-          ),
-        if (widget.parentName != null)
-          Expanded(
-            child: Center(
-              child: Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(3),
-                    border: Border.all(
-                        color: ref.read(colorNotifier).currentColorTheme.$3)),
-                height: 40,
-                // child: Text(widget.parentName.toString()),
-                child: SizedBox.expand(
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: Text(widget.parentName.toString()),
-                    ),
                   ),
-                ),
-              ),
-            ),
+                )),
           ),
+        ),
       ],
     );
   }

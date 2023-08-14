@@ -27,6 +27,21 @@ class DeptNotifier extends ChangeNotifier {
     }
   }
 
+  Future<DepartmentTree?> getWithout(int id) async {
+    final Response? response =
+        await dioUtils.get("${apiDetails['getDeptTreeWithout']!}?id=$id");
+    if (response != null) {
+      if (response.data['code'] != 20000) {
+        SmartDialogUtils.error(response.data['message']);
+        return null;
+      }
+      return DepartmentTree.fromJson(response.data['data']);
+    } else {
+      SmartDialogUtils.error("系统异常");
+      return null;
+    }
+  }
+
   Future<SingleDepartmentResponse?> querySingleById(int deptId) async {
     final Response? response =
         await dioUtils.get("${apiDetails['getDeptDetail']!}?id=$deptId");
