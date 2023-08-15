@@ -84,4 +84,12 @@ mod tests {
 
         println!("result: {}", r);
     }
+
+    #[test]
+    fn regex_test() {
+        let a = crate::common::regex::SYS_DICT_REGEX.lock().unwrap();
+        println!("[a]:{:?}", a.is_match("sys_aaaa_bbbb"));
+        println!("[a]:{:?}", a.is_match("sys_111_222"));
+        println!("[a]:{:?}", a.is_match("sys_1-"));
+    }
 }
