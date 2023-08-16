@@ -91,5 +91,12 @@ mod tests {
         println!("[a]:{:?}", a.is_match("sys_aaaa_bbbb"));
         println!("[a]:{:?}", a.is_match("sys_111_222"));
         println!("[a]:{:?}", a.is_match("sys_1-"));
+
+        println!("==================================");
+
+        let b = crate::common::regex::SYS_CONFIG_REGEX.lock().unwrap();
+        println!("[b]:{:?}", b.is_match("sys.aaaa.bbbb"));
+        println!("[b]:{:?}", b.is_match("sys.111.222"));
+        println!("[b]:{:?}", b.is_match("sys.1."));
     }
 }

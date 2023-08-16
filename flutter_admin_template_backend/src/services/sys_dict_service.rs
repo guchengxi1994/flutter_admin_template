@@ -35,6 +35,16 @@ pub struct NewSysDictRequest {
     pub dict_labels: Vec<String>,
 }
 
+#[derive(Clone, Debug, Validate, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateSysDictRequest {
+    pub dict_name: String,
+    #[validate(length(min = 5), custom = "validate_dict_type")]
+    pub dict_type: String,
+    pub dict_labels: Vec<String>,
+    pub dict_id: i64,
+}
+
 #[async_trait::async_trait]
 pub trait SysDictTrait {
     async fn query_all_sys_dict(pool: &Pool<MySql>) -> anyhow::Result<Vec<SysDict>>;
@@ -46,6 +56,8 @@ pub trait SysDictTrait {
     async fn create_dict(req: NewSysDictRequest, pool: &Pool<MySql>) -> anyhow::Result<()>;
 
     async fn delete_dict_by_id(id: i64, pool: &Pool<MySql>) -> anyhow::Result<()>;
+
+    async fn update_dict(req: UpdateSysDictRequest, pool: &Pool<MySql>) -> anyhow::Result<()>;
 }
 
 #[async_trait::async_trait]
@@ -136,6 +148,58 @@ impl SysDictTrait for SysDictService {
             .bind(id)
             .execute(&mut tx)
             .await?;
+
+        tx.commit().await?;
+
+        anyhow::Ok(())
+    }
+
+    async fn update_dict(req: UpdateSysDictRequest, pool: &Pool<MySql>) -> anyhow::Result<()> {
+        if let Err(_e) = req.validate() {
+            anyhow::bail!("参数错误")
+        }
+
+        let d = sqlx::query_as::<sqlx::MySql, SysDict>(
+            r#"select * from dict where is_deleted = 0 and dict_id = ?"#,
+        )
+        .bind(req.dict_id)
+        .fetch_one(pool)
+        .await;
+
+        if let Err(e) = d {
+            println!("[rust-error]: {:?}", e);
+            anyhow::bail!("数据不存在")
+        }
+
+        let d = Self::query_by_type(req.dict_type.clone(), pool).await;
+
+        if let Ok(_d) = d {
+            anyhow::bail!("已存在重复数据")
+        }
+
+        let mut tx = pool.begin().await?;
+
+        let _ = sqlx::query(r#"update dict_data set is_deleted = 1 where dict_id = ?"#)
+            .bind(req.dict_id)
+            .execute(&mut tx)
+            .await?;
+
+        let _ = sqlx::query(
+            r#"update dict set dict_name = ?,dict_type=? where is_deleted = 0 and dict_id = ?"#,
+        )
+        .bind(req.dict_name)
+        .bind(req.dict_type)
+        .bind(req.dict_id)
+        .execute(&mut tx)
+        .await?;
+
+        for i in req.dict_labels.iter() {
+            let _ = sqlx::query(r#"insert into dict_data (dict_id,dict_label)"#)
+                .bind(req.dict_id)
+                .bind(i)
+                .execute(&mut tx)
+                .await?;
+        }
 
         tx.commit().await?;
 
