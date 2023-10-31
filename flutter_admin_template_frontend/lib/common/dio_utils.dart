@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_template_frontend/apis.dart';
@@ -30,7 +32,14 @@ class AuthInterCeptor extends Interceptor {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     if (response.data != null) {
-      if (response.data['code'] == 40001 || response.data['code'] == 40002) {
+      final data;
+      if (response.data.runtimeType == String) {
+        data = jsonDecode(response.data);
+      } else {
+        data = response.data;
+      }
+
+      if (data['code'] == 40001 || data['code'] == 40002) {
         SmartDialogUtils.error("登录已过期");
         FatRouters.navigatorKey.currentState
             ?.pushNamedAndRemoveUntil(FatRouters.loginScreen, (route) => false);
